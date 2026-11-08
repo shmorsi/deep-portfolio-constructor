@@ -1,27 +1,27 @@
-2026-11-08 01:20:01 | INFO    | dpc.evaluation | constraint sensitivity ls_classical sector_limit=0.025: Sharpe -0.03
-2026-11-08 01:20:07 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage sector_limit=0.025: Sharpe -0.07
-2026-11-08 01:20:12 | INFO    | dpc.evaluation | constraint sensitivity e2e sector_limit=0.025: Sharpe 0.61
-2026-11-08 01:20:56 | INFO    | dpc.evaluation | constraint sensitivity ls_classical sector_limit=0.05: Sharpe -0.03
-2026-11-08 01:21:02 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage sector_limit=0.05: Sharpe -0.05
-2026-11-08 01:21:07 | INFO    | dpc.evaluation | constraint sensitivity e2e sector_limit=0.05: Sharpe 0.58
-2026-11-08 01:21:54 | INFO    | dpc.evaluation | constraint sensitivity ls_classical sector_limit=0.1: Sharpe -0.03
-2026-11-08 01:22:00 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage sector_limit=0.1: Sharpe -0.03
-2026-11-08 01:22:04 | INFO    | dpc.evaluation | constraint sensitivity e2e sector_limit=0.1: Sharpe 0.58
-2026-11-08 01:22:48 | INFO    | dpc.evaluation | constraint sensitivity ls_classical max_weight=0.03: Sharpe 0.04
-2026-11-08 01:22:54 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage max_weight=0.03: Sharpe 0.00
-2026-11-08 01:22:58 | INFO    | dpc.evaluation | constraint sensitivity e2e max_weight=0.03: Sharpe 0.54
-2026-11-08 01:23:42 | INFO    | dpc.evaluation | constraint sensitivity ls_classical max_weight=0.05: Sharpe -0.03
-2026-11-08 01:23:48 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage max_weight=0.05: Sharpe -0.05
-2026-11-08 01:23:52 | INFO    | dpc.evaluation | constraint sensitivity e2e max_weight=0.05: Sharpe 0.58
-2026-11-08 01:24:34 | INFO    | dpc.evaluation | constraint sensitivity ls_classical max_weight=0.1: Sharpe -0.08
-2026-11-08 01:24:41 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage max_weight=0.1: Sharpe -0.11
-2026-11-08 01:24:45 | INFO    | dpc.evaluation | constraint sensitivity e2e max_weight=0.1: Sharpe 0.67
+2026-11-08 03:55:25 | INFO    | dpc.evaluation | constraint sensitivity ls_classical sector_limit=0.025: Sharpe -0.03
+2026-11-08 03:55:30 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage sector_limit=0.025: Sharpe -0.07
+2026-11-08 03:55:34 | INFO    | dpc.evaluation | constraint sensitivity e2e sector_limit=0.025: Sharpe 0.61
+2026-11-08 03:55:58 | INFO    | dpc.evaluation | constraint sensitivity ls_classical sector_limit=0.05: Sharpe -0.03
+2026-11-08 03:56:04 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage sector_limit=0.05: Sharpe -0.05
+2026-11-08 03:56:08 | INFO    | dpc.evaluation | constraint sensitivity e2e sector_limit=0.05: Sharpe 0.58
+2026-11-08 03:56:32 | INFO    | dpc.evaluation | constraint sensitivity ls_classical sector_limit=0.1: Sharpe -0.03
+2026-11-08 03:56:38 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage sector_limit=0.1: Sharpe -0.03
+2026-11-08 03:56:42 | INFO    | dpc.evaluation | constraint sensitivity e2e sector_limit=0.1: Sharpe 0.58
+2026-11-08 03:57:06 | INFO    | dpc.evaluation | constraint sensitivity ls_classical max_weight=0.03: Sharpe 0.04
+2026-11-08 03:57:12 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage max_weight=0.03: Sharpe 0.00
+2026-11-08 03:57:16 | INFO    | dpc.evaluation | constraint sensitivity e2e max_weight=0.03: Sharpe 0.54
+2026-11-08 03:57:39 | INFO    | dpc.evaluation | constraint sensitivity ls_classical max_weight=0.05: Sharpe -0.03
+2026-11-08 03:57:45 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage max_weight=0.05: Sharpe -0.05
+2026-11-08 03:57:49 | INFO    | dpc.evaluation | constraint sensitivity e2e max_weight=0.05: Sharpe 0.58
+2026-11-08 03:58:11 | INFO    | dpc.evaluation | constraint sensitivity ls_classical max_weight=0.1: Sharpe -0.08
+2026-11-08 03:58:17 | INFO    | dpc.evaluation | constraint sensitivity ls_deep_twostage max_weight=0.1: Sharpe -0.11
+2026-11-08 03:58:21 | INFO    | dpc.evaluation | constraint sensitivity e2e max_weight=0.1: Sharpe 0.67
 /home/user/deep-portfolio-constructor/.venv/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
   var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
 /home/user/deep-portfolio-constructor/.venv/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
   var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
-2026-11-08 01:25:26 | INFO    | dpc.evaluation | Look-ahead checks: {'engine_truncation_invariance_ls_classical': True, 'deep_feature_truncation_invariance': True, 'oracle_sharpe': 10.565780817438494}
-2026-11-08 01:25:28 | INFO    | dpc.evaluation | Performance (OOS, net):
+2026-11-08 03:58:45 | INFO    | dpc.evaluation | Look-ahead checks: {'engine_truncation_invariance_ls_classical': True, 'deep_feature_truncation_invariance': True, 'oracle_sharpe': 10.565780817438494}
+2026-11-08 03:58:47 | INFO    | dpc.evaluation | Performance (OOS, net):
                                 ann_return  ann_vol  sharpe  sharpe_gross  sortino  max_drawdown  hit_rate_monthly  alpha_ann_ff6  alpha_t_ff6  beta_mkt  r2_ff6  turnover_ann  cost_drag_ann
 Equal weight (LO)                    0.128    0.191   0.724         0.728    1.021        -0.485             0.671          0.029        3.832     0.918   0.945         0.580          0.001
 Min variance (LO)                    0.076    0.139   0.599         0.625    0.834        -0.381             0.640         -0.006       -0.421     0.695   0.691         3.625          0.004
@@ -32,7 +32,7 @@ L/S naive signal                    -0.087    0.184  -0.404        -0.274   -0.5
 L/S classical (LW + optimiser)      -0.006    0.080  -0.032         0.119   -0.045        -0.319             0.498         -0.012       -0.690     0.016   0.148        11.962          0.012
 L/S deep risk + optimiser           -0.009    0.095  -0.047         0.080   -0.065        -0.363             0.480         -0.020       -1.241     0.053   0.331        11.993          0.012
 L/S end-to-end deep                  0.047    0.086   0.582         0.714    0.837        -0.276             0.613          0.031        1.475     0.193   0.289        11.140          0.011
-2026-11-08 01:25:28 | INFO    | dpc.evaluation | Risk decomposition:
+2026-11-08 03:58:47 | INFO    | dpc.evaluation | Risk decomposition:
                                 exante_share_specific  exante_share_style  exante_share_sector  exante_vol_ann  realised_share_factor  realised_share_specific  realised_cov_term_share  mean_abs_beta_mkt  mean_abs_beta_smb  mean_abs_beta_hml  max_abs_sector_net
 Equal weight (LO)                               0.014               0.663                0.323           0.177                  1.000                    0.000                   -0.000              0.927              0.102              0.097               0.173
 Min variance (LO)                               0.084               0.089                0.827           0.133                  0.939                    0.061                   -0.047              0.596              0.128              0.131               0.273

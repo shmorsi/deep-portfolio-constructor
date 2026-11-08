@@ -1,0 +1,31 @@
+/home/user/deep-portfolio-constructor/.venv/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+2026-11-08 03:44:09 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2008-01-31: 36 train / 12 val months, 20 epochs, val utility 0.00835 (start -0.00915), scale 0.87, w_mom -0.009 w_rev +0.006 w_lowvol -0.076
+2026-11-08 03:44:16 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2009-01-30: 48 train / 12 val months, 5 epochs, val utility -0.00966 (start -0.01007), scale 0.86, w_mom -0.010 w_rev +0.010 w_lowvol -0.081
+2026-11-08 03:44:24 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2010-01-29: 60 train / 12 val months, 4 epochs, val utility 0.00476 (start 0.00476), scale 0.86, w_mom -0.010 w_rev +0.010 w_lowvol -0.081
+2026-11-08 03:44:35 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2011-01-31: 72 train / 12 val months, 5 epochs, val utility 0.00739 (start 0.00533), scale 0.86, w_mom -0.002 w_rev -0.002 w_lowvol -0.087
+2026-11-08 03:44:45 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2012-01-31: 84 train / 12 val months, 4 epochs, val utility -0.02973 (start -0.02973), scale 0.86, w_mom -0.002 w_rev -0.002 w_lowvol -0.087
+2026-11-08 03:45:07 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2013-01-31: 96 train / 12 val months, 7 epochs, val utility 0.00487 (start 0.00417), scale 0.82, w_mom -0.019 w_rev -0.041 w_lowvol -0.112
+2026-11-08 03:45:49 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2014-01-31: 108 train / 12 val months, 13 epochs, val utility 0.01204 (start 0.00705), scale 0.80, w_mom -0.047 w_rev -0.061 w_lowvol -0.107
+2026-11-08 03:46:05 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2015-01-30: 120 train / 12 val months, 4 epochs, val utility -0.00305 (start -0.00305), scale 0.80, w_mom -0.047 w_rev -0.061 w_lowvol -0.107
+2026-11-08 03:46:26 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2016-01-29: 132 train / 12 val months, 5 epochs, val utility 0.00376 (start 0.00358), scale 0.79, w_mom -0.049 w_rev -0.060 w_lowvol -0.106
+2026-11-08 03:47:05 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2017-01-31: 144 train / 12 val months, 9 epochs, val utility 0.00193 (start 0.00012), scale 0.78, w_mom -0.072 w_rev -0.060 w_lowvol -0.101
+2026-11-08 03:47:25 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2018-01-31: 156 train / 12 val months, 4 epochs, val utility 0.00701 (start 0.00701), scale 0.78, w_mom -0.072 w_rev -0.060 w_lowvol -0.101
+2026-11-08 03:47:47 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2019-01-31: 168 train / 12 val months, 4 epochs, val utility 0.00489 (start 0.00489), scale 0.78, w_mom -0.072 w_rev -0.060 w_lowvol -0.101
+2026-11-08 03:48:10 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2020-01-31: 180 train / 12 val months, 4 epochs, val utility -0.00244 (start -0.00244), scale 0.78, w_mom -0.072 w_rev -0.060 w_lowvol -0.101
+2026-11-08 03:48:44 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2021-01-29: 192 train / 12 val months, 6 epochs, val utility 0.00066 (start -0.00316), scale 0.79, w_mom -0.060 w_rev -0.049 w_lowvol -0.102
+2026-11-08 03:49:20 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2022-01-31: 204 train / 12 val months, 6 epochs, val utility -0.01205 (start -0.01353), scale 0.77, w_mom -0.072 w_rev -0.037 w_lowvol -0.128
+2026-11-08 03:50:35 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2023-01-31: 216 train / 12 val months, 12 epochs, val utility -0.01620 (start -0.01961), scale 0.77, w_mom -0.049 w_rev -0.045 w_lowvol -0.124
+2026-11-08 03:51:11 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2024-01-31: 228 train / 12 val months, 5 epochs, val utility 0.00716 (start 0.00462), scale 0.76, w_mom -0.043 w_rev -0.064 w_lowvol -0.133
+2026-11-08 03:51:54 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2025-01-31: 240 train / 12 val months, 6 epochs, val utility 0.01311 (start 0.01104), scale 0.76, w_mom -0.054 w_rev -0.053 w_lowvol -0.121
+2026-11-08 03:54:20 | INFO    | dpc.deep.e2e | [seed44] E2E refit 2026-01-30: 252 train / 12 val months, 20 epochs, val utility 0.00511 (start -0.00328), scale 0.71, w_mom -0.034 w_rev -0.051 w_lowvol -0.088
+2026-11-08 03:54:25 | INFO    | dpc.deep.e2e | Stage 5 (e2e_seed44):
+            ann_return  ann_vol  sharpe  sortino  max_drawdown  hit_rate_monthly  alpha_ann_ff6  alpha_t_ff6  beta_mkt  r2_ff6  turnover_ann  cost_drag_ann
+e2e_seed44        0.04    0.086   0.495    0.706        -0.284             0.578          0.024        1.152     0.194   0.299        11.519          0.012
+2026-11-08 03:54:25 | INFO    | dpc.robustness | Seed robustness:
+         sharpe  ann_return  ann_vol  max_drawdown  alpha_t_ff6  turnover_ann
+seed=42   0.582       0.047    0.086        -0.276        1.475        11.140
+seed=43   0.457       0.035    0.084        -0.299        0.949        11.232
+seed=44   0.495       0.040    0.086        -0.284        1.152        11.519
+mean      0.511       0.041    0.085        -0.286        1.192        11.297
+std       0.064       0.006    0.001         0.011        0.265         0.198

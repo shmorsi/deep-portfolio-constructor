@@ -14,7 +14,7 @@ Everything is walk-forward and out-of-sample from January 2008 to September 2026
 **Headline findings:**
 * **The constrained optimiser does most of the work.** It raises the share of risk coming from intended stock bets from **17% to 61%**.
 * **The deep covariance model** forecasts risk better (best out-of-sample likelihood) but does not hedge better.
-* **The end-to-end model** has the best net Sharpe (**0.58 vs −0.03**), but the edge is not statistically significant (t = 1.7). About a third of it is market beta that leaked through the beta constraint.
+* **The end-to-end model** has the best net Sharpe (**0.58 vs −0.03**; 0.51 ± 0.06 across three seeds), but the edge is not statistically significant (t = 1.7). About a third of it is market beta that leaked through the beta constraint.
 
 ## Results
 
@@ -44,7 +44,8 @@ Out-of-sample, January 2008 to September 2026, monthly rebalancing, net of 10 bp
 
 **End-to-end vs classical:**
 * Difference in monthly net returns: +0.43% a month, Newey-West t = 1.70, over 225 months.
-* After hedging each strategy's own trailing beta (estimated point-in-time), the end-to-end Sharpe falls from 0.58 to about 0.40.
+* After hedging each strategy's own trailing beta (estimated point-in-time, so the comparison starts in 2009), the end-to-end Sharpe falls from 0.64 to 0.40 on that same window. About 37% of the edge is leaked market beta.
+* Across seeds 42 / 43 / 44, the end-to-end Sharpe is 0.58 / 0.46 / 0.50. Across risk-model sizes of 8K–109K parameters, the deep model always wins on likelihood and always loses to Ledoit-Wolf on min-variance volatility.
 
 Full tables, crisis years (2008, 2020, 2022) and sensitivity tests are in [`reports/stage6_evaluation.md`](reports/stage6_evaluation.md). The 2-page write-up is [`reports/research_note.md`](reports/research_note.md).
 

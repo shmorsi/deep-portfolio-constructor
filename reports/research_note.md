@@ -8,7 +8,7 @@
 
 * **Portfolio construction matters more than the model.** The same three signals traded naively lose 8.7% a year, with 83% of their risk coming from factor and sector exposure nobody intended. Put through a constrained optimiser (dollar-, sector-, beta-, size- and value-neutral), the share of risk from intended stock bets rises from **17% to 61%** and volatility falls from 18% to 8%.
 * **The deep risk model is a better forecaster but not a better hedger.** A transformer factor-covariance model beats Ledoit-Wolf on out-of-sample likelihood (wins 51% of months). But it produces a *higher*-volatility minimum-variance portfolio (14.0% vs 13.3%) and a two-stage strategy that is no better than classical (Sharpe −0.05 vs −0.03).
-* **End-to-end training delivers the best net Sharpe (0.58 vs −0.03), but it is not statistically conclusive and is partly leaked beta.** The edge over classical is +0.43% a month (Newey-West t = 1.70). The model learned to press against its +0.05 beta limit, and realised beta was 0.19. Hedging its own trailing beta point-in-time cuts the Sharpe to about 0.40, and the remaining FF6 alpha is not significant (t ≈ 1.4).
+* **End-to-end training delivers the best net Sharpe (0.58 for the main seed, 0.51 ± 0.06 across three seeds, vs −0.03 for classical), but it is not statistically conclusive and is partly leaked beta.** The edge over classical is +0.43% a month (Newey-West t = 1.70). The model learned to press against its +0.05 beta limit, and realised beta was 0.19. Hedging its own trailing beta point-in-time cuts the Sharpe from 0.64 to 0.40 over the common 2009+ window (about 37% of the edge), and the remaining FF6 alpha is not significant (t = 1.36).
 * **Verdict:** deep learning *improved the decision* but also *re-introduced unintended risk*, the exact thing the project set out to remove. A classical constrained optimiser remains the cleanest way to isolate intended bets in this universe.
 
 > ✍️ **YOUR ANALYSIS (2–3 sentences):** In your own words, what would you tell a PM who asks "should we put this in production?" Consider the t-stat, the beta leak and the 2022 drawdown.
@@ -87,9 +87,11 @@ A long-short book should earn returns from its *intended* stock views, not from 
 The 2022 loss is consistent with the learned tilt toward high-volatility, low-profitability stocks (the excess over classical loads −0.41 on RMW) during the rate shock.
 
 **Robustness:**
-* The end-to-end Sharpe stays between 0.54 and 0.67 across position caps of 3–10% and sector limits of 2.5–10%.
-* At 40 bps costs it is 0.19.
-* Seeds and model size: see §6 of `reports/stage6_evaluation.md` *(filled in below)*.
+* **Seeds.** The end-to-end Sharpe is 0.58 / 0.46 / 0.50 for seeds 42 / 43 / 44: mean 0.51 ± 0.06, with FF6 alpha t between 0.9 and 1.5. The headline seed is the best of the three. Every seed beats classical by a wide margin, and none is significant on alpha.
+* **Model size.** The deep risk model with 8K / 29K / 109K parameters (d_model 16 / 32 / 64) has out-of-sample NLL of −2.919 / −2.941 / −2.931, all better than Ledoit-Wolf (−2.899). Min-variance volatility is 14.3% / 14.0% / 14.3%, all worse than Ledoit-Wolf (13.3%). The finding does not depend on capacity.
+* **Constraints.** The end-to-end Sharpe stays between 0.54 and 0.67 across position caps of 3–10% and sector limits of 2.5–10%, using the trained forecasts.
+* **Costs.** It falls to 0.45 at 20 bps and 0.19 at 40 bps (same trades re-priced).
+* **Reproducibility.** Retraining the full walk-forward deep risk model from scratch reproduces the main run's numbers exactly (all printed digits).
 
 > ✍️ **YOUR ANALYSIS:** Look at `reports/figures/stage6_factor_exposures.png`. Why might an optimiser trained on 2009–2021 data learn to sit at the *upper* edge of the market-beta band? Is that "learning" or "overfitting to a bull market"?
 

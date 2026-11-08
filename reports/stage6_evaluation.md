@@ -80,6 +80,30 @@ Ex-ante shares from an independent Barra-style model (6 style + 11 sector factor
 | ls_deep_twostage - ls_classical |             -0.0002 |  -0.2209 |   225.0000 |
 | e2e - ls_deep_twostage          |              0.0046 |   1.7130 |   225.0000 |
 
+## Diagnostic: market-beta leakage (hedge each strategy's own trailing beta, point-in-time)
+
+|                                |   sharpe_unhedged |   sharpe_beta_hedged |   avg_trailing_beta |   alpha_ff6_hedged |   alpha_t_hedged |
+|:-------------------------------|------------------:|---------------------:|--------------------:|-------------------:|-----------------:|
+| L/S naive signal               |            -0.505 |               -0.287 |              -0.254 |             -0.069 |           -2.578 |
+| L/S classical (LW + optimiser) |            -0.049 |                0.042 |              -0.036 |             -0.004 |           -0.233 |
+| L/S deep risk + optimiser      |            -0.081 |               -0.007 |              -0.026 |             -0.015 |           -0.823 |
+| L/S end-to-end deep            |             0.639 |                0.402 |               0.177 |              0.032 |            1.362 |
+
+## What is the end-to-end model's extra return made of? (FF6 regression of e2e minus classical, monthly)
+
+|             |   e2e - ls_classical |
+|:------------|---------------------:|
+| alpha       |               0.0036 |
+| alpha_t     |               1.5999 |
+| r2          |               0.2303 |
+| beta_Mkt-RF |               0.1772 |
+| beta_SMB    |              -0.0431 |
+| beta_HML    |              -0.0978 |
+| beta_RMW    |              -0.4102 |
+| beta_CMA    |              -0.1825 |
+| beta_Mom    |              -0.0739 |
+| n_obs       |             225.0000 |
+
 ## Sensitivity: transaction costs (Sharpe, same trades re-priced)
 
 |                                |   sharpe@0bps |   sharpe@5bps |   sharpe@10bps |   sharpe@20bps |   sharpe@40bps |
@@ -111,6 +135,24 @@ Ex-ante shares from an independent Barra-style model (6 style + 11 sector factor
 | ('sector_limit=0.1', 'L/S classical (LW + optimiser)')   |   -0.032 |     0.082 |         -0.331 |         11.974 |
 | ('sector_limit=0.1', 'L/S deep risk + optimiser')        |   -0.034 |     0.099 |         -0.369 |         11.992 |
 | ('sector_limit=0.1', 'L/S end-to-end deep')              |    0.579 |     0.090 |         -0.285 |         11.137 |
+
+## Model Size
+
+|            |   n_params |   oos_nll_deep |   oos_nll_ledoit_wolf |   gmv_vol_deep |   gmv_vol_ledoit_wolf |   twostage_sharpe |   twostage_vol |
+|:-----------|-----------:|---------------:|----------------------:|---------------:|----------------------:|------------------:|---------------:|
+| d_model=16 |   8121.000 |         -2.919 |                -2.899 |          0.143 |                 0.133 |            -0.044 |          0.096 |
+| d_model=32 |  29033.000 |         -2.941 |                -2.899 |          0.140 |                 0.133 |            -0.047 |          0.095 |
+| d_model=64 | 109257.000 |         -2.931 |                -2.899 |          0.143 |                 0.133 |            -0.007 |          0.093 |
+
+## Seeds
+
+|         |   sharpe |   ann_return |   ann_vol |   max_drawdown |   alpha_t_ff6 |   turnover_ann |
+|:--------|---------:|-------------:|----------:|---------------:|--------------:|---------------:|
+| seed=42 |    0.582 |        0.047 |     0.086 |         -0.276 |         1.475 |         11.140 |
+| seed=43 |    0.457 |        0.035 |     0.084 |         -0.299 |         0.949 |         11.232 |
+| seed=44 |    0.495 |        0.040 |     0.086 |         -0.284 |         1.152 |         11.519 |
+| mean    |    0.511 |        0.041 |     0.085 |         -0.286 |         1.192 |         11.297 |
+| std     |    0.064 |        0.006 |     0.001 |          0.011 |         0.265 |          0.198 |
 
 ## Look-ahead checks
 
