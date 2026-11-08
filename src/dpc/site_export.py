@@ -170,19 +170,23 @@ def render_site_figures(cfg: Config) -> list[Path]:
     save(fig, p)
     written.append(p)
 
-    # 3. Market beta at each rebalance: the leak
+    # 3. Market beta: estimated at each rebalance (held inside the band) vs realised (the leak)
+    perf = pd.read_csv(cfg.paths.reports / "stage6_performance.csv", index_col=0)
     fig, ax = plt.subplots(figsize=(10, 4.6))
-    for s in ("ls_naive", "ls_classical", "e2e", "e2e_deep"):
-        f = cfg.paths.results / f"{s}__risk_decomp.parquet"
-        if f.exists():
-            ex = pd.read_parquet(f)["exp_style:Mkt-RF"]
-            ax.plot(ex.index, ex.values, color=dark(COLORS[s]), lw=2 if s == "e2e" else 1.3, label=SHORT[s])
     lim = cfg.optimizer.factor_limit
     ax.axhspan(-lim, lim, color=DARK["grid"], alpha=0.9, lw=0)
     ax.axhline(0, color=DARK["baseline"], lw=1)
-    ax.set_title(f"Market beta at each rebalance (band = the ±{lim:g} limit)")
+    for s in ("ls_classical", "e2e"):
+        f = cfg.paths.results / f"{s}__risk_decomp.parquet"
+        if f.exists():
+            ex = pd.read_parquet(f)["exp_style:Mkt-RF"]
+            ax.plot(ex.index, ex.values, color=dark(COLORS[s]), lw=1.8 if s == "e2e" else 1.3, label=f"{SHORT[s]}, estimated")
+    realised = float(perf.loc[LABELS["e2e"], "beta_mkt"])
+    ax.axhline(realised, color=dark(COLORS["e2e"]), lw=1.6, ls=(0, (5, 4)), label=f"{SHORT['e2e']}, realised: {realised:.2f}")
+    ax.set_ylim(-0.12, max(0.25, realised + 0.05))
+    ax.set_title(f"Market beta: estimated at each rebalance (inside the ±{lim:g} band) vs realised")
     ax.set_ylabel("Portfolio beta")
-    ax.legend(loc="lower left", fontsize=8.5, ncols=4)
+    ax.legend(loc="upper left", fontsize=8.5, ncols=3)
     p = out_dir / "dpc-beta.png"
     save(fig, p)
     written.append(p)

@@ -51,13 +51,13 @@ Out-of-sample, January 2008 to September 2026 (225 months), monthly rebalancing,
 
 | Component | Test | Result |
 |---|---|---|
-| AlphaFormer (views) | Out-of-sample rank IC vs the classical composite | **0.0165** (t 1.25) vs −0.004; top-minus-bottom quintile +0.47% a month (t 1.63). Best signal, not significant. |
+| AlphaFormer (views) | Out-of-sample rank IC vs the classical composite | **0.0165** (t 1.25) vs −0.004 for the composite and 0.0161 for momentum alone. Top-minus-bottom quintile +0.47% a month (t 1.63), about double momentum's 0.24%. Not significant. |
 | Deep risk model | Gaussian NLL and minimum-variance realised vol vs Ledoit-Wolf | Better likelihood (−2.941 vs −2.899), worse hedge (14.0% vs 13.3%), at every model size. |
 | End-to-end training | Paired monthly return vs classical, Newey-West | +0.43% a month, **t 1.70**. Hedging its own trailing beta point-in-time: Sharpe 0.64 → 0.40. |
 | Fully deep | Paired vs the end-to-end model | −0.30% a month, t −1.90: overfit (about 250 monthly decisions per refit). |
 
 **Robustness:**
-* End-to-end Sharpe across seeds 42/43/44: 0.58 / 0.46 / 0.50.
+* End-to-end Sharpe across seeds 42/43/44: 0.58 / 0.46 / 0.49.
 * Across position caps of 3–10% and sector limits of 2.5–10%: 0.54 to 0.67.
 * At 40 bps costs: 0.19.
 

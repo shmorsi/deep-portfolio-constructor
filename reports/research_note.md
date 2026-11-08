@@ -84,7 +84,7 @@ A long-short book should earn returns from its *intended* stock views, not from 
 
 **Each hypothesis, in turn:**
 * **H1, rejected for hedging.** The deep covariance model wins on likelihood (−2.941 vs −2.899 for Ledoit-Wolf) but builds a *more* volatile minimum-variance portfolio (14.0% vs 13.3%), at every model size tried.
-* **H2, weakly supported.** AlphaFormer's out-of-sample IC is 0.0165 (t = 1.25), against −0.004 for the composite. Its top-minus-bottom quintile spread is +0.47% a month (t = 1.63).
+* **H2, weakly supported.** AlphaFormer's out-of-sample IC is 0.0165 (t = 1.25), against −0.004 for the composite, but only level with momentum alone (0.0161). Its top-minus-bottom quintile spread is +0.47% a month (t = 1.63), about double momentum's 0.24%.
 * **H3, supported but not significant.** End-to-end training lifted Sharpe to 0.58 (t = 1.70 against classical). Training AlphaFormer end to end as well overfit: about 250 monthly decisions per refit cannot support the extra parameters.
 
 **Stress years:**
@@ -97,7 +97,7 @@ A long-short book should earn returns from its *intended* stock views, not from 
 The 2022 loss is consistent with the learned tilt toward high-volatility, low-profitability stocks (the end-to-end model's excess over classical loads −0.41 on RMW) during the rate shock.
 
 **Robustness:**
-* End-to-end Sharpe across three seeds: 0.58 / 0.46 / 0.50, so the headline seed is the best of the three.
+* End-to-end Sharpe across three seeds: 0.58 / 0.46 / 0.49, so the headline seed is the best of the three.
 * Across position caps of 3–10% and sector limits of 2.5–10%: 0.54–0.67.
 * At 20 and 40 bps costs: 0.45 and 0.19.
 

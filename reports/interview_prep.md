@@ -14,7 +14,7 @@ For each stage: what was built, the finance in plain English, and three intervie
 * **Gradient check.** I verified cvxpylayers' gradients against a problem with a known answer (dollar-neutral projection, whose Jacobian is I − 11ᵀ/n) before trusting it in Stage 5.
 
 **Q1. Why fix seeds? Doesn't that hide instability?**
-Seeds give auditability: the same code and data give the same number. To *measure* instability, I reran the end-to-end model with three seeds: Sharpe 0.58 / 0.46 / 0.50. The honest number to quote is the mean, 0.51 ± 0.06. The headline seed happened to be the best of the three.
+Seeds give auditability: the same code and data give the same number. To *measure* instability, I reran the end-to-end model with three seeds: Sharpe 0.58 / 0.46 / 0.49. The honest number to quote is the mean, 0.51 ± 0.06. The headline seed happened to be the best of the three.
 
 **Q2. Why put every parameter in a config file?**
 * It can be audited: all assumptions are in one place.
@@ -143,9 +143,9 @@ Likelihood mostly rewards getting the *level* of each stock's variance right thr
   * The static inputs are volatilities, factor betas, the three classical signals and the sector.
 * **How it's trained.** On the negative information coefficient (IC), as a 3-seed ensemble with 28,033 parameters each. It uses the same yearly walk-forward refits and label-date assertions as the risk model.
 * **Out-of-sample result.**
-  * IC 0.0165 (t 1.25), against −0.004 for the classical composite.
-  * Top-minus-bottom quintile +0.47% a month (t 1.63).
-  * The best signal, but not significant.
+  * IC 0.0165 (t 1.25), against −0.004 for the classical composite, but only level with momentum alone (0.0161).
+  * Top-minus-bottom quintile +0.47% a month (t 1.63), about double momentum's 0.24%.
+  * Not significant.
 
 **Q1. Why train a return model on IC instead of mean squared error?**
 A market-neutral book only needs the *ranking* of stocks next month, not the level of the market. Correlation between the forecast and realised cross-sectional returns is scale-free (it ignores how big the numbers are) and differentiable, so it trains directly on what the portfolio uses. MSE would spend capacity predicting the market's average move, which the dollar-neutral constraint throws away. A natural target is the cross-sectionally standardised next-month return, and the loss is −mean(IC) over the months in a batch.
