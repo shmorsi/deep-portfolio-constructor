@@ -231,6 +231,62 @@ class DashboardConfig:
 
 
 @dataclass(frozen=True)
+class WealthModelConfig:
+    d_model: int
+    n_heads: int
+    n_layers: int
+    dropout: float
+    init_trade: float
+
+
+@dataclass(frozen=True)
+class WealthTrainConfig:
+    learning_rate: float
+    weight_decay: float
+    episode_months: int
+    batch_episodes: int
+    max_steps: int
+    eval_every: int
+    patience: int
+    val_years: int
+    refit_every_years: int
+    warm_start: bool
+    grad_clip: float
+    risk_aversion: float
+    seeds: list[int]
+    workers: int
+
+
+@dataclass(frozen=True)
+class WealthEvaluationConfig:
+    sensitivity_cost_bps: list[float]
+    rolling_years: int
+    nw_lags: int
+    bootstrap_block_months: int
+    bootstrap_draws: int
+    ablation_seeds: list[int]
+
+
+@dataclass(frozen=True)
+class WealthConfig:
+    """The long-only, long-horizon study on Kenneth French's industry portfolios."""
+
+    base_url: str
+    industry_file: str
+    factor_file: str
+    oos_start: str
+    cost_bps: float
+    rebalance_month: int
+    min_variance_max_weight: float
+    max_tilt: float
+    growth_shrink: float
+    feature_clip: float
+    model: WealthModelConfig
+    train: WealthTrainConfig
+    evaluation: WealthEvaluationConfig
+
+
+@dataclass(frozen=True)
 class Config:
     """Top-level configuration object passed through the whole pipeline."""
 
@@ -250,6 +306,7 @@ class Config:
     e2e: E2EConfig
     evaluation: EvaluationConfig
     dashboard: DashboardConfig
+    wealth: WealthConfig
 
     def replace(self, **sections: Any) -> "Config":
         """Copy with whole sections swapped (used by sensitivity tests)."""
@@ -346,6 +403,17 @@ def _validate(cfg: Config) -> None:
         raise ConfigError("backtest.transaction_cost_bps must be >= 0")
     if cfg.baselines.hrp_linkage not in ("single", "average", "complete", "ward"):
         raise ConfigError("baselines.hrp_linkage must be single/average/complete/ward")
+    w = cfg.wealth
+    if w.max_tilt <= 1:
+        raise ConfigError("wealth.max_tilt must be > 1")
+    if not 0 < w.model.init_trade < 1:
+        raise ConfigError("wealth.model.init_trade must be in (0, 1)")
+    if w.model.d_model % w.model.n_heads != 0:
+        raise ConfigError("wealth.model.d_model must be divisible by n_heads")
+    if not 1 <= w.rebalance_month <= 12:
+        raise ConfigError("wealth.rebalance_month must be a month number")
+    if w.train.risk_aversion <= 0 or w.cost_bps < 0:
+        raise ConfigError("wealth.train.risk_aversion must be > 0 and wealth.cost_bps >= 0")
 
 
 SECTIONS: dict[str, type] = {
@@ -364,6 +432,7 @@ SECTIONS: dict[str, type] = {
     "e2e": E2EConfig,
     "evaluation": EvaluationConfig,
     "dashboard": DashboardConfig,
+    "wealth": WealthConfig,
 }
 
 

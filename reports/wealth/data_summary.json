@@ -1,0 +1,42 @@
+{
+ "industries": [
+  "Food",
+  "Beer",
+  "Smoke",
+  "Games",
+  "Books",
+  "Hshld",
+  "Clths",
+  "Hlth",
+  "Chems",
+  "Txtls",
+  "Cnstr",
+  "Steel",
+  "FabPr",
+  "ElcEq",
+  "Autos",
+  "Carry",
+  "Mines",
+  "Coal",
+  "Oil",
+  "Util",
+  "Telcm",
+  "Servs",
+  "BusEq",
+  "Paper",
+  "Trans",
+  "Whlsl",
+  "Rtail",
+  "Meals",
+  "Fin",
+  "Other"
+ ],
+ "first_month": "1926-07",
+ "last_month": "2026-09",
+ "months": 1203,
+ "first_decision": "1931-06",
+ "check_cap_weighted_vs_french_market": {
+  "correlation": 0.999786136775569,
+  "mean_abs_diff_monthly": 0.0004429994383264171
+ }
+}

@@ -171,3 +171,47 @@ evaluation:
 # ---------------------------------------------------------------- Stage 7 ----
 dashboard:
   default_strategy: e2e         # the pre-specified end-to-end model opens first
+
+# ------------------------------------------------- Long-only wealth study ----
+# A neural network allocates a long-only, fully invested portfolio across 30 US
+# industries (Kenneth French, 1926 onward: no survivorship bias), trained on the
+# growth of wealth after costs. Out of sample from January 1960.
+wealth:
+  base_url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
+  industry_file: "30_Industry_Portfolios_CSV.zip"
+  factor_file: "F-F_Research_Data_Factors_CSV.zip"
+  oos_start: "1960-01"            # first month earned out of sample
+  cost_bps: 10.0                  # paid on every unit traded, one way
+  rebalance_month: 1              # classical strategies rebalance each January, then sit
+  min_variance_max_weight: 0.20   # min variance may hold at most 20% in one industry
+  max_tilt: 3.0                   # network and growth optimiser: each industry within 1/3x..3x its market weight
+  growth_shrink: 0.5              # classical growth optimiser: long-run means shrunk halfway to their average
+  feature_clip: 4.0               # standardised features clipped at +-4
+  model:
+    d_model: 32
+    n_heads: 4
+    n_layers: 2
+    dropout: 0.1
+    init_trade: 0.25              # starting trade fraction; the network learns its own
+  train:
+    learning_rate: 0.001
+    weight_decay: 0.0001
+    episode_months: 60            # training plays 5-year episodes through the simulator
+    batch_episodes: 32
+    max_steps: 400
+    eval_every: 10                # validation run every 10 steps
+    patience: 8                   # stop after 8 validation runs without improvement
+    val_years: 10                 # the last 10 years before each refit are validation
+    refit_every_years: 5
+    warm_start: true
+    grad_clip: 1.0
+    risk_aversion: 1.0            # 1 = log utility: maximise long-run growth (Kelly)
+    seeds: [42, 43, 44, 45, 46]   # the deployed policy averages these five
+    workers: 4
+  evaluation:
+    sensitivity_cost_bps: [0, 10, 25, 50]
+    rolling_years: 10
+    nw_lags: 12
+    bootstrap_block_months: 12
+    bootstrap_draws: 5000
+    ablation_seeds: [42, 43]

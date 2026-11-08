@@ -52,13 +52,20 @@ def quickstart(cfg: Config, launch: bool = True) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
-    parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all"])
+    parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
+                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-evaluate", "wealth-site"])
+    parser.add_argument("--variants", default="deep", help="wealth-train: comma-separated variants, or 'all' (deep + ablations)")
     parser.add_argument("--config", default=None, help="path to config.yaml (default: search upward)")
     parser.add_argument("--refresh", action="store_true", help="re-download data instead of using the cache")
     parser.add_argument("--no-launch", action="store_true", help="quickstart: print results only, do not open the dashboard")
     args = parser.parse_args(argv)
     cfg = _prepare(args.config)
-    stages = ["data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate"] if args.stage == "all" else [args.stage]
+    if args.stage == "all":
+        stages = ["data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate"]
+    elif args.stage == "wealth":
+        stages = ["wealth-data", "wealth-baselines", "wealth-train", "wealth-evaluate", "wealth-site"]
+    else:
+        stages = [args.stage]
 
     for stage in stages:
         if stage == "quickstart":
@@ -105,6 +112,26 @@ def main(argv: list[str] | None = None) -> int:
             from dpc.evaluation import run_stage6
 
             run_stage6(cfg)
+        elif stage.startswith("wealth-"):
+            from dpc.wealth import pipeline
+
+            if stage == "wealth-data":
+                pipeline.stage_data(cfg, refresh=args.refresh)
+            elif stage == "wealth-baselines":
+                pipeline.stage_baselines(cfg)
+            elif stage == "wealth-train":
+                from dpc.wealth.train import VARIANTS
+
+                names = list(VARIANTS) if args.variants == "all" else args.variants.split(",")
+                pipeline.stage_train(cfg, names)
+            elif stage == "wealth-evaluate":
+                from dpc.wealth.evaluate import run_evaluation
+
+                run_evaluation(cfg)
+            elif stage == "wealth-site":
+                from dpc.wealth.report import export_site
+
+                export_site(cfg)
         write_run_manifest(run_manifest(cfg.project.seed, cfg.root), cfg.paths.reports / f"run_manifest_{stage}.json")
     return 0
 
