@@ -2,6 +2,8 @@
 
 **A market-neutral long-short equity portfolio with PyTorch at every layer: a transformer return model, a transformer covariance model, and end-to-end training through a differentiable constrained optimiser. Built as an ablation, so each deep component's contribution is measured, and tested honestly against classical portfolio construction.**
 
+**Explore it:** [shmorsi.github.io/projects/deep-portfolio-constructor.html](https://shmorsi.github.io/projects/deep-portfolio-constructor.html). Step through the ablation, scrub through the real portfolio month by month, and neutralise a toy portfolio yourself.
+
 ```mermaid
 flowchart LR
   D["Prices, factors, sectors<br/>99 US and Canadian large caps"] --> A["AlphaFormer<br/>transformer over 12 months,<br/>attention across stocks"]
