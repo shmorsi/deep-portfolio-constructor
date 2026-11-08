@@ -1,0 +1,28 @@
+/home/user/deep-portfolio-constructor/.venv/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
+  var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+2026-11-08 00:54:33 | INFO    | dpc.deep.train_risk | Sample bank: 1362 origins, 99 stocks, seq 60, horizon 21
+2026-11-08 00:54:57 | INFO    | dpc.deep.train_risk | [main] refit 2008-01-31: 189 train / 49 val samples, 22 epochs, best val NLL -2.8816
+2026-11-08 00:55:08 | INFO    | dpc.deep.train_risk | [main] refit 2009-01-30: 235 train / 61 val samples, 9 epochs, best val NLL -2.3663
+2026-11-08 00:55:32 | INFO    | dpc.deep.train_risk | [main] refit 2010-01-29: 283 train / 72 val samples, 15 epochs, best val NLL -2.5387
+2026-11-08 00:55:50 | INFO    | dpc.deep.train_risk | [main] refit 2011-01-31: 332 train / 84 val samples, 9 epochs, best val NLL -2.9668
+2026-11-08 00:56:09 | INFO    | dpc.deep.train_risk | [main] refit 2012-01-31: 380 train / 97 val samples, 9 epochs, best val NLL -3.0244
+2026-11-08 00:57:07 | INFO    | dpc.deep.train_risk | [main] refit 2013-01-31: 428 train / 109 val samples, 12 epochs, best val NLL -3.0804
+2026-11-08 00:57:28 | INFO    | dpc.deep.train_risk | [main] refit 2014-01-31: 477 train / 121 val samples, 7 epochs, best val NLL -3.1579
+2026-11-08 00:58:00 | INFO    | dpc.deep.train_risk | [main] refit 2015-01-30: 523 train / 133 val samples, 9 epochs, best val NLL -3.1976
+2026-11-08 00:58:26 | INFO    | dpc.deep.train_risk | [main] refit 2016-01-29: 571 train / 144 val samples, 7 epochs, best val NLL -3.1622
+2026-11-08 00:59:05 | INFO    | dpc.deep.train_risk | [main] refit 2017-01-31: 620 train / 156 val samples, 11 epochs, best val NLL -3.1048
+2026-11-08 00:59:36 | INFO    | dpc.deep.train_risk | [main] refit 2018-01-31: 667 train / 169 val samples, 8 epochs, best val NLL -3.1298
+2026-11-08 01:00:09 | INFO    | dpc.deep.train_risk | [main] refit 2019-01-31: 716 train / 181 val samples, 8 epochs, best val NLL -3.1063
+2026-11-08 01:00:57 | INFO    | dpc.deep.train_risk | [main] refit 2020-01-31: 763 train / 193 val samples, 8 epochs, best val NLL -3.1229
+2026-11-08 01:02:27 | INFO    | dpc.deep.train_risk | [main] refit 2021-01-29: 811 train / 204 val samples, 18 epochs, best val NLL -2.9337
+2026-11-08 01:03:08 | INFO    | dpc.deep.train_risk | [main] refit 2022-01-31: 860 train / 216 val samples, 8 epochs, best val NLL -2.9105
+2026-11-08 01:04:13 | INFO    | dpc.deep.train_risk | [main] refit 2023-01-31: 906 train / 228 val samples, 13 epochs, best val NLL -2.8681
+2026-11-08 01:04:50 | INFO    | dpc.deep.train_risk | [main] refit 2024-01-31: 956 train / 241 val samples, 7 epochs, best val NLL -2.8375
+2026-11-08 01:06:10 | INFO    | dpc.deep.train_risk | [main] refit 2025-01-31: 1001 train / 252 val samples, 14 epochs, best val NLL -2.9408
+2026-11-08 01:07:34 | INFO    | dpc.deep.train_risk | [main] refit 2026-01-30: 1048 train / 264 val samples, 14 epochs, best val NLL -2.9159
+2026-11-08 01:07:38 | INFO    | dpc.deep.train_risk | Stage 4 out-of-sample risk-model comparison:
+                   mean_oos_nll  median_oos_nll  share_months_best_nll  gmv_realised_vol_ann
+sample                  -2.6899         -2.8404                 0.0045                0.1471
+ledoit_wolf             -2.8987         -2.9864                 0.4821                0.1326
+trailing_vol_diag       -2.6115         -2.7687                 0.0000                0.1672
+deep                    -2.9407         -3.0081                 0.5134                0.1400

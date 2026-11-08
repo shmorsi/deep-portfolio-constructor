@@ -99,7 +99,8 @@ optimizer:                      # shared by classical long-short and end-to-end 
 # ---------------------------------------------------------------- Stage 4 ----
 risk_model:
   architecture: transformer     # temporal encoder: lstm | transformer
-  seq_len_days: 63              # look-back fed to the network
+  seq_len_days: 60              # look-back fed to the network (~3 months)
+  patch_len_days: 5             # PatchTST-style: 60 days -> 12 weekly tokens (25x cheaper attention)
   horizon_days: 21              # forecast covariance of the next ~month
   n_factors: 8                  # Sigma = B B' + diag(d), B is N x n_factors
   d_model: 32
@@ -115,20 +116,22 @@ risk_model:
   val_fraction: 0.2             # last 20% of the training window, chronologically
   early_stopping_patience: 6
   refit_every_months: 12        # walk-forward: retrain once a year, expanding window
+  warm_start: true              # each refit starts from the previous year's weights
   min_idio_var: 1.0e-6          # floor on daily idiosyncratic variance (numerical)
   grad_clip: 1.0
 
 # ---------------------------------------------------------------- Stage 5 ----
 e2e:
-  learning_rate: 0.0005
+  learning_rate: 0.003          # alpha network
+  risk_lr_mult: 0.05            # risk network fine-tunes at 5% of that (it is pre-trained)
   weight_decay: 0.0001
-  max_epochs: 25
+  max_epochs: 20
   batch_size: 12                # months per gradient step
   val_months: 12                # last 12 months of each training window
-  early_stopping_patience: 5
+  early_stopping_patience: 4
   loss_risk_aversion: 10.0      # loss = -(return - cost) + lambda * realised daily variance (per month)
   alpha_hidden: 32
-  alpha_residual_scale: 1.0     # mu = mu_grinold * exp(s) + scale * net(x); net starts at 0
+  alpha_residual_scale: 1.0     # mu = IC*vol*( exp(a)*z_combined + scale*g(z, h) ); g and a start at 0
   finetune_risk_model: true
   grad_clip: 1.0
 

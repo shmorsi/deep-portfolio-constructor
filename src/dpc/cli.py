@@ -1,6 +1,6 @@
 """Command-line entry point: ``python -m dpc.cli <stage>``.
 
-Stages: setup, data, signals, baselines, risk, e2e, evaluate, all.
+Stages: setup, data, signals, baselines, risk, e2e, robustness, evaluate, all.
 """
 
 from __future__ import annotations
@@ -23,12 +23,12 @@ def _prepare(config_path: str | None) -> Config:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
-    parser.add_argument("stage", choices=["setup", "data", "signals", "baselines", "risk", "e2e", "evaluate", "all"])
+    parser.add_argument("stage", choices=["setup", "data", "signals", "baselines", "risk", "e2e", "robustness", "evaluate", "all"])
     parser.add_argument("--config", default=None, help="path to config.yaml (default: search upward)")
     parser.add_argument("--refresh", action="store_true", help="re-download data instead of using the cache")
     args = parser.parse_args(argv)
     cfg = _prepare(args.config)
-    stages = ["data", "signals", "baselines", "risk", "e2e", "evaluate"] if args.stage == "all" else [args.stage]
+    stages = ["data", "signals", "baselines", "risk", "e2e", "robustness", "evaluate"] if args.stage == "all" else [args.stage]
 
     for stage in stages:
         if stage == "setup":
@@ -55,6 +55,10 @@ def main(argv: list[str] | None = None) -> int:
             from dpc.deep.e2e import run_stage5
 
             run_stage5(cfg)
+        elif stage == "robustness":
+            from dpc.robustness import run_robustness
+
+            run_robustness(cfg)
         elif stage == "evaluate":
             from dpc.evaluation import run_stage6
 

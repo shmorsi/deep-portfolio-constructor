@@ -153,6 +153,7 @@ class OptimizerConfig:
 class RiskModelConfig:
     architecture: str
     seq_len_days: int
+    patch_len_days: int
     horizon_days: int
     n_factors: int
     d_model: int
@@ -168,6 +169,7 @@ class RiskModelConfig:
     val_fraction: float
     early_stopping_patience: int
     refit_every_months: int
+    warm_start: bool
     min_idio_var: float
     grad_clip: float
 
@@ -175,6 +177,7 @@ class RiskModelConfig:
 @dataclass(frozen=True)
 class E2EConfig:
     learning_rate: float
+    risk_lr_mult: float
     weight_decay: float
     max_epochs: int
     batch_size: int
@@ -303,6 +306,8 @@ def _validate(cfg: Config) -> None:
         raise ConfigError("risk_model.architecture must be 'lstm' or 'transformer'")
     if cfg.risk_model.d_model % cfg.risk_model.n_heads != 0:
         raise ConfigError("risk_model.d_model must be divisible by n_heads")
+    if cfg.risk_model.seq_len_days % cfg.risk_model.patch_len_days != 0:
+        raise ConfigError("risk_model.seq_len_days must be a multiple of patch_len_days")
     if not 0 < cfg.risk_model.val_fraction < 1:
         raise ConfigError("risk_model.val_fraction must be in (0, 1)")
     if cfg.backtest.transaction_cost_bps < 0:
