@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dpc"
+version = "0.1.0"
+description = "Deep Portfolio Constructor: factor-neutral long-short equity with a deep risk model and a differentiable optimizer."
+requires-python = ">=3.11"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-ra"
+filterwarnings = [
+    # Third-party: cvxpylayers' diffcp interface calls np.array(..., copy=False)
+    # on objects that predate NumPy 2's copy keyword. Harmless; filtered narrowly
+    # so that any *other* warning still shows up.
+    "ignore:__array__ implementation doesn't accept a copy keyword:DeprecationWarning:cvxpylayers.*",
+]

@@ -1,0 +1,101 @@
+ticker,name,country,sector
+AAPL,Apple,US,Information Technology
+MSFT,Microsoft,US,Information Technology
+NVDA,NVIDIA,US,Information Technology
+ORCL,Oracle,US,Information Technology
+CSCO,Cisco Systems,US,Information Technology
+INTC,Intel,US,Information Technology
+IBM,IBM,US,Information Technology
+ADBE,Adobe,US,Information Technology
+TXN,Texas Instruments,US,Information Technology
+QCOM,Qualcomm,US,Information Technology
+AVGO,Broadcom,US,Information Technology
+ACN,Accenture,US,Information Technology
+GIB,CGI Inc,CA,Information Technology
+SHOP,Shopify,CA,Information Technology
+GOOGL,Alphabet,US,Communication Services
+META,Meta Platforms,US,Communication Services
+VZ,Verizon,US,Communication Services
+T,AT&T,US,Communication Services
+CMCSA,Comcast,US,Communication Services
+DIS,Walt Disney,US,Communication Services
+NFLX,Netflix,US,Communication Services
+BCE,BCE Inc,CA,Communication Services
+TU,TELUS,CA,Communication Services
+RCI,Rogers Communications,CA,Communication Services
+AMZN,Amazon,US,Consumer Discretionary
+HD,Home Depot,US,Consumer Discretionary
+MCD,McDonald's,US,Consumer Discretionary
+NKE,Nike,US,Consumer Discretionary
+TJX,TJX Companies,US,Consumer Discretionary
+BKNG,Booking Holdings,US,Consumer Discretionary
+MGA,Magna International,CA,Consumer Discretionary
+PG,Procter & Gamble,US,Consumer Staples
+KO,Coca-Cola,US,Consumer Staples
+PEP,PepsiCo,US,Consumer Staples
+WMT,Walmart,US,Consumer Staples
+COST,Costco,US,Consumer Staples
+CL,Colgate-Palmolive,US,Consumer Staples
+PM,Philip Morris International,US,Consumer Staples
+JNJ,Johnson & Johnson,US,Health Care
+UNH,UnitedHealth,US,Health Care
+PFE,Pfizer,US,Health Care
+MRK,Merck,US,Health Care
+ABT,Abbott Laboratories,US,Health Care
+LLY,Eli Lilly,US,Health Care
+TMO,Thermo Fisher,US,Health Care
+AMGN,Amgen,US,Health Care
+MDT,Medtronic,US,Health Care
+GILD,Gilead Sciences,US,Health Care
+JPM,JPMorgan Chase,US,Financials
+BAC,Bank of America,US,Financials
+WFC,Wells Fargo,US,Financials
+C,Citigroup,US,Financials
+GS,Goldman Sachs,US,Financials
+MS,Morgan Stanley,US,Financials
+AXP,American Express,US,Financials
+V,Visa,US,Financials
+MA,Mastercard,US,Financials
+BRK-B,Berkshire Hathaway,US,Financials
+RY,Royal Bank of Canada,CA,Financials
+TD,Toronto-Dominion Bank,CA,Financials
+BNS,Bank of Nova Scotia,CA,Financials
+BMO,Bank of Montreal,CA,Financials
+CM,CIBC,CA,Financials
+MFC,Manulife,CA,Financials
+SLF,Sun Life,CA,Financials
+GE,GE Aerospace,US,Industrials
+HON,Honeywell,US,Industrials
+UNP,Union Pacific,US,Industrials
+UPS,United Parcel Service,US,Industrials
+CAT,Caterpillar,US,Industrials
+BA,Boeing,US,Industrials
+LMT,Lockheed Martin,US,Industrials
+CNI,Canadian National Railway,CA,Industrials
+CP,Canadian Pacific Kansas City,CA,Industrials
+WCN,Waste Connections,CA,Industrials
+XOM,Exxon Mobil,US,Energy
+CVX,Chevron,US,Energy
+COP,ConocoPhillips,US,Energy
+SLB,Schlumberger,US,Energy
+EOG,EOG Resources,US,Energy
+ENB,Enbridge,CA,Energy
+CNQ,Canadian Natural Resources,CA,Energy
+SU,Suncor Energy,CA,Energy
+TRP,TC Energy,CA,Energy
+IMO,Imperial Oil,CA,Energy
+LIN,Linde,US,Materials
+APD,Air Products,US,Materials
+SHW,Sherwin-Williams,US,Materials
+NEM,Newmont,US,Materials
+FCX,Freeport-McMoRan,US,Materials
+TECK,Teck Resources,CA,Materials
+AEM,Agnico Eagle Mines,CA,Materials
+CCJ,Cameco,CA,Materials
+NEE,NextEra Energy,US,Utilities
+DUK,Duke Energy,US,Utilities
+SO,Southern Company,US,Utilities
+AEP,American Electric Power,US,Utilities
+AMT,American Tower,US,Real Estate
+PLD,Prologis,US,Real Estate
+SPG,Simon Property Group,US,Real Estate

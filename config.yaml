@@ -1,0 +1,147 @@
+# =============================================================================
+# Deep Portfolio Constructor — single source of truth for every setting.
+#
+# Rule: no number that changes a result may live in the code. If you find
+# yourself typing a constant in src/, it belongs here instead.
+#
+# The loader in src/dpc/config.py is strict: unknown keys and missing keys are
+# errors, so a typo can never silently fall back to a default.
+# Units: returns are decimals (0.01 = 1%), windows are trading days unless the
+# key says months, costs are basis points.
+# =============================================================================
+
+project:
+  name: deep-portfolio-constructor
+  seed: 42                      # master seed for numpy / torch / random
+  deterministic_torch: true     # deterministic kernels: same seed -> same bits
+  torch_num_threads: 4          # fixed so float summation order is fixed
+
+paths:                          # relative to this file
+  data_raw: data/raw
+  data_processed: data/processed
+  models: data/models
+  reports: reports
+  figures: reports/figures
+  notebooks: notebooks
+  results: reports/results      # backtest outputs (weights, returns) for the dashboard
+  universe_file: data/universe.csv
+
+logging:
+  level: INFO
+
+# ---------------------------------------------------------------- Stage 1 ----
+data:
+  # The brief asks for 2005-today. We pull from 2003 so that the first
+  # out-of-sample month (Jan 2008) has ~4 years of history behind it:
+  # 1y estimation warm-up + ~3y deep-model training. 2003-2007 is used for
+  # estimation/training only; every reported result starts at oos_start.
+  start_date: "2003-01-01"
+  end_date: null                # null = latest available close
+  benchmark_ticker: SPY         # also defines the trading calendar
+  ff_base_url: "https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/ftp/"
+  ff_five_factor_file: "F-F_Research_Data_5_Factors_2x3_daily_CSV.zip"
+  ff_momentum_file: "F-F_Momentum_Factor_daily_CSV.zip"
+  membership_file: null         # point-in-time index membership (e.g. CRSP). null => survivorship-bias warning
+  quality:
+    outlier_abs_daily_return: 0.40   # |r| above this is flagged for review
+    split_day_abs_return_max: 0.25   # adjusted return on a split day must be below this
+    max_missing_frac: 0.02           # max share of missing days after listing
+    max_stale_run_days: 5            # consecutive identical prices flagged as stale
+  universe:
+    min_history_days: 252       # a stock enters the investable set after 1y of clean returns
+    max_missing_in_window: 10   # and at most this many missing days in that window
+
+# ---------------------------------------------------------------- Stage 2 ----
+signals:
+  momentum_lookback_months: 12
+  momentum_skip_months: 1       # skip the most recent month (reversal effect)
+  reversal_lookback_months: 1
+  low_vol_lookback_days: 252
+  winsorize_z: 3.0              # clip cross-sectional z-scores at +-3
+  weights:                      # combination weights (equal = no tuning)
+    momentum: 1.0
+    reversal: 1.0
+    low_vol: 1.0
+  newey_west_lags: 6            # for t-statistics of monthly IC series
+
+# ---------------------------------------------------------------- Stage 3 ----
+exposures:
+  beta_window_days: 252         # rolling regression on Mkt-RF, SMB, HML, RMW, CMA, Mom
+  beta_min_obs: 126
+
+backtest:
+  oos_start: "2008-01-01"       # first rebalance used in any reported result
+  transaction_cost_bps: 10      # one-way cost per unit of traded notional
+  cov_window_days: 252          # estimation window for classical covariances
+  annualization_days: 252
+  min_weight_print: 0.0001      # weights below this are treated as zero in reports
+
+alpha:
+  # Grinold's "alpha = IC x volatility x score": converts a z-score into an
+  # expected return. The IC is an assumption, not fitted (no look-ahead).
+  assumed_ic: 0.05
+
+baselines:
+  long_only_max_weight: 0.10    # cap for long-only optimised baselines
+  hrp_linkage: single           # Lopez de Prado's original choice
+
+optimizer:                      # shared by classical long-short and end-to-end models
+  gross_leverage: 2.0           # sum |w| <= 2  (100% long / 100% short)
+  max_weight: 0.05              # |w_i| <= 5% of capital
+  sector_limit: 0.05            # |net sector exposure| <= 5%
+  factor_limit: 0.05            # |portfolio beta| to each neutralised factor <= 0.05
+  neutral_factors: [Mkt-RF, SMB, HML]   # market beta, size, value
+  turnover_limit: 1.0           # sum |w_new - w_old| <= 1.0 per rebalance (not applied to the first)
+  risk_aversion: 5.0            # gamma in  mu'w - gamma * w'Sigma w   (monthly units)
+  turnover_penalty_mult: 1.0    # penalty = mult * cost * sum |dw| inside the objective
+  solver_eps: 1.0e-6
+
+# ---------------------------------------------------------------- Stage 4 ----
+risk_model:
+  architecture: transformer     # temporal encoder: lstm | transformer
+  seq_len_days: 63              # look-back fed to the network
+  horizon_days: 21              # forecast covariance of the next ~month
+  n_factors: 8                  # Sigma = B B' + diag(d), B is N x n_factors
+  d_model: 32
+  n_heads: 4
+  temporal_layers: 1
+  cross_sectional_layers: 2     # attention across stocks
+  dropout: 0.1
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  max_epochs: 40
+  batch_size: 16                # samples (dates) per gradient step
+  sample_stride_days: 5         # training origins every 5 days (overlapping targets)
+  val_fraction: 0.2             # last 20% of the training window, chronologically
+  early_stopping_patience: 6
+  refit_every_months: 12        # walk-forward: retrain once a year, expanding window
+  min_idio_var: 1.0e-6          # floor on daily idiosyncratic variance (numerical)
+  grad_clip: 1.0
+
+# ---------------------------------------------------------------- Stage 5 ----
+e2e:
+  learning_rate: 0.0005
+  weight_decay: 0.0001
+  max_epochs: 25
+  batch_size: 12                # months per gradient step
+  val_months: 12                # last 12 months of each training window
+  early_stopping_patience: 5
+  loss_risk_aversion: 10.0      # loss = -(return - cost) + lambda * realised daily variance (per month)
+  alpha_hidden: 32
+  alpha_residual_scale: 1.0     # mu = mu_grinold * exp(s) + scale * net(x); net starts at 0
+  finetune_risk_model: true
+  grad_clip: 1.0
+
+# ---------------------------------------------------------------- Stage 6 ----
+evaluation:
+  crisis_years: [2008, 2020, 2022]
+  sensitivity_cost_bps: [0, 5, 10, 20, 40]
+  sensitivity_sector_limits: [0.025, 0.05, 0.10]
+  sensitivity_max_weights: [0.03, 0.05, 0.10]
+  sensitivity_d_model: [16, 32, 64]
+  seeds: [42, 43, 44]           # robustness of the deep results to initialisation
+  risk_model_window_days: 252   # evaluation-only Barra-style model for risk decomposition
+
+# ---------------------------------------------------------------- Stage 7 ----
+dashboard:
+  default_strategy: e2e

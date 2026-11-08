@@ -1,0 +1,20 @@
+# Environment
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Downloaded / generated data (re-creatable from the pipeline; never commit vendor data)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Generated run artefacts
+reports/figures/*
+!reports/figures/.gitkeep
+reports/run_manifest.json
+
+# Notebook checkpoints
+.ipynb_checkpoints/

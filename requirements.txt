@@ -1,0 +1,27 @@
+# Pinned for reproducibility (resolved on Python 3.13, 2026-11-07).
+# Core numerics
+numpy==2.5.4
+pandas==3.1.1
+scipy==1.18.1
+scikit-learn==1.9.1
+statsmodels==0.15.0
+
+# Deep learning (see README for the smaller CPU-only install)
+torch==2.15.0
+
+# Convex optimisation + differentiable optimisation layers
+cvxpy==1.9.3
+cvxpylayers==1.2.0
+diffcp==1.1.9
+
+# Data
+yfinance==1.8.0
+PyYAML==6.0.3
+
+# Visualisation + dashboard
+matplotlib==3.11.2
+plotly==7.1.0
+streamlit==1.67.0
+
+# Testing
+pytest==9.2.0
