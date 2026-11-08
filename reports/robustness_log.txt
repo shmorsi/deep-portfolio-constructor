@@ -1,2 +1,14 @@
 /home/user/deep-portfolio-constructor/.venv/lib/python3.13/site-packages/numpy/lib/_nanfunctions_impl.py:1997: RuntimeWarning: Degrees of freedom <= 0 for slice.
   var = nanvar(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+2026-11-08 01:25:52 | INFO    | dpc.deep.train_risk | [d16] refit 2008-01-31: 189 train / 49 val samples, 40 epochs, best val NLL -2.8930
+2026-11-08 01:26:03 | INFO    | dpc.deep.train_risk | [d16] refit 2009-01-30: 235 train / 61 val samples, 10 epochs, best val NLL -2.3936
+2026-11-08 01:26:16 | INFO    | dpc.deep.train_risk | [d16] refit 2010-01-29: 283 train / 72 val samples, 9 epochs, best val NLL -2.5374
+2026-11-08 01:26:30 | INFO    | dpc.deep.train_risk | [d16] refit 2011-01-31: 332 train / 84 val samples, 9 epochs, best val NLL -2.9851
+2026-11-08 01:26:53 | INFO    | dpc.deep.train_risk | [d16] refit 2012-01-31: 380 train / 97 val samples, 12 epochs, best val NLL -3.0329
+2026-11-08 01:27:14 | INFO    | dpc.deep.train_risk | [d16] refit 2013-01-31: 428 train / 109 val samples, 9 epochs, best val NLL -3.0635
+2026-11-08 01:27:41 | INFO    | dpc.deep.train_risk | [d16] refit 2014-01-31: 477 train / 121 val samples, 9 epochs, best val NLL -3.1506
+2026-11-08 01:28:08 | INFO    | dpc.deep.train_risk | [d16] refit 2015-01-30: 523 train / 133 val samples, 9 epochs, best val NLL -3.2024
+2026-11-08 01:29:07 | INFO    | dpc.deep.train_risk | [d16] refit 2016-01-29: 571 train / 144 val samples, 21 epochs, best val NLL -3.1687
+2026-11-08 01:29:33 | INFO    | dpc.deep.train_risk | [d16] refit 2017-01-31: 620 train / 156 val samples, 8 epochs, best val NLL -3.1125
+2026-11-08 01:29:58 | INFO    | dpc.deep.train_risk | [d16] refit 2018-01-31: 667 train / 169 val samples, 8 epochs, best val NLL -3.1358
+2026-11-08 01:30:38 | INFO    | dpc.deep.train_risk | [d16] refit 2019-01-31: 716 train / 181 val samples, 13 epochs, best val NLL -3.1039

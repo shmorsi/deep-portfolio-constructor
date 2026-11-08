@@ -16,8 +16,10 @@ from dpc.evaluation import LABELS
 # Same validated palette as the static report; colour follows the strategy.
 BLUE, ORANGE, AQUA, YELLOW, VIOLET = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#6250d6"
 RED, GRAY, GRID = "#e34948", "#898781", "#e1e0d9"
-COLOR = {"e2e": BLUE, "ls_naive": ORANGE, "ls_classical": AQUA, "ls_deep_twostage": VIOLET}
-LO_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4"]
+# Fixed per strategy (never by rank). 9 strategies > 8 hues, so two long-only ones share muted grays.
+COLOR = {"e2e": BLUE, "ls_naive": ORANGE, "ls_classical": AQUA, "ls_deep_twostage": VIOLET,
+         "equal_weight": YELLOW, "min_variance": "#e87ba4", "mean_variance_lw": "#008300",
+         "risk_parity": GRAY, "hrp": "#b9b8b0"}
 
 st.set_page_config(page_title="Deep Portfolio Constructor", layout="wide")
 
@@ -30,7 +32,7 @@ def data():
 def style(fig: go.Figure, height: int = 360) -> go.Figure:
     fig.update_layout(height=height, margin=dict(l=10, r=10, t=40, b=10), hovermode="x unified",
                       plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
-                      legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0))
+                      legend=dict(orientation="h", yanchor="top", y=-0.12, x=0))
     fig.update_xaxes(gridcolor=GRID, zeroline=False)
     fig.update_yaxes(gridcolor=GRID, zeroline=False)
     return fig
@@ -108,13 +110,13 @@ with tab3:
     lim = cfg.optimizer.sector_limit * 100
     fig = go.Figure(go.Bar(x=sec.values, y=sec.index, orientation="h", marker_color=[BLUE if abs(v) <= lim + 1e-6 else RED for v in sec.values],
                            hovertemplate="%{y}: %{x:.2f}%<extra></extra>"))
-    fig.add_vrect(x0=-lim, x1=lim, fillcolor=GRID, opacity=0.5, line_width=0)
+    fig.add_vrect(x0=-lim, x1=lim, fillcolor=GRID, opacity=0.5, line_width=0, layer="below")
     a.plotly_chart(style(fig, 420).update_layout(title=f"Net sector exposure vs ±{lim:g}% limit", xaxis_title="% of capital"), use_container_width=True)
     fx = D.factor_exposure(strat, date)
     flim = cfg.optimizer.factor_limit
     fig = go.Figure(go.Bar(x=fx.index, y=fx.values, marker_color=[BLUE if abs(v) <= flim + 1e-6 else RED for v in fx.values],
                            hovertemplate="%{x}: %{y:.3f}<extra></extra>"))
-    fig.add_hrect(y0=-flim, y1=flim, fillcolor=GRID, opacity=0.5, line_width=0)
+    fig.add_hrect(y0=-flim, y1=flim, fillcolor=GRID, opacity=0.5, line_width=0, layer="below")
     b.plotly_chart(style(fig, 420).update_layout(title=f"Portfolio beta to market, size, value vs ±{flim:g}", yaxis_title="beta"), use_container_width=True)
     to = D.results[strat].turnover
     fig = go.Figure(go.Scatter(x=to.index, y=to.values * 100, mode="lines", line=dict(color=COLOR.get(strat, BLUE), width=2), name="turnover"))
@@ -128,15 +130,11 @@ with tab4:
     names = [strat, *sel]
     cum = D.cumulative(names)
     fig = go.Figure()
-    lo_i = 0
     for s, col in zip(names, cum.columns):
-        if s in COLOR:
-            color = COLOR[s]
-        else:
-            color = LO_COLORS[lo_i % len(LO_COLORS)] if len(sel) <= 4 else GRAY
-            lo_i += 1
+        color = COLOR.get(s, GRAY)
         fig.add_trace(go.Scatter(x=cum.index, y=cum[col], name=col, line=dict(color=color, width=2.5 if s == strat else 1.5)))
-    fig.update_yaxes(type="log")
+    ticks = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
+    fig.update_yaxes(type="log", tickvals=ticks, ticktext=[f"${t:g}" for t in ticks])
     st.plotly_chart(style(fig, 460).update_layout(title="Growth of $1 (excess of cash, net of costs, log scale)"), use_container_width=True)
     if perf is not None:
         cols = ["sharpe", "sortino", "ann_return", "ann_vol", "max_drawdown", "hit_rate_monthly", "alpha_ann_ff6", "alpha_t_ff6", "turnover_ann"]

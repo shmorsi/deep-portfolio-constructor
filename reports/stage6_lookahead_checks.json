@@ -1,0 +1,5 @@
+{
+  "engine_truncation_invariance_ls_classical": true,
+  "deep_feature_truncation_invariance": true,
+  "oracle_sharpe": 10.565780817438494
+}

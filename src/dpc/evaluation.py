@@ -176,6 +176,29 @@ def difference_test(a: BacktestResult, b: BacktestResult, lags: int) -> dict[str
     return {"mean_monthly_diff": mean, "t_stat": t, "n_months": n}
 
 
+def beta_hedged(results: dict[str, BacktestResult], panel: Panel, cfg: Config) -> pd.DataFrame:
+    """Diagnostic: how much of each strategy is leaked market beta?
+
+    Hedge each strategy with its OWN trailing market beta, estimated from its
+    past daily returns only (shifted one day), and recompute the metrics. An
+    ex-ante beta-neutral book can still carry realised beta when the input
+    betas are measured with error (worst for volatile stocks).
+    """
+    win, ann, lags = cfg.evaluation.hedge_beta_window_days, cfg.backtest.annualization_days, cfg.signals.newey_west_lags
+    rows = {}
+    for name, r in results.items():
+        x = r.excess_returns(panel.ff["RF"])
+        m = panel.ff["Mkt-RF"].reindex(x.index)
+        b = (x.rolling(win).cov(m) / m.rolling(win).var()).shift(1)
+        h = (x - b * m).dropna()
+        met = performance_metrics(h, panel.ff, None, None, ann, lags)
+        raw = performance_metrics(x.loc[h.index], panel.ff, None, None, ann, lags)
+        rows[LABELS.get(name, name)] = {"sharpe_unhedged": raw["sharpe"], "sharpe_beta_hedged": met["sharpe"],
+                                        "avg_trailing_beta": float(b.mean()), "alpha_ff6_hedged": met["alpha_ann_ff6"],
+                                        "alpha_t_hedged": met["alpha_t_ff6"]}
+    return pd.DataFrame(rows).T
+
+
 def oracle_check(panel: Panel, signals: dict, betas: dict, cfg: Config) -> dict[str, float]:
     """Calibration of what look-ahead looks like: trade on NEXT month's return."""
     from dpc.signals import forward_returns, monthly_returns
@@ -293,8 +316,20 @@ def run_stage6(cfg: Config) -> dict:
     out["tests"] = pd.DataFrame(tests).T
     out["tests"].to_csv(rep / "stage6_difference_tests.csv")
 
-    # 5. Sensitivity: costs
     ls = {k: v for k, v in results.items() if k in LS_ORDER}
+    out["beta_hedged"] = beta_hedged(ls, panel, cfg)
+    out["beta_hedged"].to_csv(rep / "stage6_beta_hedged.csv")
+    tests_vs = {}
+    if "e2e" in results and "ls_classical" in results:
+        from dpc.stats import factor_regression
+
+        d = to_monthly(results["e2e"].daily_net) - to_monthly(results["ls_classical"].daily_net)
+        fm = to_monthly(panel.ff[["Mkt-RF", "SMB", "HML", "RMW", "CMA", "Mom"]].loc[results["e2e"].daily_net.index])
+        tests_vs = factor_regression(d, fm, lags)
+    out["e2e_minus_classical_ff6"] = pd.Series(tests_vs, dtype=float).to_frame("e2e - ls_classical")
+    out["e2e_minus_classical_ff6"].to_csv(rep / "stage6_e2e_minus_classical_ff6.csv")
+
+    # 5. Sensitivity: costs
     out["cost_sensitivity"] = cost_sensitivity(ls, panel, cfg)
     out["cost_sensitivity"].to_csv(rep / "stage6_cost_sensitivity.csv")
 
@@ -372,6 +407,10 @@ def write_markdown(cfg: Config, out: dict) -> None:
     for y, t in out["crisis"].items():
         lines += [f"## {y}", "", _md(t), ""]
     lines += ["## Paired tests on monthly net returns (Newey-West)", "", _md(out["tests"], ".4f"), ""]
+    lines += ["## Diagnostic: market-beta leakage (hedge each strategy's own trailing beta, point-in-time)", "",
+              _md(out["beta_hedged"]), ""]
+    lines += ["## What is the end-to-end model's extra return made of? (FF6 regression of e2e minus classical, monthly)", "",
+              _md(out["e2e_minus_classical_ff6"], ".4f"), ""]
     lines += ["## Sensitivity: transaction costs (Sharpe, same trades re-priced)", "", _md(out["cost_sensitivity"], ".2f"), ""]
     lines += ["## Sensitivity: constraints (re-optimised; deep models not retrained)", "", _md(out["constraint_sensitivity"]), ""]
     for k in ("stage6_model_size", "stage6_seeds"):

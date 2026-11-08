@@ -144,6 +144,7 @@ evaluation:
   sensitivity_d_model: [16, 32, 64]
   seeds: [42, 43, 44]           # robustness of the deep results to initialisation
   risk_model_window_days: 252   # evaluation-only Barra-style model for risk decomposition
+  hedge_beta_window_days: 252   # diagnostic: hedge each strategy's own trailing (point-in-time) market beta
 
 # ---------------------------------------------------------------- Stage 7 ----
 dashboard:

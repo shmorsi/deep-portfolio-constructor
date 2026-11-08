@@ -199,6 +199,7 @@ class EvaluationConfig:
     sensitivity_d_model: list[int]
     seeds: list[int]
     risk_model_window_days: int
+    hedge_beta_window_days: int
 
 
 @dataclass(frozen=True)

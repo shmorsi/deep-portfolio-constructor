@@ -8,6 +8,9 @@ import pandas as pd
 from dpc.backtest import BacktestResult
 from dpc.config import Config
 from dpc.data.panel import Panel
+from matplotlib.dates import DateFormatter, YearLocator
+from matplotlib.ticker import FuncFormatter
+
 from dpc.plotting import BASELINE, CATEGORICAL, CONTEXT_GRAY, INK_2, apply_style, save
 
 # Colour follows the entity, fixed for every chart in the project.
@@ -28,18 +31,20 @@ SHORT = {
 }
 
 
-def _label_ends(ax, series: dict[str, pd.Series]) -> None:
-    """Direct labels at line ends, nudged apart so they never collide."""
-    ends = sorted(((s.iloc[-1], n) for n, s in series.items()), key=lambda x: x[0])
-    lo, hi = ax.get_ylim()
-    gap = (hi - lo) * 0.045
+def _label_ends(ax, series: dict[str, pd.Series], log: bool = False) -> None:
+    """Direct labels at line ends, nudged apart (in log space for log axes) so they never collide."""
+    tf = (lambda v: np.log10(v)) if log else (lambda v: v)
+    inv = (lambda v: 10**v) if log else (lambda v: v)
+    lo, hi = (tf(v) for v in ax.get_ylim())
+    gap = (hi - lo) * 0.05
+    ends = sorted(((tf(s.iloc[-1]), n) for n, s in series.items()), key=lambda x: x[0])
     placed: list[float] = []
     for y, n in ends:
         if placed and y - placed[-1] < gap:
             y = placed[-1] + gap
         placed.append(y)
-        ax.annotate(SHORT.get(n, n), (series[n].index[-1], y), xytext=(6, 0), textcoords="offset points",
-                    color=INK_2, fontsize=8.5, va="center")
+        ax.annotate(SHORT.get(n, n), (series[n].index[-1], inv(y)), xytext=(6, 0), textcoords="offset points",
+                    color=INK_2, fontsize=8.5, va="center", annotation_clip=False)
 
 
 def cumulative_returns(cfg: Config, panel: Panel, results: dict[str, BacktestResult]) -> None:
@@ -56,11 +61,14 @@ def cumulative_returns(cfg: Config, panel: Panel, results: dict[str, BacktestRes
             series[n] = w
             ax.plot(w.index, w.values, color=COLOR[n], lw=2.2 if n == "e2e" else 1.6, label=SHORT[n])
         ax.set_yscale("log")
+        ax.yaxis.set_major_formatter(FuncFormatter(lambda v, _: f"${v:g}"))
+        ax.yaxis.set_minor_formatter(FuncFormatter(lambda v, _: f"${v:g}" if f"{v:g}".lstrip("0.")[:1] in ("2", "5") else ""))
         ax.axhline(1, color=BASELINE, lw=1)
         ax.set_title(title)
         ax.set_ylabel("Growth of $1 (log scale)")
         ax.legend(loc="upper left", fontsize=8.5)
-        _label_ends(ax, {k: np.log10(v) * 0 + v for k, v in series.items()})
+        if len(series) <= 4:  # direct labels only when few enough to read
+            _label_ends(ax, series, log=True)
     fig.suptitle("Out-of-sample cumulative net returns, monthly rebalancing, 10 bps costs", x=0.01, ha="left", fontsize=11, color=INK_2)
     save(fig, cfg.paths.figures / "stage6_cumulative.png")
 
@@ -103,6 +111,8 @@ def risk_decomposition_bars(cfg: Config, decomp: pd.DataFrame) -> None:
     ax.set_xlim(0, 100)
     ax.set_xlabel("Share of predicted portfolio variance (%)")
     ax.set_title("Where does the risk come from? (average over out-of-sample rebalances)")
+    fig.text(0.01, -0.08, "Independent Barra-style model: 6 style betas + 11 sector factors. For long-only books the sector "
+             "bucket also carries the overall market move (sector dummies span the intercept).", fontsize=8, color=INK_2)
     ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.14), ncols=3, fontsize=8.5)
     ax.grid(axis="y", visible=False)
     save(fig, cfg.paths.figures / "stage6_risk_decomposition.png")
@@ -119,10 +129,12 @@ def beta_exposure(cfg: Config, exposures: dict[str, pd.DataFrame]) -> None:
                 ax.plot(s.index, s.values, color=COLOR[n], lw=1.6 if n == "e2e" else 1.2, label=SHORT[n])
         ax.axhspan(-cfg.optimizer.factor_limit, cfg.optimizer.factor_limit, color="#e1e0d9", alpha=0.7, lw=0)
         ax.axhline(0, color=BASELINE, lw=1)
+        ax.xaxis.set_major_locator(YearLocator(4))
+        ax.xaxis.set_major_formatter(DateFormatter("%Y"))
         ax.set_title(title)
     axes[0].set_ylabel("Portfolio exposure (beta)")
     axes[0].legend(loc="lower left", fontsize=8.5)
-    fig.suptitle(f"Factor exposure at each rebalance (shaded band = ±{cfg.optimizer.factor_limit:g} limit)", x=0.01, ha="left", fontsize=11, color=INK_2)
+    fig.suptitle(f"Factor exposure at each rebalance (shaded band = ±{cfg.optimizer.factor_limit:g} limit)", x=0.01, y=1.04, ha="left", fontsize=11, color=INK_2)
     save(fig, cfg.paths.figures / "stage6_factor_exposures.png")
 
 
