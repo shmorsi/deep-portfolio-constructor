@@ -25,8 +25,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from dpc.backtest import BacktestResult, load_result, run_backtest
-from dpc.baselines import LONG_ONLY, get_betas, load_signals, make_ls_classical, summarize
+from dpc.backtest import BacktestResult, run_backtest
+from dpc.baselines import get_betas, load_signals, make_ls_classical, summarize
 from dpc.config import Config
 from dpc.data.panel import Panel
 from dpc.exposures import STYLE_FACTORS
@@ -36,18 +36,7 @@ from dpc.stats import newey_west_mean
 
 log = get_logger(__name__)
 
-LS_ORDER = ["ls_naive", "ls_classical", "ls_deep_twostage", "e2e"]
-LABELS = {
-    "equal_weight": "Equal weight (LO)",
-    "min_variance": "Min variance (LO)",
-    "mean_variance_lw": "Mean-variance LW (LO)",
-    "risk_parity": "Risk parity (LO)",
-    "hrp": "HRP (LO)",
-    "ls_naive": "L/S naive signal",
-    "ls_classical": "L/S classical (LW + optimiser)",
-    "ls_deep_twostage": "L/S deep risk + optimiser",
-    "e2e": "L/S end-to-end deep",
-}
+from dpc.strategies import LABELS, LONG_SHORT as LS_ORDER, load_all_results as _load_all  # noqa: E402
 
 
 # --------------------------------------------------------------------------- #
@@ -250,12 +239,9 @@ def feature_truncation_check(panel: Panel, cfg: Config, T: pd.Timestamp) -> bool
 # Runner
 # --------------------------------------------------------------------------- #
 def load_all_results(cfg: Config) -> dict[str, BacktestResult]:
-    names = [*LONG_ONLY, *LS_ORDER]
-    out = {}
-    for n in names:
-        try:
-            out[n] = load_result(n, cfg.paths.results)
-        except FileNotFoundError:
+    out = _load_all(cfg.paths.results)
+    for n in LS_ORDER:
+        if n not in out:
             log.warning("Result %s not found; skipping", n)
     return out
 
@@ -310,7 +296,8 @@ def run_stage6(cfg: Config) -> dict:
 
     # 4. Is deep better? Paired tests on monthly net returns
     tests = {}
-    for a, b in [("e2e", "ls_classical"), ("ls_deep_twostage", "ls_classical"), ("e2e", "ls_deep_twostage")]:
+    for a, b in [("e2e_deep", "ls_classical"), ("e2e_deep", "e2e"), ("e2e", "ls_classical"), ("ls_deep_alpha", "ls_classical"),
+                 ("ls_deep_twostage", "ls_classical"), ("e2e", "ls_deep_twostage")]:
         if a in results and b in results:
             tests[f"{a} - {b}"] = difference_test(results[a], results[b], lags)
     out["tests"] = pd.DataFrame(tests).T
@@ -338,7 +325,10 @@ def run_stage6(cfg: Config) -> dict:
     out["constraint_sensitivity"].to_csv(rep / "stage6_constraint_sensitivity.csv")
 
     # 7. Robustness results produced by `python -m dpc.cli robustness`, if present
-    for f in ("stage6_model_size.csv", "stage6_seeds.csv"):
+    alpha_ic = cfg.paths.reports / "stage4b_alpha_ic.csv"
+    if alpha_ic.exists():
+        out["alpha_ic"] = pd.read_csv(alpha_ic, index_col=0)
+    for f in ("stage6_model_size.csv", "stage6_seeds.csv", "stage6_seeds_deep.csv"):
         p = rep / f
         if p.exists():
             out[f[:-4]] = pd.read_csv(p, index_col=0)
@@ -368,11 +358,14 @@ def constraint_sensitivity(cfg: Config, panel: Panel, signals: dict, betas: dict
 
     n_sec = panel.universe["sector"].nunique()
     deep_fc = RiskForecasts.load(cfg.paths.data_processed / "deep_risk_forecasts.npz")
-    e2e_path = cfg.paths.data_processed / "e2e_forecasts_main.npz"
-    e2e_fc = None
-    if e2e_path.exists():
-        z = np.load(e2e_path)
-        e2e_fc = E2EForecasts(pd.DatetimeIndex(z["dates"].astype("datetime64[ns]")), z["mu"], z["B"], z["s"])
+    def load_e2e(tag: str):
+        path = cfg.paths.data_processed / f"e2e_forecasts_{tag}.npz"
+        if not path.exists():
+            return None
+        z = np.load(path)
+        return E2EForecasts(pd.DatetimeIndex(z["dates"].astype("datetime64[ns]")), z["mu"], z["B"], z["s"])
+
+    e2e_fc, e2e_deep_fc = load_e2e("main"), load_e2e("deep")
     variants = [("sector_limit", v) for v in cfg.evaluation.sensitivity_sector_limits] + \
                [("max_weight", v) for v in cfg.evaluation.sensitivity_max_weights]
     rows = []
@@ -384,6 +377,8 @@ def constraint_sensitivity(cfg: Config, panel: Panel, signals: dict, betas: dict
         }
         if e2e_fc is not None:
             builders["e2e"] = lambda: make_e2e_strategy(c2, e2e_fc, panel.tickers, n_sec)[0]
+        if e2e_deep_fc is not None:
+            builders["e2e_deep"] = lambda: make_e2e_strategy(c2, e2e_deep_fc, panel.tickers, n_sec)[0]
         for name, b in builders.items():
             r = run_backtest(name, panel, b(), signals, betas, cfg.backtest.oos_start, cfg.backtest.transaction_cost_bps, False)
             m = performance_metrics(r.daily_net, panel.ff, r.turnover, r.costs, cfg.backtest.annualization_days, cfg.signals.newey_west_lags)
@@ -400,6 +395,9 @@ def _md(df: pd.DataFrame, fmt: str = ".3f") -> str:
 def write_markdown(cfg: Config, out: dict) -> None:
     lines = ["# Stage 6 - Evaluation (all results out-of-sample, walk-forward, net of costs)", ""]
     lines += ["## Performance", "", _md(out["performance"]), ""]
+    if "alpha_ic" in out:
+        lines += ["## Deep views: AlphaFormer vs classical signals (out-of-sample rank IC, Newey-West t)", "",
+                  _md(out["alpha_ic"], ".4f"), ""]
     lines += ["## Risk decomposition (headline)", "",
               "Ex-ante shares from an independent Barra-style model (6 style + 11 sector factors); "
               "realised shares split each day's P&L into factor and stock-specific parts.", "",
@@ -413,7 +411,7 @@ def write_markdown(cfg: Config, out: dict) -> None:
               _md(out["e2e_minus_classical_ff6"], ".4f"), ""]
     lines += ["## Sensitivity: transaction costs (Sharpe, same trades re-priced)", "", _md(out["cost_sensitivity"], ".2f"), ""]
     lines += ["## Sensitivity: constraints (re-optimised; deep models not retrained)", "", _md(out["constraint_sensitivity"]), ""]
-    for k in ("stage6_model_size", "stage6_seeds"):
+    for k in ("stage6_model_size", "stage6_seeds", "stage6_seeds_deep"):
         if k in out:
             lines += [f"## {k.replace('stage6_', '').replace('_', ' ').title()}", "", _md(out[k]), ""]
     lines += ["## Look-ahead checks", "", "```json", json.dumps(out["lookahead"], indent=2), "```", ""]

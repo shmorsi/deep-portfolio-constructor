@@ -48,6 +48,8 @@ from dpc.backtest import LookAheadError, PointInTimeView, rebalance_dates, run_b
 from dpc.config import Config, RiskModelConfig
 from dpc.covariance import DAYS_PER_MONTH
 from dpc.data.panel import Panel
+from dpc.deep.alpha_data import AlphaBank, build_alpha_bank
+from dpc.deep.alpha_model import AlphaEnsemble
 from dpc.deep.features import SampleBank, build_sample_bank
 from dpc.deep.risk_model import DeepRiskModel, to_return_space
 from dpc.deep.train_risk import new_model, refit_dates
@@ -75,14 +77,19 @@ class MonthBank:
     S: np.ndarray  # (n_sec, N) sector membership
     r_next: np.ndarray  # (M, Dmax, N) next-month daily returns (0 padded)
     label_end: pd.DatetimeIndex  # last day of each month's label window
+    ab: AlphaBank | None = None  # AlphaFormer inputs (fully deep variant only)
+    ab_rows: np.ndarray | None = None  # row of each month in ``ab``
 
     def __len__(self) -> int:
         return len(self.dates)
 
 
-def build_month_bank(cfg: Config, panel: Panel, bank: SampleBank, signals: dict, betas: dict) -> MonthBank:
+def build_month_bank(cfg: Config, panel: Panel, bank: SampleBank, signals: dict, betas: dict,
+                     ab: AlphaBank | None = None) -> MonthBank:
     me = panel.month_ends
     me = me[me.isin(bank.origins)]
+    if ab is not None:  # fully deep variant: only months the AlphaFormer can score
+        me = me[me.isin(ab.dates)]
     rets = panel.returns
     vol = rets.rolling(cfg.backtest.cov_window_days, min_periods=cfg.backtest.cov_window_days).std() * math.sqrt(DAYS_PER_MONTH)
     tick = panel.tickers
@@ -91,6 +98,8 @@ def build_month_bank(cfg: Config, panel: Panel, bank: SampleBank, signals: dict,
         inv &= df.loc[me, tick].notna().to_numpy()
     inv &= bank.mask_in[[bank.index_of(d) for d in me]]
     inv &= vol.loc[me].notna().to_numpy()
+    if ab is not None:
+        inv &= ab.mask[ab.rows_for(me)]
     keep = inv.sum(axis=1) >= 20
     me, inv = me[keep], inv[keep]
     z = np.stack([signals[k].loc[me, tick].fillna(0).to_numpy() for k in SIGNAL_NAMES], axis=-1)
@@ -111,7 +120,7 @@ def build_month_bank(cfg: Config, panel: Panel, bank: SampleBank, signals: dict,
     return MonthBank(
         dates=me, bank_idx=np.array([bank.index_of(d) for d in me]), z=z, zc=zc,
         vol_m=np.nan_to_num(vol.loc[me].to_numpy()), inv=inv, X=X, S=S, r_next=r_next,
-        label_end=pd.DatetimeIndex(label_end),
+        label_end=pd.DatetimeIndex(label_end), ab=ab, ab_rows=None if ab is None else ab.rows_for(me),
     )
 
 
@@ -137,9 +146,18 @@ class AlphaNet(nn.Module):
 
 
 class E2EModel(nn.Module):
-    def __init__(self, risk: DeepRiskModel, rc: RiskModelConfig, alpha_hidden: int, ic: float, residual_scale: float):
+    """views (optional AlphaFormer) + risk (DeepRiskModel) -> mu, B, s for the optimiser layer.
+
+    Without ``views`` the base score is the classical composite z-score (the
+    pre-specified e2e model). With ``views`` the base score is the
+    AlphaFormer's cross-sectional forecast: deep learning at every layer.
+    """
+
+    def __init__(self, risk: DeepRiskModel, rc: RiskModelConfig, alpha_hidden: int, ic: float, residual_scale: float,
+                 views: AlphaEnsemble | None = None):
         super().__init__()
         self.risk = risk
+        self.views = views
         self.alpha = AlphaNet(rc.d_model, alpha_hidden, residual_scale).double()
         self.ic = ic
         self.horizon = rc.horizon_days
@@ -154,7 +172,13 @@ class E2EModel(nn.Module):
         Bh, sh = to_return_space(Bz.double(), psi.double(), torch.as_tensor(bank.sigma[idx], dtype=F64), self.horizon)
         m = mask.to(F64)
         z = torch.as_tensor(mb.z[rows], dtype=F64)
-        score = self.alpha(z, torch.as_tensor(mb.zc[rows], dtype=F64), h.double())
+        if self.views is not None:
+            ar = mb.ab_rows[rows]
+            base, _ = self.views(torch.from_numpy(mb.ab.seq[ar]), torch.from_numpy(mb.ab.static[ar]), mask)
+            base = base.double()
+        else:
+            base = torch.as_tensor(mb.zc[rows], dtype=F64)
+        score = self.alpha(z, base, h.double())
         mu = self.ic * torch.as_tensor(mb.vol_m[rows], dtype=F64) * score * m
         return mu, Bh * m.unsqueeze(-1), sh * m
 
@@ -202,7 +226,8 @@ def _sequential_weights(model, layer, cfg, bank, mb, rows: np.ndarray, w_start: 
 
 
 def train_e2e(cfg: Config, bank: SampleBank, mb: MonthBank, refit: pd.Timestamp, risk_state: dict,
-              alpha_state: dict | None, rc: RiskModelConfig, seed: int, layer: CvxpyLayer) -> tuple[E2EModel, dict]:
+              alpha_state: dict | None, rc: RiskModelConfig, seed: int, layer: CvxpyLayer,
+              views: AlphaEnsemble | None = None) -> tuple[E2EModel, dict]:
     ec = cfg.e2e
     usable = np.where(mb.label_end <= refit)[0]
     if len(usable) and mb.label_end[usable].max() > refit:
@@ -212,12 +237,14 @@ def train_e2e(cfg: Config, bank: SampleBank, mb: MonthBank, refit: pd.Timestamp,
     set_global_seed(seed)
     risk = new_model(bank, rc)
     risk.load_state_dict(risk_state)
-    model = E2EModel(risk, rc, ec.alpha_hidden, cfg.alpha.assumed_ic, ec.alpha_residual_scale)
+    model = E2EModel(risk, rc, ec.alpha_hidden, cfg.alpha.assumed_ic, ec.alpha_residual_scale, views=views)
     if alpha_state is not None:
         model.alpha.load_state_dict(alpha_state)
     groups = [{"params": model.alpha.parameters(), "lr": ec.learning_rate}]
+    if views is not None:  # pre-trained AlphaFormer fine-tunes through the optimiser too
+        groups.append({"params": model.views.parameters(), "lr": ec.learning_rate * ec.pretrained_lr_mult})
     if ec.finetune_risk_model:
-        groups.append({"params": model.risk.parameters(), "lr": ec.learning_rate * ec.risk_lr_mult})
+        groups.append({"params": model.risk.parameters(), "lr": ec.learning_rate * ec.pretrained_lr_mult})
     else:
         for p in model.risk.parameters():
             p.requires_grad_(False)
@@ -228,6 +255,8 @@ def train_e2e(cfg: Config, bank: SampleBank, mb: MonthBank, refit: pd.Timestamp,
     R_all = torch.as_tensor(mb.r_next, dtype=F64)
 
     model.risk.eval()  # dropout off: the optimiser input should be deterministic
+    if model.views is not None:
+        model.views.eval()
     zero = torch.zeros(mb.inv.shape[1], dtype=F64)
     W_buf, _ = _sequential_weights(model, layer, cfg, bank, mb, usable, zero)  # initial previous-weights buffer
     pos = {r: k for k, r in enumerate(usable)}
@@ -290,7 +319,9 @@ def make_e2e_strategy(cfg: Config, fc: E2EForecasts, tickers: list[str], n_sec: 
 
     def fn(view: PointInTimeView, w0: pd.Series) -> pd.Series:
         k = fc.dates.get_loc(view.date)
-        keep = np.isin(view.tickers, view.investable)
+        # Only stocks the model actually forecast (positive idiosyncratic risk). A stock with no
+        # forecast would look riskless to the optimiser and could be misused as a free hedge.
+        keep = np.isin(view.tickers, view.investable) & (fc.s[k] > 0)
         x: OptimizerInputs = long_short_inputs(view, w0, fc.mu[k] * keep, fc.B[k] * keep[:, None], fc.s[k] * keep, cfg)
         return pd.Series(opt.solve(x), index=view.tickers)
 
@@ -298,7 +329,7 @@ def make_e2e_strategy(cfg: Config, fc: E2EForecasts, tickers: list[str], n_sec: 
 
 
 def walk_forward_e2e(cfg: Config, panel: Panel, bank: SampleBank, mb: MonthBank, rc: RiskModelConfig,
-                     seed: int, risk_tag: str, tag: str) -> tuple[E2EForecasts, pd.DataFrame]:
+                     seed: int, risk_tag: str, tag: str, views_tag: str | None = None) -> tuple[E2EForecasts, pd.DataFrame]:
     rebal = rebalance_dates(panel, cfg.backtest.oos_start)
     refits = refit_dates(rebal, rc.refit_every_months)
     layer = make_layer(cfg, len(panel.tickers), mb.S.shape[0])
@@ -307,7 +338,12 @@ def walk_forward_e2e(cfg: Config, panel: Panel, bank: SampleBank, mb: MonthBank,
     alpha_state, rows_log = None, []
     for j, R in enumerate(refits):
         ck = torch.load(cfg.paths.models / f"risk_{risk_tag}_{R.date()}.pt", weights_only=False)
-        model, info = train_e2e(cfg, bank, mb, R, ck["state"], alpha_state, rc, seed, layer)
+        views = None
+        if views_tag is not None:  # the AlphaFormer ensemble trained at the same refit date (Stage 4b)
+            from dpc.deep.train_alpha import load_alpha_ensemble
+
+            views = load_alpha_ensemble(cfg, mb.ab, R, tag=views_tag)
+        model, info = train_e2e(cfg, bank, mb, R, ck["state"], alpha_state, rc, seed, layer, views=views)
         alpha_state = copy.deepcopy(model.alpha.state_dict())
         torch.save({"state": model.state_dict()}, cfg.paths.models / f"e2e_{tag}_{R.date()}.pt")
         info["refit"] = R
@@ -325,7 +361,10 @@ def walk_forward_e2e(cfg: Config, panel: Panel, bank: SampleBank, mb: MonthBank,
     return E2EForecasts(rebal, mu_o, B_o, s_o), pd.DataFrame(rows_log)
 
 
-def run_stage5(cfg: Config, seed: int | None = None, tag: str = "main", risk_tag: str = "main") -> pd.DataFrame:
+def run_stage5(cfg: Config, seed: int | None = None, tag: str = "main", risk_tag: str = "main",
+               views: bool = False) -> pd.DataFrame:
+    """views=False: the pre-specified e2e (classical composite + deep risk + optimiser layer).
+    views=True: the fully deep e2e (AlphaFormer + deep risk + optimiser layer), saved as e2e_<tag>."""
     from dpc.baselines import get_betas, load_signals, summarize
 
     seed = cfg.project.seed if seed is None else seed
@@ -333,8 +372,9 @@ def run_stage5(cfg: Config, seed: int | None = None, tag: str = "main", risk_tag
     rc = cfg.risk_model
     signals, betas = load_signals(cfg), get_betas(cfg, panel)
     bank = build_sample_bank(panel, rc.seq_len_days, rc.horizon_days, rc.sample_stride_days)
-    mb = build_month_bank(cfg, panel, bank, signals, betas)
-    fc, refit_log = walk_forward_e2e(cfg, panel, bank, mb, rc, seed, risk_tag, tag)
+    ab = build_alpha_bank(panel, signals, betas, cfg.alpha_model) if views else None
+    mb = build_month_bank(cfg, panel, bank, signals, betas, ab=ab)
+    fc, refit_log = walk_forward_e2e(cfg, panel, bank, mb, rc, seed, risk_tag, tag, views_tag="main" if views else None)
     refit_log.to_csv(cfg.paths.reports / f"stage5_refits_{tag}.csv", index=False)
     np.savez_compressed(cfg.paths.data_processed / f"e2e_forecasts_{tag}.npz", mu=fc.mu, B=fc.B, s=fc.s,
                         dates=fc.dates.values.astype("datetime64[ns]").astype(np.int64))

@@ -62,26 +62,28 @@ def model_size(cfg: Config) -> pd.DataFrame:
     return df
 
 
-def seeds(cfg: Config) -> pd.DataFrame:
+def seeds(cfg: Config, views: bool = False) -> pd.DataFrame:
+    """Re-run the end-to-end walk-forward with each seed. views=True: the fully deep model."""
     from dpc.backtest import load_result
     from dpc.deep.e2e import run_stage5
 
     panel = Panel.load(cfg.paths.data_processed)
     rows = {}
+    base = "deep" if views else "main"
     for s in cfg.evaluation.seeds:
-        tag = "main" if s == cfg.project.seed else f"seed{s}"
+        tag = base if s == cfg.project.seed else (f"deep_seed{s}" if views else f"seed{s}")
         name = "e2e" if tag == "main" else f"e2e_{tag}"
         try:
             r = load_result(name, cfg.paths.results)
         except FileNotFoundError:
-            run_stage5(cfg, seed=s, tag=tag)
+            run_stage5(cfg, seed=s, tag=tag, views=views)
             r = load_result(name, cfg.paths.results)
         m = performance_metrics(r.daily_net, panel.ff, r.turnover, r.costs, cfg.backtest.annualization_days, cfg.signals.newey_west_lags)
         rows[f"seed={s}"] = {k: m[k] for k in ("sharpe", "ann_return", "ann_vol", "max_drawdown", "alpha_t_ff6", "turnover_ann")}
     df = pd.DataFrame(rows).T
     df.loc["mean"] = df.mean()
     df.loc["std"] = df.iloc[:-1].std()
-    df.to_csv(cfg.paths.reports / "stage6_seeds.csv")
+    df.to_csv(cfg.paths.reports / ("stage6_seeds_deep.csv" if views else "stage6_seeds.csv"))
     log.info("Seed robustness:\n%s", df.round(3).to_string())
     return df
 
@@ -89,6 +91,7 @@ def seeds(cfg: Config) -> pd.DataFrame:
 def run_robustness(cfg: Config) -> None:
     model_size(cfg)
     seeds(cfg)
+    seeds(cfg, views=True)
 
 
 __all__ = ["run_robustness", "model_size", "seeds", "np"]

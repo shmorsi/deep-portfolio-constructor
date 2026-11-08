@@ -133,6 +133,36 @@ Likelihood mostly rewards getting the *level* of each stock's variance right thr
 
 ---
 
+## Stage 4b: AlphaFormer, deep views
+
+**What and why.**
+* **What it is.** A PyTorch transformer that forecasts next month's *relative* returns.
+* **How it reads the data.**
+  * Each stock's last 12 monthly returns are tokens, and attention runs over months.
+  * A second encoder attends *across stocks* to make the forecast peer-aware.
+  * The static inputs are volatilities, factor betas, the three classical signals and the sector.
+* **How it's trained.** On the negative information coefficient (IC), as a 3-seed ensemble with 28,033 parameters each. It uses the same yearly walk-forward refits and label-date assertions as the risk model.
+* **Out-of-sample result.**
+  * IC 0.0165 (t 1.25), against −0.004 for the classical composite.
+  * Top-minus-bottom quintile +0.47% a month (t 1.63).
+  * The best signal, but not significant.
+
+**Q1. Why train a return model on IC instead of mean squared error?**
+A market-neutral book only needs the *ranking* of stocks next month, not the level of the market. Correlation between the forecast and realised cross-sectional returns is scale-free (it ignores how big the numbers are) and differentiable, so it trains directly on what the portfolio uses. MSE would spend capacity predicting the market's average move, which the dollar-neutral constraint throws away. A natural target is the cross-sectionally standardised next-month return, and the loss is −mean(IC) over the months in a batch.
+
+**Q2. Why is the cross-sectional attention permutation-equivariant, and why does that matter?**
+There's no positional encoding across stocks, so relabelling the stocks just relabels the forecasts, and a test checks exactly that. Without it, the model could learn something meaningless like "the 7th stock in the list goes up". With it, the model can only learn relationships between stocks' features, such as a stock being cheap versus its sector peers.
+
+**Q3. AlphaFormer helped as an input but hurt when trained end to end. Why?**
+* **As an input,** in the two-stage strategy, Sharpe went from −0.05 to 0.33.
+* **Trained end to end with everything else,** Sharpe fell to 0.15, and the result was 0.30% a month worse than the end-to-end model with classical views (t −1.90).
+
+Each yearly refit has at most about 250 monthly decisions to learn from. The fully deep model fits the most parameters to them, and it learned to scale AlphaFormer's score up about 2×. That is classic overfitting.
+
+What I'd try next: freeze AlphaFormer and train only its weight end to end, pool more assets, or ensemble seeds. An ablation like this is how you find which component actually earns its complexity.
+
+---
+
 ## Stage 5: End-to-end differentiable optimiser
 
 **What and why.**
@@ -142,9 +172,8 @@ Likelihood mostly rewards getting the *level* of each stock's variance right thr
 * **Loss.** −(realised net return − costs) + λ × realised daily variance.
 
 **Results:**
-* Net Sharpe 0.58 (seed mean 0.51) vs −0.03 for classical.
-* Edge t = 1.70.
-* Realised beta 0.19.
+* End-to-end model (classical views, deep risk): net Sharpe 0.58 (seed mean 0.51) vs −0.03 for classical, edge t = 1.70, realised beta 0.19.
+* Fully deep model (adds AlphaFormer): 0.15, FF6 alpha t 0.04. Its return is mostly leaked beta.
 
 **Q1. Why train end-to-end instead of predict-then-optimise?**
 Forecast error is not decision error. The optimiser is very sensitive to some errors (e.g. small eigenvalues, the ranking of the extreme stocks) and ignores others. Training on realised portfolio utility puts the model's capacity where the decision is sensitive. The risk is that it also finds *unintended* routes to utility, which is exactly what happened with beta.

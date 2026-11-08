@@ -15,6 +15,7 @@ project:
   seed: 42                      # master seed for numpy / torch / random
   deterministic_torch: true     # deterministic kernels: same seed -> same bits
   torch_num_threads: 4          # fixed so float summation order is fixed
+  device: auto                  # PyTorch device for the shared Trainer: auto | cpu | cuda | mps
 
 paths:                          # relative to this file
   data_raw: data/raw
@@ -120,10 +121,31 @@ risk_model:
   min_idio_var: 1.0e-6          # floor on daily idiosyncratic variance (numerical)
   grad_clip: 1.0
 
+# ---------------------------------------------------------------- Stage 4b ---
+alpha_model:                    # AlphaFormer: deep "analyst views" (next-month cross-sectional returns)
+  seq_len_months: 12            # each stock's last 12 monthly returns are the token sequence
+  d_model: 32
+  n_heads: 4
+  temporal_layers: 1            # attention over months (within a stock)
+  cross_sectional_layers: 2     # attention across stocks (within a month)
+  dropout: 0.1
+  learning_rate: 0.001
+  weight_decay: 0.001
+  max_epochs: 60
+  batch_size: 8                 # months (cross-sections) per gradient step
+  val_months: 24                # last 24 labelled months of each training window
+  early_stopping_patience: 8
+  refit_every_months: 12        # same yearly walk-forward refits as the risk model
+  warm_start: true
+  ensemble_size: 3              # average of 3 seeds: cuts the variance of a noisy target
+  feature_clip: 5.0             # standardised inputs clipped at +-5 (inputs only)
+  target_clip: 3.0              # standardised training target clipped at +-3
+  grad_clip: 1.0
+
 # ---------------------------------------------------------------- Stage 5 ----
 e2e:
   learning_rate: 0.003          # alpha network
-  risk_lr_mult: 0.05            # risk network fine-tunes at 5% of that (it is pre-trained)
+  pretrained_lr_mult: 0.05      # pre-trained networks (risk model, AlphaFormer) fine-tune at 5% of that
   weight_decay: 0.0001
   max_epochs: 20
   batch_size: 12                # months per gradient step
@@ -148,4 +170,4 @@ evaluation:
 
 # ---------------------------------------------------------------- Stage 7 ----
 dashboard:
-  default_strategy: e2e
+  default_strategy: e2e         # the pre-specified end-to-end model opens first

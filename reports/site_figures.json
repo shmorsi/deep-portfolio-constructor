@@ -1,0 +1,654 @@
+{
+  "_meta": {
+    "oos_start": "2008-01-01",
+    "cost_bps": 10.0
+  },
+  "ls_naive.sharpe": {
+    "value": -0.4035833732471678,
+    "source": "reports/stage6_performance.csv [L/S naive signal, sharpe]"
+  },
+  "ls_naive.ann_return": {
+    "value": -0.08699491193039743,
+    "source": "reports/stage6_performance.csv [L/S naive signal, ann_return]"
+  },
+  "ls_naive.ann_vol": {
+    "value": 0.18355260664226083,
+    "source": "reports/stage6_performance.csv [L/S naive signal, ann_vol]"
+  },
+  "ls_naive.max_drawdown": {
+    "value": -0.877040334424314,
+    "source": "reports/stage6_performance.csv [L/S naive signal, max_drawdown]"
+  },
+  "ls_naive.alpha_ann_ff6": {
+    "value": -0.07790893770793206,
+    "source": "reports/stage6_performance.csv [L/S naive signal, alpha_ann_ff6]"
+  },
+  "ls_naive.alpha_t_ff6": {
+    "value": -3.46964156198318,
+    "source": "reports/stage6_performance.csv [L/S naive signal, alpha_t_ff6]"
+  },
+  "ls_naive.beta_mkt": {
+    "value": -0.16345286011496427,
+    "source": "reports/stage6_performance.csv [L/S naive signal, beta_mkt]"
+  },
+  "ls_naive.exante_share_specific": {
+    "value": 0.1743313794681353,
+    "source": "reports/stage6_risk_decomposition.csv [L/S naive signal, exante_share_specific]"
+  },
+  "ls_naive.realised_share_specific": {
+    "value": 0.07431533322281321,
+    "source": "reports/stage6_risk_decomposition.csv [L/S naive signal, realised_share_specific]"
+  },
+  "ls_naive.sharpe_unhedged": {
+    "value": -0.5050421473631143,
+    "source": "reports/stage6_beta_hedged.csv [L/S naive signal, sharpe_unhedged]"
+  },
+  "ls_naive.sharpe_beta_hedged": {
+    "value": -0.2869997878593926,
+    "source": "reports/stage6_beta_hedged.csv [L/S naive signal, sharpe_beta_hedged]"
+  },
+  "ls_naive.avg_trailing_beta": {
+    "value": -0.2544032968727044,
+    "source": "reports/stage6_beta_hedged.csv [L/S naive signal, avg_trailing_beta]"
+  },
+  "ls_naive.alpha_t_hedged": {
+    "value": -2.5778471417265156,
+    "source": "reports/stage6_beta_hedged.csv [L/S naive signal, alpha_t_hedged]"
+  },
+  "ls_classical.sharpe": {
+    "value": -0.031768353359077066,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), sharpe]"
+  },
+  "ls_classical.ann_return": {
+    "value": -0.005740146013725411,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), ann_return]"
+  },
+  "ls_classical.ann_vol": {
+    "value": 0.08013213111465757,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), ann_vol]"
+  },
+  "ls_classical.max_drawdown": {
+    "value": -0.31923205298560753,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), max_drawdown]"
+  },
+  "ls_classical.alpha_ann_ff6": {
+    "value": -0.011756809978337422,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), alpha_ann_ff6]"
+  },
+  "ls_classical.alpha_t_ff6": {
+    "value": -0.6899481759962065,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), alpha_t_ff6]"
+  },
+  "ls_classical.beta_mkt": {
+    "value": 0.016099735992899804,
+    "source": "reports/stage6_performance.csv [L/S classical (LW + optimiser), beta_mkt]"
+  },
+  "ls_classical.exante_share_specific": {
+    "value": 0.6142165229988524,
+    "source": "reports/stage6_risk_decomposition.csv [L/S classical (LW + optimiser), exante_share_specific]"
+  },
+  "ls_classical.realised_share_specific": {
+    "value": 0.6214741563440856,
+    "source": "reports/stage6_risk_decomposition.csv [L/S classical (LW + optimiser), realised_share_specific]"
+  },
+  "ls_classical.sharpe_unhedged": {
+    "value": -0.04884703447079496,
+    "source": "reports/stage6_beta_hedged.csv [L/S classical (LW + optimiser), sharpe_unhedged]"
+  },
+  "ls_classical.sharpe_beta_hedged": {
+    "value": 0.042283264338435336,
+    "source": "reports/stage6_beta_hedged.csv [L/S classical (LW + optimiser), sharpe_beta_hedged]"
+  },
+  "ls_classical.avg_trailing_beta": {
+    "value": -0.03607360671987195,
+    "source": "reports/stage6_beta_hedged.csv [L/S classical (LW + optimiser), avg_trailing_beta]"
+  },
+  "ls_classical.alpha_t_hedged": {
+    "value": -0.23299467079011574,
+    "source": "reports/stage6_beta_hedged.csv [L/S classical (LW + optimiser), alpha_t_hedged]"
+  },
+  "ls_deep_twostage.sharpe": {
+    "value": -0.04726515371094007,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, sharpe]"
+  },
+  "ls_deep_twostage.ann_return": {
+    "value": -0.009001646400773167,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, ann_return]"
+  },
+  "ls_deep_twostage.ann_vol": {
+    "value": 0.09524307997855924,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, ann_vol]"
+  },
+  "ls_deep_twostage.max_drawdown": {
+    "value": -0.36253595762845725,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, max_drawdown]"
+  },
+  "ls_deep_twostage.alpha_ann_ff6": {
+    "value": -0.019771883713992428,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, alpha_ann_ff6]"
+  },
+  "ls_deep_twostage.alpha_t_ff6": {
+    "value": -1.2410769605347802,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, alpha_t_ff6]"
+  },
+  "ls_deep_twostage.beta_mkt": {
+    "value": 0.05289050954706384,
+    "source": "reports/stage6_performance.csv [L/S deep risk + optimiser, beta_mkt]"
+  },
+  "ls_deep_twostage.exante_share_specific": {
+    "value": 0.4119449767430776,
+    "source": "reports/stage6_risk_decomposition.csv [L/S deep risk + optimiser, exante_share_specific]"
+  },
+  "ls_deep_twostage.realised_share_specific": {
+    "value": 0.3423029957851771,
+    "source": "reports/stage6_risk_decomposition.csv [L/S deep risk + optimiser, realised_share_specific]"
+  },
+  "ls_deep_twostage.sharpe_unhedged": {
+    "value": -0.0813693279301626,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep risk + optimiser, sharpe_unhedged]"
+  },
+  "ls_deep_twostage.sharpe_beta_hedged": {
+    "value": -0.0072339691306642475,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep risk + optimiser, sharpe_beta_hedged]"
+  },
+  "ls_deep_twostage.avg_trailing_beta": {
+    "value": -0.026257472844718212,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep risk + optimiser, avg_trailing_beta]"
+  },
+  "ls_deep_twostage.alpha_t_hedged": {
+    "value": -0.8232889285469278,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep risk + optimiser, alpha_t_hedged]"
+  },
+  "ls_deep_alpha.sharpe": {
+    "value": 0.333074858316824,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, sharpe]"
+  },
+  "ls_deep_alpha.ann_return": {
+    "value": 0.025096856605592466,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, ann_return]"
+  },
+  "ls_deep_alpha.ann_vol": {
+    "value": 0.08534866383381016,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, ann_vol]"
+  },
+  "ls_deep_alpha.max_drawdown": {
+    "value": -0.26342483927529303,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, max_drawdown]"
+  },
+  "ls_deep_alpha.alpha_ann_ff6": {
+    "value": 0.015647409531771593,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, alpha_ann_ff6]"
+  },
+  "ls_deep_alpha.alpha_t_ff6": {
+    "value": 0.8017176681787915,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, alpha_t_ff6]"
+  },
+  "ls_deep_alpha.beta_mkt": {
+    "value": 0.14544754268765958,
+    "source": "reports/stage6_performance.csv [L/S deep views + deep risk + optimiser, beta_mkt]"
+  },
+  "ls_deep_alpha.exante_share_specific": {
+    "value": 0.498856103357275,
+    "source": "reports/stage6_risk_decomposition.csv [L/S deep views + deep risk + optimiser, exante_share_specific]"
+  },
+  "ls_deep_alpha.realised_share_specific": {
+    "value": 0.4562111502874401,
+    "source": "reports/stage6_risk_decomposition.csv [L/S deep views + deep risk + optimiser, realised_share_specific]"
+  },
+  "ls_deep_alpha.sharpe_unhedged": {
+    "value": 0.3974042732695541,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep views + deep risk + optimiser, sharpe_unhedged]"
+  },
+  "ls_deep_alpha.sharpe_beta_hedged": {
+    "value": 0.25076005088452413,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep views + deep risk + optimiser, sharpe_beta_hedged]"
+  },
+  "ls_deep_alpha.avg_trailing_beta": {
+    "value": 0.11449893512989043,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep views + deep risk + optimiser, avg_trailing_beta]"
+  },
+  "ls_deep_alpha.alpha_t_hedged": {
+    "value": 1.0301646992295406,
+    "source": "reports/stage6_beta_hedged.csv [L/S deep views + deep risk + optimiser, alpha_t_hedged]"
+  },
+  "e2e.sharpe": {
+    "value": 0.5821493098880375,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), sharpe]"
+  },
+  "e2e.ann_return": {
+    "value": 0.047339112753943535,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), ann_return]"
+  },
+  "e2e.ann_vol": {
+    "value": 0.08577790734758636,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), ann_vol]"
+  },
+  "e2e.max_drawdown": {
+    "value": -0.2762090480715459,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), max_drawdown]"
+  },
+  "e2e.alpha_ann_ff6": {
+    "value": 0.03109728968433728,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), alpha_ann_ff6]"
+  },
+  "e2e.alpha_t_ff6": {
+    "value": 1.4750535309986932,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), alpha_t_ff6]"
+  },
+  "e2e.beta_mkt": {
+    "value": 0.19330116060033195,
+    "source": "reports/stage6_performance.csv [L/S end-to-end (classical views), beta_mkt]"
+  },
+  "e2e.exante_share_specific": {
+    "value": 0.47056609349999157,
+    "source": "reports/stage6_risk_decomposition.csv [L/S end-to-end (classical views), exante_share_specific]"
+  },
+  "e2e.realised_share_specific": {
+    "value": 0.45568699832866816,
+    "source": "reports/stage6_risk_decomposition.csv [L/S end-to-end (classical views), realised_share_specific]"
+  },
+  "e2e.sharpe_unhedged": {
+    "value": 0.6387820108777702,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end (classical views), sharpe_unhedged]"
+  },
+  "e2e.sharpe_beta_hedged": {
+    "value": 0.40211088680028656,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end (classical views), sharpe_beta_hedged]"
+  },
+  "e2e.avg_trailing_beta": {
+    "value": 0.17720210931298477,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end (classical views), avg_trailing_beta]"
+  },
+  "e2e.alpha_t_hedged": {
+    "value": 1.3619045796854994,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end (classical views), alpha_t_hedged]"
+  },
+  "e2e_deep.sharpe": {
+    "value": 0.15154140669103175,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, sharpe]"
+  },
+  "e2e_deep.ann_return": {
+    "value": 0.009826776608618415,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, ann_return]"
+  },
+  "e2e_deep.ann_vol": {
+    "value": 0.09310876954908531,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, ann_vol]"
+  },
+  "e2e_deep.max_drawdown": {
+    "value": -0.3072684094631496,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, max_drawdown]"
+  },
+  "e2e_deep.alpha_ann_ff6": {
+    "value": 0.0007885270273276488,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, alpha_ann_ff6]"
+  },
+  "e2e_deep.alpha_t_ff6": {
+    "value": 0.03931745091193749,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, alpha_t_ff6]"
+  },
+  "e2e_deep.beta_mkt": {
+    "value": 0.17253883702221118,
+    "source": "reports/stage6_performance.csv [L/S end-to-end, fully deep, beta_mkt]"
+  },
+  "e2e_deep.exante_share_specific": {
+    "value": 0.48396236715851415,
+    "source": "reports/stage6_risk_decomposition.csv [L/S end-to-end, fully deep, exante_share_specific]"
+  },
+  "e2e_deep.realised_share_specific": {
+    "value": 0.4323668193908099,
+    "source": "reports/stage6_risk_decomposition.csv [L/S end-to-end, fully deep, realised_share_specific]"
+  },
+  "e2e_deep.sharpe_unhedged": {
+    "value": 0.21760777144041102,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end, fully deep, sharpe_unhedged]"
+  },
+  "e2e_deep.sharpe_beta_hedged": {
+    "value": 0.0723382168798436,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end, fully deep, sharpe_beta_hedged]"
+  },
+  "e2e_deep.avg_trailing_beta": {
+    "value": 0.12500550196188462,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end, fully deep, avg_trailing_beta]"
+  },
+  "e2e_deep.alpha_t_hedged": {
+    "value": 0.32981578696351577,
+    "source": "reports/stage6_beta_hedged.csv [L/S end-to-end, fully deep, alpha_t_hedged]"
+  },
+  "ic.deep_alpha.mean_IC": {
+    "value": 0.016491083280737485,
+    "source": "reports/stage4b_alpha_ic.csv [deep_alpha, mean_IC]"
+  },
+  "ic.deep_alpha.IC_t_stat_NW": {
+    "value": 1.249845774938973,
+    "source": "reports/stage4b_alpha_ic.csv [deep_alpha, IC_t_stat_NW]"
+  },
+  "ic.deep_alpha.Q5_minus_Q1_monthly": {
+    "value": 0.004666087460318097,
+    "source": "reports/stage4b_alpha_ic.csv [deep_alpha, Q5_minus_Q1_monthly]"
+  },
+  "ic.deep_alpha.Q5_Q1_t_stat_NW": {
+    "value": 1.6276128509496617,
+    "source": "reports/stage4b_alpha_ic.csv [deep_alpha, Q5_Q1_t_stat_NW]"
+  },
+  "ic.deep_alpha.n_months": {
+    "value": 224.0,
+    "source": "reports/stage4b_alpha_ic.csv [deep_alpha, n_months]"
+  },
+  "ic.combined.mean_IC": {
+    "value": -0.003854118801231542,
+    "source": "reports/stage4b_alpha_ic.csv [combined, mean_IC]"
+  },
+  "ic.combined.IC_t_stat_NW": {
+    "value": -0.27996662114642124,
+    "source": "reports/stage4b_alpha_ic.csv [combined, IC_t_stat_NW]"
+  },
+  "ic.combined.Q5_minus_Q1_monthly": {
+    "value": -0.003191885580770519,
+    "source": "reports/stage4b_alpha_ic.csv [combined, Q5_minus_Q1_monthly]"
+  },
+  "ic.combined.Q5_Q1_t_stat_NW": {
+    "value": -0.9934382566061434,
+    "source": "reports/stage4b_alpha_ic.csv [combined, Q5_Q1_t_stat_NW]"
+  },
+  "ic.combined.n_months": {
+    "value": 224.0,
+    "source": "reports/stage4b_alpha_ic.csv [combined, n_months]"
+  },
+  "ic.momentum.mean_IC": {
+    "value": 0.016092489330339892,
+    "source": "reports/stage4b_alpha_ic.csv [momentum, mean_IC]"
+  },
+  "ic.momentum.IC_t_stat_NW": {
+    "value": 1.151247393643285,
+    "source": "reports/stage4b_alpha_ic.csv [momentum, IC_t_stat_NW]"
+  },
+  "ic.momentum.Q5_minus_Q1_monthly": {
+    "value": 0.0023766225675147554,
+    "source": "reports/stage4b_alpha_ic.csv [momentum, Q5_minus_Q1_monthly]"
+  },
+  "ic.momentum.Q5_Q1_t_stat_NW": {
+    "value": 0.6716908142914536,
+    "source": "reports/stage4b_alpha_ic.csv [momentum, Q5_Q1_t_stat_NW]"
+  },
+  "ic.momentum.n_months": {
+    "value": 224.0,
+    "source": "reports/stage4b_alpha_ic.csv [momentum, n_months]"
+  },
+  "risk.deep.mean_oos_nll": {
+    "value": -2.940675730244348,
+    "source": "reports/stage4_risk_model.csv [deep, mean_oos_nll]"
+  },
+  "risk.deep.gmv_realised_vol_ann": {
+    "value": 0.14001145873647458,
+    "source": "reports/stage4_risk_model.csv [deep, gmv_realised_vol_ann]"
+  },
+  "risk.deep.share_months_best_nll": {
+    "value": 0.5133928571428571,
+    "source": "reports/stage4_risk_model.csv [deep, share_months_best_nll]"
+  },
+  "risk.ledoit_wolf.mean_oos_nll": {
+    "value": -2.8987240710379756,
+    "source": "reports/stage4_risk_model.csv [ledoit_wolf, mean_oos_nll]"
+  },
+  "risk.ledoit_wolf.gmv_realised_vol_ann": {
+    "value": 0.13260237067390862,
+    "source": "reports/stage4_risk_model.csv [ledoit_wolf, gmv_realised_vol_ann]"
+  },
+  "risk.ledoit_wolf.share_months_best_nll": {
+    "value": 0.48214285714285715,
+    "source": "reports/stage4_risk_model.csv [ledoit_wolf, share_months_best_nll]"
+  },
+  "risk.sample.mean_oos_nll": {
+    "value": -2.6899053885730657,
+    "source": "reports/stage4_risk_model.csv [sample, mean_oos_nll]"
+  },
+  "risk.sample.gmv_realised_vol_ann": {
+    "value": 0.1470601593197113,
+    "source": "reports/stage4_risk_model.csv [sample, gmv_realised_vol_ann]"
+  },
+  "risk.sample.share_months_best_nll": {
+    "value": 0.004464285714285714,
+    "source": "reports/stage4_risk_model.csv [sample, share_months_best_nll]"
+  },
+  "diff.e2e_deep - ls_classical.mean_monthly_diff": {
+    "value": 0.0013636694170110829,
+    "source": "reports/stage6_difference_tests.csv [e2e_deep - ls_classical, mean_monthly_diff]"
+  },
+  "diff.e2e_deep - ls_classical.t_stat": {
+    "value": 0.591921456175753,
+    "source": "reports/stage6_difference_tests.csv [e2e_deep - ls_classical, t_stat]"
+  },
+  "diff.e2e_deep - ls_classical.n_months": {
+    "value": 225.0,
+    "source": "reports/stage6_difference_tests.csv [e2e_deep - ls_classical, n_months]"
+  },
+  "diff.e2e_deep - e2e.mean_monthly_diff": {
+    "value": -0.0029840173796563674,
+    "source": "reports/stage6_difference_tests.csv [e2e_deep - e2e, mean_monthly_diff]"
+  },
+  "diff.e2e_deep - e2e.t_stat": {
+    "value": -1.9025961711585684,
+    "source": "reports/stage6_difference_tests.csv [e2e_deep - e2e, t_stat]"
+  },
+  "diff.e2e_deep - e2e.n_months": {
+    "value": 225.0,
+    "source": "reports/stage6_difference_tests.csv [e2e_deep - e2e, n_months]"
+  },
+  "diff.e2e - ls_classical.mean_monthly_diff": {
+    "value": 0.0043476867966674515,
+    "source": "reports/stage6_difference_tests.csv [e2e - ls_classical, mean_monthly_diff]"
+  },
+  "diff.e2e - ls_classical.t_stat": {
+    "value": 1.7048537791809606,
+    "source": "reports/stage6_difference_tests.csv [e2e - ls_classical, t_stat]"
+  },
+  "diff.e2e - ls_classical.n_months": {
+    "value": 225.0,
+    "source": "reports/stage6_difference_tests.csv [e2e - ls_classical, n_months]"
+  },
+  "diff.ls_deep_alpha - ls_classical.mean_monthly_diff": {
+    "value": 0.0025562647063317586,
+    "source": "reports/stage6_difference_tests.csv [ls_deep_alpha - ls_classical, mean_monthly_diff]"
+  },
+  "diff.ls_deep_alpha - ls_classical.t_stat": {
+    "value": 1.1202545380477067,
+    "source": "reports/stage6_difference_tests.csv [ls_deep_alpha - ls_classical, t_stat]"
+  },
+  "diff.ls_deep_alpha - ls_classical.n_months": {
+    "value": 225.0,
+    "source": "reports/stage6_difference_tests.csv [ls_deep_alpha - ls_classical, n_months]"
+  },
+  "diff.ls_deep_twostage - ls_classical.mean_monthly_diff": {
+    "value": -0.00021025118554683436,
+    "source": "reports/stage6_difference_tests.csv [ls_deep_twostage - ls_classical, mean_monthly_diff]"
+  },
+  "diff.ls_deep_twostage - ls_classical.t_stat": {
+    "value": -0.2209004672389756,
+    "source": "reports/stage6_difference_tests.csv [ls_deep_twostage - ls_classical, t_stat]"
+  },
+  "diff.ls_deep_twostage - ls_classical.n_months": {
+    "value": 225.0,
+    "source": "reports/stage6_difference_tests.csv [ls_deep_twostage - ls_classical, n_months]"
+  },
+  "diff.e2e - ls_deep_twostage.mean_monthly_diff": {
+    "value": 0.004557937982214286,
+    "source": "reports/stage6_difference_tests.csv [e2e - ls_deep_twostage, mean_monthly_diff]"
+  },
+  "diff.e2e - ls_deep_twostage.t_stat": {
+    "value": 1.7129797961460096,
+    "source": "reports/stage6_difference_tests.csv [e2e - ls_deep_twostage, t_stat]"
+  },
+  "diff.e2e - ls_deep_twostage.n_months": {
+    "value": 225.0,
+    "source": "reports/stage6_difference_tests.csv [e2e - ls_deep_twostage, n_months]"
+  },
+  "seeds.seed=42.sharpe": {
+    "value": 0.5821493098880375,
+    "source": "reports/stage6_seeds.csv [seed=42, sharpe]"
+  },
+  "seeds.seed=43.sharpe": {
+    "value": 0.45684076864808243,
+    "source": "reports/stage6_seeds.csv [seed=43, sharpe]"
+  },
+  "seeds.seed=44.sharpe": {
+    "value": 0.4947360920735631,
+    "source": "reports/stage6_seeds.csv [seed=44, sharpe]"
+  },
+  "seeds.mean.sharpe": {
+    "value": 0.5112420568698943,
+    "source": "reports/stage6_seeds.csv [mean, sharpe]"
+  },
+  "seeds.std.sharpe": {
+    "value": 0.06426424186368865,
+    "source": "reports/stage6_seeds.csv [std, sharpe]"
+  },
+  "tests": {
+    "value": 89,
+    "source": "pytest --collect-only, deep-portfolio-constructor main"
+  },
+  "oracle_sharpe": {
+    "value": 10.565780817438494,
+    "source": "reports/stage6_lookahead_checks.json [oracle_sharpe]"
+  },
+  "lookahead_checks_passed": {
+    "value": 1.0,
+    "source": "reports/stage6_lookahead_checks.json [engine and deep-feature truncation invariance]"
+  },
+  "cost.e2e.sharpe@0bps": {
+    "value": 0.7135486019770152,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end (classical views), sharpe@0bps]"
+  },
+  "cost.e2e.sharpe@5bps": {
+    "value": 0.6479599971442694,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end (classical views), sharpe@5bps]"
+  },
+  "cost.e2e.sharpe@10bps": {
+    "value": 0.5821493098880376,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end (classical views), sharpe@10bps]"
+  },
+  "cost.e2e.sharpe@20bps": {
+    "value": 0.4501402886100334,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end (classical views), sharpe@20bps]"
+  },
+  "cost.e2e.sharpe@40bps": {
+    "value": 0.18651910526393967,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end (classical views), sharpe@40bps]"
+  },
+  "cost.e2e_deep.sharpe@0bps": {
+    "value": 0.28020140582924996,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end, fully deep, sharpe@0bps]"
+  },
+  "cost.e2e_deep.sharpe@5bps": {
+    "value": 0.21588714625740693,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end, fully deep, sharpe@5bps]"
+  },
+  "cost.e2e_deep.sharpe@10bps": {
+    "value": 0.15154140669103175,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end, fully deep, sharpe@10bps]"
+  },
+  "cost.e2e_deep.sharpe@20bps": {
+    "value": 0.023008785437825967,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end, fully deep, sharpe@20bps]"
+  },
+  "cost.e2e_deep.sharpe@40bps": {
+    "value": -0.23168359692171414,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S end-to-end, fully deep, sharpe@40bps]"
+  },
+  "cost.ls_classical.sharpe@0bps": {
+    "value": 0.11917091619855456,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S classical (LW + optimiser), sharpe@0bps]"
+  },
+  "cost.ls_classical.sharpe@5bps": {
+    "value": 0.04368067067922319,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S classical (LW + optimiser), sharpe@5bps]"
+  },
+  "cost.ls_classical.sharpe@10bps": {
+    "value": -0.031768353359077066,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S classical (LW + optimiser), sharpe@10bps]"
+  },
+  "cost.ls_classical.sharpe@20bps": {
+    "value": -0.18213675978155403,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S classical (LW + optimiser), sharpe@20bps]"
+  },
+  "cost.ls_classical.sharpe@40bps": {
+    "value": -0.4780109431562889,
+    "source": "reports/stage6_cost_sensitivity.csv [L/S classical (LW + optimiser), sharpe@40bps]"
+  },
+  "constraints.e2e.sharpe_min": {
+    "value": 0.5413648465519119,
+    "source": "reports/stage6_constraint_sensitivity.csv [e2e rows, min sharpe]"
+  },
+  "constraints.e2e.sharpe_max": {
+    "value": 0.6707139982775966,
+    "source": "reports/stage6_constraint_sensitivity.csv [e2e rows, max sharpe]"
+  },
+  "constraints.e2e_deep.sharpe_min": {
+    "value": 0.048368629984381635,
+    "source": "reports/stage6_constraint_sensitivity.csv [e2e_deep rows, min sharpe]"
+  },
+  "constraints.e2e_deep.sharpe_max": {
+    "value": 0.2867162413538409,
+    "source": "reports/stage6_constraint_sensitivity.csv [e2e_deep rows, max sharpe]"
+  },
+  "model_size.d_model=16.n_params": {
+    "value": 8121.0,
+    "source": "reports/stage6_model_size.csv [d_model=16, n_params]"
+  },
+  "model_size.d_model=16.oos_nll_deep": {
+    "value": -2.9188674730433477,
+    "source": "reports/stage6_model_size.csv [d_model=16, oos_nll_deep]"
+  },
+  "model_size.d_model=16.gmv_vol_deep": {
+    "value": 0.14316094515192374,
+    "source": "reports/stage6_model_size.csv [d_model=16, gmv_vol_deep]"
+  },
+  "model_size.d_model=16.twostage_sharpe": {
+    "value": -0.0436187013555077,
+    "source": "reports/stage6_model_size.csv [d_model=16, twostage_sharpe]"
+  },
+  "model_size.d_model=32.n_params": {
+    "value": 29033.0,
+    "source": "reports/stage6_model_size.csv [d_model=32, n_params]"
+  },
+  "model_size.d_model=32.oos_nll_deep": {
+    "value": -2.940675730244348,
+    "source": "reports/stage6_model_size.csv [d_model=32, oos_nll_deep]"
+  },
+  "model_size.d_model=32.gmv_vol_deep": {
+    "value": 0.14001145873647458,
+    "source": "reports/stage6_model_size.csv [d_model=32, gmv_vol_deep]"
+  },
+  "model_size.d_model=32.twostage_sharpe": {
+    "value": -0.04726515371094007,
+    "source": "reports/stage6_model_size.csv [d_model=32, twostage_sharpe]"
+  },
+  "model_size.d_model=64.n_params": {
+    "value": 109257.0,
+    "source": "reports/stage6_model_size.csv [d_model=64, n_params]"
+  },
+  "model_size.d_model=64.oos_nll_deep": {
+    "value": -2.9305466041113695,
+    "source": "reports/stage6_model_size.csv [d_model=64, oos_nll_deep]"
+  },
+  "model_size.d_model=64.gmv_vol_deep": {
+    "value": 0.1427443106370015,
+    "source": "reports/stage6_model_size.csv [d_model=64, gmv_vol_deep]"
+  },
+  "model_size.d_model=64.twostage_sharpe": {
+    "value": -0.007168093209107256,
+    "source": "reports/stage6_model_size.csv [d_model=64, twostage_sharpe]"
+  },
+  "universe.n_stocks": {
+    "value": 99.0,
+    "source": "reports/data_quality_summary.csv [passed]"
+  },
+  "params.alpha_former": {
+    "value": 28033.0,
+    "source": "src/dpc/deep/alpha_model.py with config.yaml alpha_model, 3-seed ensemble has 3x"
+  },
+  "params.risk_model": {
+    "value": 29033.0,
+    "source": "src/dpc/deep/risk_model.py with config.yaml risk_model"
+  }
+}

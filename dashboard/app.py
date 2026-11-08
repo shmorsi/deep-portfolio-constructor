@@ -11,15 +11,11 @@ import streamlit as st
 
 from dpc.config import load_config
 from dpc.dashboard_data import load_dashboard_data
-from dpc.evaluation import LABELS
+from dpc.strategies import COLORS as COLOR, FLAGSHIP, LABELS, LONG_SHORT
 
 # Same validated palette as the static report; colour follows the strategy.
 BLUE, ORANGE, AQUA, YELLOW, VIOLET = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#6250d6"
 RED, GRAY, GRID = "#e34948", "#898781", "#e1e0d9"
-# Fixed per strategy (never by rank). 9 strategies > 8 hues, so two long-only ones share muted grays.
-COLOR = {"e2e": BLUE, "ls_naive": ORANGE, "ls_classical": AQUA, "ls_deep_twostage": VIOLET,
-         "equal_weight": YELLOW, "min_variance": "#e87ba4", "mean_variance_lw": "#008300",
-         "risk_parity": GRAY, "hrp": "#b9b8b0"}
 
 st.set_page_config(page_title="Deep Portfolio Constructor", layout="wide")
 
@@ -40,13 +36,14 @@ def style(fig: go.Figure, height: int = 360) -> go.Figure:
 
 D = data()
 cfg = D.cfg
-ls_names = [n for n in ("e2e", "ls_deep_twostage", "ls_classical", "ls_naive") if n in D.results]
-default = cfg.dashboard.default_strategy if cfg.dashboard.default_strategy in ls_names else ls_names[0]
+ls_names = [n for n in reversed(LONG_SHORT) if n in D.results]
+default = FLAGSHIP if FLAGSHIP in ls_names else ls_names[0]
 
 st.title("Deep Portfolio Constructor")
 st.caption("Market-neutral long-short equity: keep the intended stock bets, remove unintended sector and factor risk. "
            "All results are walk-forward and out-of-sample, net of transaction costs. Universe: 99 US & Canadian large caps "
-           "(today's constituents, so survivorship bias applies).")
+           "(today's constituents, so survivorship bias applies). The models are PyTorch: a transformer return model, "
+           "a transformer covariance model, and both trained end to end through a differentiable optimiser.")
 
 with st.sidebar:
     strat = st.selectbox("Strategy", ls_names, index=ls_names.index(default), format_func=lambda s: LABELS.get(s, s))
@@ -125,7 +122,7 @@ with tab3:
 
 with tab4:
     sel = st.multiselect("Compare with", [n for n in D.results if n != strat],
-                         default=[n for n in ("ls_classical", "ls_deep_twostage", "ls_naive", "equal_weight") if n in D.results and n != strat],
+                         default=[n for n in ("e2e", "ls_classical", "ls_naive", "equal_weight") if n in D.results and n != strat],
                          format_func=lambda s: LABELS.get(s, s))
     names = [strat, *sel]
     cum = D.cumulative(names)

@@ -40,6 +40,7 @@ class ProjectConfig:
     seed: int
     deterministic_torch: bool
     torch_num_threads: int
+    device: str
 
 
 @dataclass(frozen=True)
@@ -175,9 +176,31 @@ class RiskModelConfig:
 
 
 @dataclass(frozen=True)
+class AlphaModelConfig:
+    seq_len_months: int
+    d_model: int
+    n_heads: int
+    temporal_layers: int
+    cross_sectional_layers: int
+    dropout: float
+    learning_rate: float
+    weight_decay: float
+    max_epochs: int
+    batch_size: int
+    val_months: int
+    early_stopping_patience: int
+    refit_every_months: int
+    warm_start: bool
+    ensemble_size: int
+    feature_clip: float
+    target_clip: float
+    grad_clip: float
+
+
+@dataclass(frozen=True)
 class E2EConfig:
     learning_rate: float
-    risk_lr_mult: float
+    pretrained_lr_mult: float
     weight_decay: float
     max_epochs: int
     batch_size: int
@@ -223,6 +246,7 @@ class Config:
     baselines: BaselinesConfig
     optimizer: OptimizerConfig
     risk_model: RiskModelConfig
+    alpha_model: AlphaModelConfig
     e2e: E2EConfig
     evaluation: EvaluationConfig
     dashboard: DashboardConfig
@@ -303,6 +327,13 @@ def _validate(cfg: Config) -> None:
     for name in ("sector_limit", "factor_limit", "turnover_limit", "risk_aversion", "solver_eps"):
         if getattr(o, name) <= 0:
             raise ConfigError(f"optimizer.{name} must be > 0")
+    if p.device not in ("auto", "cpu", "cuda", "mps"):
+        raise ConfigError("project.device must be auto, cpu, cuda or mps")
+    am = cfg.alpha_model
+    if am.d_model % am.n_heads != 0:
+        raise ConfigError("alpha_model.d_model must be divisible by n_heads")
+    if am.ensemble_size < 1:
+        raise ConfigError("alpha_model.ensemble_size must be >= 1")
     if cfg.risk_model.architecture not in ("lstm", "transformer"):
         raise ConfigError("risk_model.architecture must be 'lstm' or 'transformer'")
     if cfg.risk_model.d_model % cfg.risk_model.n_heads != 0:
@@ -329,6 +360,7 @@ SECTIONS: dict[str, type] = {
     "baselines": BaselinesConfig,
     "optimizer": OptimizerConfig,
     "risk_model": RiskModelConfig,
+    "alpha_model": AlphaModelConfig,
     "e2e": E2EConfig,
     "evaluation": EvaluationConfig,
     "dashboard": DashboardConfig,

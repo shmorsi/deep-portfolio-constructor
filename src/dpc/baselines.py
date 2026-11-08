@@ -30,8 +30,9 @@ from dpc.signals import SIGNAL_NAMES
 
 log = get_logger(__name__)
 
-LONG_ONLY = ["equal_weight", "min_variance", "mean_variance_lw", "risk_parity", "hrp"]
-LONG_SHORT = ["ls_naive", "ls_classical"]
+from dpc.strategies import LONG_ONLY  # noqa: E402
+
+LONG_SHORT_CLASSICAL = ["ls_naive", "ls_classical"]
 
 
 # --------------------------------------------------------------------------- #
@@ -41,10 +42,10 @@ def window_returns(view: PointInTimeView, tickers: list[str], window: int) -> pd
     return view.returns[tickers].iloc[-window:]
 
 
-def grinold_mu(view: PointInTimeView, tickers: list[str], ic: float, vol_window: int) -> np.ndarray:
+def grinold_mu(view: PointInTimeView, tickers: list[str], ic: float, vol_window: int, signal: str = "combined") -> np.ndarray:
     """alpha_i = IC * sigma_i * z_i (monthly). Converts a score into a return forecast."""
     vol = view.returns[tickers].iloc[-vol_window:].std().to_numpy() * np.sqrt(DAYS_PER_MONTH)
-    z = view.signal("combined")[tickers].to_numpy()
+    z = view.signal(signal)[tickers].to_numpy()
     return ic * vol * z
 
 
@@ -257,4 +258,4 @@ def run_stage3(cfg: Config) -> pd.DataFrame:
     return table
 
 
-__all__ = ["run_stage3", "STYLE_FACTORS", "LONG_ONLY", "LONG_SHORT"]
+__all__ = ["run_stage3", "STYLE_FACTORS", "LONG_ONLY", "LONG_SHORT_CLASSICAL"]

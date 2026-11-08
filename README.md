@@ -1,79 +1,118 @@
 # Deep Portfolio Constructor
 
-**A market-neutral long-short equity portfolio that keeps the intended stock bets and removes unintended sector and factor risk, using a transformer covariance model and an end-to-end differentiable optimiser. It is tested honestly against classical portfolio construction.**
+**A market-neutral long-short equity portfolio with PyTorch at every layer: a transformer return model, a transformer covariance model, and end-to-end training through a differentiable constrained optimiser. Built as an ablation, so each deep component's contribution is measured, and tested honestly against classical portfolio construction.**
+
+```mermaid
+flowchart LR
+  D["Prices, factors, sectors<br/>99 US and Canadian large caps"] --> A["AlphaFormer<br/>transformer over 12 months,<br/>attention across stocks"]
+  D --> R["Deep risk model<br/>patch transformer,<br/>Σ = D(BBᵀ + Ψ)D"]
+  A -- "views μ" --> O["Differentiable optimiser<br/>cvxpylayers: dollar-, sector-,<br/>beta-, size-, value-neutral"]
+  R -- "risk B, Ψ" --> O
+  O -- "weights w*" --> P["Next month's<br/>realised return − costs"]
+  P -. "gradient through the KKT conditions" .-> O
+  O -. " " .-> A
+  O -. " " .-> R
+```
 
 ## Summary
 
-I built a research pipeline that turns three textbook signals (12-1 momentum, short-term reversal and low volatility) into a dollar-neutral portfolio of 99 US and Canadian large caps. Every long-short strategy goes through one shared convex optimiser, which makes the portfolio neutral to sectors, market beta, size and value. Only the inputs differ:
-* a classical Ledoit-Wolf covariance
-* a deep covariance model (patch transformer over time plus self-attention across stocks, with a factor-structured, always-positive-definite output)
-* an end-to-end model trained *through* the optimiser with cvxpylayers, on realised risk-adjusted return after costs
+Three textbook signals (12-1 momentum, short-term reversal, low volatility) are turned into a dollar-neutral portfolio of 99 US and Canadian large caps, in six ways. Every long-short strategy uses the same convex optimiser (neutral to sectors, market beta, size and value, with position caps and a turnover limit). Only the inputs change, one deep component at a time:
 
-Everything is walk-forward and out-of-sample from January 2008 to September 2026, with yearly refits and explicit look-ahead checks.
+1. **Classical:** Ledoit-Wolf covariance, signal-based expected returns.
+2. **+ Deep risk:** a PyTorch transformer forecasts the covariance matrix.
+3. **+ Deep views:** **AlphaFormer**, a PyTorch transformer, forecasts next month's cross-sectional returns.
+4. **+ End-to-end:** the risk model is trained *through* the optimiser (cvxpylayers) on realised risk-adjusted return after costs.
+5. **Fully deep:** AlphaFormer, the risk model and the optimiser are all trained together end to end.
 
-**Headline findings:**
-* **The constrained optimiser does most of the work.** It raises the share of risk coming from intended stock bets from **17% to 61%**.
-* **The deep covariance model** forecasts risk better (best out-of-sample likelihood) but does not hedge better.
-* **The end-to-end model** has the best net Sharpe (**0.58 vs −0.03**; 0.51 ± 0.06 across three seeds), but the edge is not statistically significant (t = 1.7). About a third of it is market beta that leaked through the beta constraint.
+Everything is walk-forward and out of sample from January 2008 to September 2026. Models refit yearly, and the look-ahead checks are explicit.
+
+**Findings:**
+* **The optimiser does the risk work.** It raises the share of risk from intended stock bets from **17% to 61%**.
+* **End-to-end training through the optimiser gives the best net Sharpe** (**0.58 vs −0.03** classical), but the edge is not statistically significant (t = 1.70). About 37% of it is market beta that leaked through the beta constraint.
+* **More deep learning was not better.** Adding AlphaFormer to end-to-end training fell to 0.15 (t = −1.90 against the end-to-end model).
 
 ## Results
 
-Out-of-sample, January 2008 to September 2026, monthly rebalancing, net of 10 bps per unit traded:
+Out-of-sample, January 2008 to September 2026 (225 months), monthly rebalancing, net of 10 bps per unit traded:
 
-| Strategy | Net Sharpe | Sortino | Max DD | Ann. turnover | FF6 alpha (t) | % risk from intended bets |
-|---|---|---|---|---|---|---|
-| Equal weight (long-only) | 0.72 | 1.02 | −48.5% | 0.6× | 2.9% (3.83)* | 1% |
-| Min variance (long-only) | 0.60 | 0.83 | −38.1% | 3.6× | −0.6% (−0.42) | 8% |
-| Mean-variance, Ledoit-Wolf (long-only) | 0.60 | 0.84 | −36.9% | 11.7× | −0.7% (−0.58) | 10% |
-| Risk parity (long-only) | 0.72 | 1.01 | −45.0% | 0.7× | 2.0% (2.42)* | 2% |
-| HRP (long-only) | 0.72 | 1.01 | −41.3% | 3.1× | 1.8% (2.05)* | 2% |
-| L/S naive signal | −0.40 | −0.54 | −87.7% | 23.7× | −7.8% (−3.47) | 17% |
-| L/S classical (LW + optimiser) | −0.03 | −0.05 | −31.9% | 12.0× | −1.2% (−0.69) | **61%** |
-| L/S deep risk + optimiser | −0.05 | −0.07 | −36.3% | 12.0× | −2.0% (−1.24) | 41% |
-| **L/S end-to-end deep** | **0.58** | **0.84** | **−27.6%** | 11.1× | 3.1% (1.48) | 47% |
+| Strategy | Net Sharpe | Return | Vol | Max DD | FF6 alpha t | Market beta | % risk from intended bets |
+|---|---|---|---|---|---|---|---|
+| L/S naive signal (no risk model) | −0.40 | −8.7% | 18.4% | −88% | −3.47 | −0.16 | 17% |
+| L/S classical (Ledoit-Wolf + optimiser) | −0.03 | −0.6% | 8.0% | −32% | −0.69 | 0.02 | **61%** |
+| + deep risk model | −0.05 | −0.9% | 9.5% | −36% | −1.24 | 0.05 | 41% |
+| + deep views (AlphaFormer), two-stage | 0.33 | 2.5% | 8.5% | −26% | 0.80 | 0.15 | 50% |
+| **End-to-end through the optimiser (primary)** | **0.58** | **4.7%** | 8.6% | −28% | 1.48 | 0.19 | 47% |
+| Fully deep end-to-end (adds AlphaFormer) | 0.15 | 1.0% | 9.3% | −31% | 0.04 | 0.17 | 48% |
+| Equal weight, long-only (context) | 0.72 | 12.8% | 19.1% | −49% | 3.83* | 0.92 | 1% |
 
 \* Long-only alphas are inflated by survivorship bias (see Limitations). "% risk from intended bets" is the ex-ante stock-specific share of variance under an *independent*, evaluation-only Barra-style model (6 style factors and 11 sectors).
 
-**Deep risk model vs classical**, out-of-sample at monthly rebalance dates:
+**What each deep component did:**
 
-| | Gaussian NLL (lower is better) | Months best | Min-variance realised vol |
-|---|---|---|---|
-| Sample covariance | −2.690 | 0% | 14.7% |
-| Ledoit-Wolf | −2.899 | 48% | **13.3%** |
-| **Deep (transformer)** | **−2.941** | **51%** | 14.0% |
+| Component | Test | Result |
+|---|---|---|
+| AlphaFormer (views) | Out-of-sample rank IC vs the classical composite | **0.0165** (t 1.25) vs −0.004; top-minus-bottom quintile +0.47% a month (t 1.63). Best signal, not significant. |
+| Deep risk model | Gaussian NLL and minimum-variance realised vol vs Ledoit-Wolf | Better likelihood (−2.941 vs −2.899), worse hedge (14.0% vs 13.3%), at every model size. |
+| End-to-end training | Paired monthly return vs classical, Newey-West | +0.43% a month, **t 1.70**. Hedging its own trailing beta point-in-time: Sharpe 0.64 → 0.40. |
+| Fully deep | Paired vs the end-to-end model | −0.30% a month, t −1.90: overfit (about 250 monthly decisions per refit). |
 
-**End-to-end vs classical:**
-* Difference in monthly net returns: +0.43% a month, Newey-West t = 1.70, over 225 months.
-* After hedging each strategy's own trailing beta (estimated point-in-time, so the comparison starts in 2009), the end-to-end Sharpe falls from 0.64 to 0.40 on that same window. About 37% of the edge is leaked market beta.
-* Across seeds 42 / 43 / 44, the end-to-end Sharpe is 0.58 / 0.46 / 0.50. Across risk-model sizes of 8K–109K parameters, the deep model always wins on likelihood and always loses to Ledoit-Wolf on min-variance volatility.
+**Robustness:**
+* End-to-end Sharpe across seeds 42/43/44: 0.58 / 0.46 / 0.50.
+* Across position caps of 3–10% and sector limits of 2.5–10%: 0.54 to 0.67.
+* At 40 bps costs: 0.19.
 
 Full tables, crisis years (2008, 2020, 2022) and sensitivity tests are in [`reports/stage6_evaluation.md`](reports/stage6_evaluation.md). The 2-page write-up is [`reports/research_note.md`](reports/research_note.md).
 
 ![Risk decomposition](reports/figures/stage6_risk_decomposition.png)
 
-## How to run
+## The deep learning (all PyTorch)
 
-Requires Python 3.11 or later and about 6 GB of disk for PyTorch. The full pipeline takes about 1.5 hours on a 4-core CPU, and a GPU isn't needed.
+| Model | File | Architecture | Loss | Parameters |
+|---|---|---|---|---|
+| **AlphaFormer** | `src/dpc/deep/alpha_model.py` | transformer over each stock's 12 monthly returns, then self-attention across stocks (permutation-equivariant), 3-seed ensemble | negative information coefficient | 28,033 per member |
+| **Deep risk model** | `src/dpc/deep/risk_model.py` | patch transformer over 60 days + 6 factor returns, cross-stock attention, factor-structured Σ = D(BBᵀ+Ψ)D (positive definite by construction) | Gaussian negative log-likelihood (Woodbury) | 29,033 |
+| **End-to-end model** | `src/dpc/deep/e2e.py` | the two networks above feed a cvxpylayers optimiser layer; a zero-initialised residual starts it at the classical answer | −(realised return − costs) + λ·realised variance | both, fine-tuned |
+| **First-principles optimiser** | `src/dpc/deep/torch_qp.py` | equality-constrained mean-variance solved through its KKT system with `torch.linalg.solve` | used for teaching and tests | none |
 
-Set up the environment:
+Shared PyTorch infrastructure is in `src/dpc/deep/trainer.py`: a `Dataset`/`DataLoader` per month, AdamW, gradient clipping, early stopping on a validation metric, best-weights restore, and device selection (CUDA, Apple MPS or CPU).
+
+## Quick start
+
+**See the results in a minute.** This needs no download, no training and no PyTorch:
 
 ```bash
-python -m venv .venv
-```
-
-```bash
-source .venv/bin/activate
-```
-
-```bash
-pip install -r requirements.txt
+pip install -r requirements-dashboard.txt
 ```
 
 ```bash
 pip install -e .
 ```
 
-Then run the stages one at a time:
+```bash
+python -m dpc.cli quickstart
+```
+
+`quickstart` prints the headline table and opens the Streamlit dashboard (current weights, risk breakdown, exposures against limits, performance against every baseline). It reads only committed results.
+
+**Understand it from first principles:** open [`notebooks/01_first_principles.ipynb`](notebooks/01_first_principles.ipynb). It covers:
+* why a naive long-short portfolio hides a factor bet
+* an optimiser differentiated with autograd
+* a model learning the right signal from portfolio P&L alone
+* the real models and results
+
+It runs in seconds on a fresh clone.
+
+**Reproduce everything from raw data** (about 2 hours on a 4-core laptop CPU; a GPU is used automatically if present):
+
+```bash
+pip install -r requirements.txt
+```
+
+```bash
+python -m dpc.cli all
+```
+
+To run the stages one at a time:
 
 ```bash
 python -m dpc.cli data          # Stage 1: download, quality-check, build the panel
@@ -88,15 +127,19 @@ python -m dpc.cli baselines     # Stage 3: classical baselines on the shared eng
 ```
 
 ```bash
-python -m dpc.cli risk          # Stage 4: walk-forward deep covariance model (~15 min)
+python -m dpc.cli risk          # Stage 4: walk-forward deep covariance model
 ```
 
 ```bash
-python -m dpc.cli e2e           # Stage 5: end-to-end differentiable optimiser (~10 min)
+python -m dpc.cli alpha         # Stage 4b: walk-forward AlphaFormer
 ```
 
 ```bash
-python -m dpc.cli robustness    # Stage 6a: model-size and seed reruns (~1 h)
+python -m dpc.cli e2e           # Stage 5: end-to-end models through the optimiser layer
+```
+
+```bash
+python -m dpc.cli robustness    # Stage 6a: model-size and seed reruns
 ```
 
 ```bash
@@ -104,57 +147,25 @@ python -m dpc.cli evaluate      # Stage 6b: metrics, risk decomposition, sensiti
 ```
 
 ```bash
-streamlit run dashboard/app.py  # Stage 7: dashboard
+python -m dpc.cli site          # figures for the portfolio website, each with its source
 ```
 
 ```bash
-pytest                          # 77 tests
+pytest                          # 89 tests
 ```
 
-`python -m dpc.cli all` runs Stages 1–6 in order. Every setting lives in [`config.yaml`](config.yaml); the loader rejects unknown or missing keys.
-
-On a laptop without an NVIDIA GPU, you can install the much smaller CPU build of PyTorch first:
-
-```bash
-pip install torch --index-url https://download.pytorch.org/whl/cpu
-```
-
-## Project layout
-
-```
-config.yaml               every setting (strictly validated)
-data/universe.csv         tickers, country, GICS sector
-src/dpc/
-  data/                   download (yfinance, Ken French), quality checks, clean panel
-  signals.py              momentum, reversal, low-vol; IC with Newey-West t-stats
-  exposures.py            point-in-time rolling factor betas
-  covariance.py           sample and Ledoit-Wolf
-  optimizer.py            the ONE long-short problem (cvxpy, DPP-compliant)
-  backtest.py             walk-forward engine; PointInTimeView hides the future
-  baselines.py            EW, min-var, MV-LW, risk parity, HRP, naive and classical L/S
-  deep/features.py        point-in-time tensors
-  deep/risk_model.py      patch transformer + cross-sectional attention -> D(BB'+Psi)D
-  deep/train_risk.py      walk-forward training, embargo, out-of-sample evaluation
-  deep/e2e.py             end-to-end model through a cvxpylayers optimiser layer
-  evaluation.py           metrics, Barra-style risk decomposition, tests, look-ahead checks
-  robustness.py           model-size and seed reruns
-dashboard/app.py          Streamlit dashboard
-tests/                    pytest suite (engine, constraints, gradients, look-ahead)
-reports/                  research note, evaluation tables, figures
-```
+Every setting lives in [`config.yaml`](config.yaml), and the loader rejects unknown or missing keys.
 
 ## Look-ahead safeguards
 
-* **Point-in-time access.** Strategies only see a `PointInTimeView` that slices data at the decision date. The engine raises an error on any weight in a non-investable stock.
-* **Truncation invariance.** Tests and a runtime check on the real data scramble every return after a date T and assert that all decisions up to T are unchanged. This covers the signals, eligibility, backtest weights and deep-model inputs.
-* **Walk-forward deep training.** Every training label must end on or before the refit date, and there is an embargo between training and validation windows. Both are asserted in code.
+* **Point-in-time access.** Strategies see only a `PointInTimeView` that slices data at the decision date.
+* **Labels end before refits.** Deep-model training labels must end on or before each refit date, with an embargo between training and validation. Both are asserted in code for the risk model, AlphaFormer and the end-to-end models.
+* **Truncation invariance.** Scrambling every return after a date T must leave every decision and every model input up to T unchanged. This is tested and also checked at runtime on the real data.
 * **Oracle calibration.** A deliberately cheating strategy that trades on next month's returns scores a Sharpe of 10.6, which shows what look-ahead would look like.
 
 ## Limitations
 
-* ⚠️ **Survivorship bias.** No point-in-time index membership was available (no WRDS/CRSP). The universe is *today's* large caps, so delisted and fallen companies are missing. This inflates long-only returns and alphas and penalises the low-volatility signal. Sector labels are also current GICS, not point-in-time.
-* **Returns-based exposures.** Size and value exposure are rolling betas to SMB and HML, not market-cap or book-to-market characteristics. Beta estimation error let the end-to-end model carry a realised market beta of about 0.19 despite an ex-ante limit of ±0.05.
-* **Not statistically significant.** The end-to-end improvement is not significant at 5%, and several variants were tried during development, so a multiple-testing haircut would be needed.
-* **Simplified execution.** Trades fill at the monthly close at a flat 10 bps, with no borrow costs, market impact or capacity limits.
-* **Data truncation.** The sample ends in September 2026 because the Ken French factors are published with a lag.
-* **Partial retraining in sensitivity tests.** Constraint and cost sensitivity re-uses the trained forecasts, and model-size sensitivity retrains only the risk model.
+* ⚠️ **Survivorship bias.** No point-in-time index membership was available (no WRDS/CRSP), so the universe is *today's* large caps. This inflates long-only results and penalises the low-volatility signal. Sector labels are current, not point-in-time.
+* **Returns-based exposures.** Size and value exposure are rolling betas to SMB and HML, not fundamental characteristics. Beta estimation error is how the end-to-end models carried a realised market beta of about 0.17–0.19 despite an ex-ante limit of ±0.05.
+* **No significant improvement.** No deep model's improvement is statistically significant. Six market-neutral variants were compared, so a multiple-testing haircut applies. The fully deep model was run with one seed.
+* **Simplified execution.** Trades fill at the monthly close at a flat 10 bps, with no borrow costs, market impact or capacity limits. The sample ends in September 2026 because the Fama-French factors are published with a lag.

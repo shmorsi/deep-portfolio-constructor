@@ -13,22 +13,7 @@ from matplotlib.ticker import FuncFormatter
 
 from dpc.plotting import BASELINE, CATEGORICAL, CONTEXT_GRAY, INK_2, apply_style, save
 
-# Colour follows the entity, fixed for every chart in the project.
-COLOR = {
-    "ls_naive": CATEGORICAL[1],  # orange
-    "ls_classical": CATEGORICAL[2],  # aqua
-    "ls_deep_twostage": CATEGORICAL[6],  # violet
-    "e2e": CATEGORICAL[0],  # blue = the headline model
-    "equal_weight": CATEGORICAL[0],
-    "min_variance": CATEGORICAL[1],
-    "mean_variance_lw": CATEGORICAL[2],
-    "risk_parity": CATEGORICAL[3],
-    "hrp": CATEGORICAL[4],
-}
-SHORT = {
-    "ls_naive": "Naive L/S", "ls_classical": "Classical L/S", "ls_deep_twostage": "Deep two-stage", "e2e": "End-to-end",
-    "equal_weight": "Equal wt", "min_variance": "Min var", "mean_variance_lw": "MV (LW)", "risk_parity": "Risk parity", "hrp": "HRP",
-}
+from dpc.strategies import COLORS as COLOR, LONG_SHORT, SHORT  # one source for names and colours
 
 
 def _label_ends(ax, series: dict[str, pd.Series], log: bool = False) -> None:
@@ -51,7 +36,7 @@ def cumulative_returns(cfg: Config, panel: Panel, results: dict[str, BacktestRes
     import matplotlib.pyplot as plt
 
     groups = [("Long-only baselines (excess of cash)", [n for n in COLOR if n in results and results[n].long_only]),
-              ("Market-neutral long-short", [n for n in ("ls_naive", "ls_classical", "ls_deep_twostage", "e2e") if n in results])]
+              ("Market-neutral long-short", [n for n in LONG_SHORT if n in results])]
     fig, axes = plt.subplots(1, 2, figsize=(13, 4.6), sharey=False)
     for ax, (title, names) in zip(axes, groups):
         series = {}
@@ -77,7 +62,7 @@ def drawdowns(cfg: Config, panel: Panel, results: dict[str, BacktestResult]) -> 
     import matplotlib.pyplot as plt
 
     fig, ax = plt.subplots(figsize=(11, 3.8))
-    for n in ("ls_naive", "ls_classical", "ls_deep_twostage", "e2e"):
+    for n in LONG_SHORT:
         if n not in results:
             continue
         w = (1 + results[n].daily_net).cumprod()
@@ -85,7 +70,7 @@ def drawdowns(cfg: Config, panel: Panel, results: dict[str, BacktestResult]) -> 
         ax.plot(dd.index, dd.values * 100, color=COLOR[n], lw=1.8 if n == "e2e" else 1.3, label=SHORT[n])
     ax.set_title("Drawdowns of the market-neutral strategies")
     ax.set_ylabel("Drawdown (%)")
-    ax.legend(loc="lower left", ncols=4, fontsize=8.5)
+    ax.legend(loc="lower left", ncols=3, fontsize=8.5)
     save(fig, cfg.paths.figures / "stage6_drawdowns.png")
 
 
@@ -123,7 +108,7 @@ def beta_exposure(cfg: Config, exposures: dict[str, pd.DataFrame]) -> None:
 
     fig, axes = plt.subplots(1, 3, figsize=(13, 3.6), sharey=True)
     for ax, (col, title) in zip(axes, [("exp_style:Mkt-RF", "Market beta"), ("exp_style:SMB", "Size (SMB) beta"), ("exp_style:HML", "Value (HML) beta")]):
-        for n in ("ls_naive", "ls_classical", "e2e"):
+        for n in ("ls_naive", "ls_classical", "e2e", "e2e_deep"):
             if n in exposures:
                 s = exposures[n][col]
                 ax.plot(s.index, s.values, color=COLOR[n], lw=1.6 if n == "e2e" else 1.2, label=SHORT[n])
@@ -142,7 +127,7 @@ def crisis_years(cfg: Config, panel: Panel, results: dict[str, BacktestResult]) 
     import matplotlib.pyplot as plt
 
     years = cfg.evaluation.crisis_years
-    names = [n for n in ("e2e", "ls_deep_twostage", "ls_classical", "ls_naive", "equal_weight", "min_variance", "hrp") if n in results]
+    names = [n for n in ("e2e_deep", "e2e", "ls_deep_alpha", "ls_classical", "ls_naive", "equal_weight", "hrp") if n in results]
     fig, axes = plt.subplots(1, len(years), figsize=(13, 3.8), sharey=True)
     for ax, y in zip(axes, years):
         vals = []
@@ -151,7 +136,7 @@ def crisis_years(cfg: Config, panel: Panel, results: dict[str, BacktestResult]) 
             x = x[x.index.year == y]
             vals.append(((1 + x).prod() - 1) * 100)
         pos = np.arange(len(names))[::-1]
-        ax.barh(pos, vals, color=[COLOR[n] if not results[n].long_only else CONTEXT_GRAY for n in names], height=0.6)
+        ax.barh(pos, vals, color=[COLOR[n] if not results[n].long_only else CONTEXT_GRAY for n in names], height=0.6)  # long-only = grey context
         for p, v in zip(pos, vals):
             ax.text(v + (1 if v >= 0 else -1), p, f"{v:+.0f}%", va="center", ha="left" if v >= 0 else "right", fontsize=8, color=INK_2)
         ax.axvline(0, color=BASELINE, lw=1)

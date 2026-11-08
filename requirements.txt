@@ -15,6 +15,8 @@ cvxpylayers==1.2.0
 diffcp==1.1.9
 
 # Data
+pyarrow==26.0.1
+tabulate==0.10.0
 yfinance==1.8.0
 PyYAML==6.0.3
 
@@ -22,6 +24,11 @@ PyYAML==6.0.3
 matplotlib==3.11.2
 plotly==7.1.0
 streamlit==1.67.0
+
+# Notebook (first-principles walkthrough)
+nbformat==5.11.1
+nbclient==0.11.0
+ipykernel==7.4.0
 
 # Testing
 pytest==9.2.0

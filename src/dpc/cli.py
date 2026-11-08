@@ -1,6 +1,6 @@
 """Command-line entry point: ``python -m dpc.cli <stage>``.
 
-Stages: setup, data, signals, baselines, risk, e2e, robustness, evaluate, all.
+Stages: setup, quickstart, data, signals, baselines, risk, alpha, e2e, robustness, evaluate, all.
 """
 
 from __future__ import annotations
@@ -21,16 +21,48 @@ def _prepare(config_path: str | None) -> Config:
     return cfg
 
 
+def quickstart(cfg: Config, launch: bool = True) -> int:
+    """See the results in about a minute: no download, no training, no GPU.
+
+    Prints the headline table from the committed evaluation files and opens the
+    dashboard, which reads only committed results. Reproducing every number
+    from raw data is `python -m dpc.cli all` (about 2 hours on a laptop CPU).
+    """
+    import subprocess
+
+    import pandas as pd
+
+    perf_path = cfg.paths.reports / "stage6_performance.csv"
+    if not perf_path.exists():
+        print("No committed results found. Run `python -m dpc.cli all` first.")
+        return 1
+    perf = pd.read_csv(perf_path, index_col=0)
+    cols = ["sharpe", "ann_return", "ann_vol", "max_drawdown", "alpha_t_ff6"]
+    pd.set_option("display.width", 140)
+    print("\nOut-of-sample, Jan 2008 onward, monthly rebalancing, net of costs:\n")
+    print(perf[cols].round(3).to_string())
+    print("\nFirst-principles walkthrough: notebooks/01_first_principles.ipynb")
+    print("Research note:                reports/research_note.md")
+    if launch:
+        app = cfg.root / "dashboard" / "app.py"
+        print(f"\nOpening the dashboard ({app.relative_to(cfg.root)}); press Ctrl+C to stop.\n")
+        return subprocess.call([sys.executable, "-m", "streamlit", "run", str(app)], cwd=cfg.root)
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
-    parser.add_argument("stage", choices=["setup", "data", "signals", "baselines", "risk", "e2e", "robustness", "evaluate", "all"])
+    parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all"])
     parser.add_argument("--config", default=None, help="path to config.yaml (default: search upward)")
     parser.add_argument("--refresh", action="store_true", help="re-download data instead of using the cache")
+    parser.add_argument("--no-launch", action="store_true", help="quickstart: print results only, do not open the dashboard")
     args = parser.parse_args(argv)
     cfg = _prepare(args.config)
-    stages = ["data", "signals", "baselines", "risk", "e2e", "robustness", "evaluate"] if args.stage == "all" else [args.stage]
+    stages = ["data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate"] if args.stage == "all" else [args.stage]
 
     for stage in stages:
+        if stage == "quickstart":
+            return quickstart(cfg, launch=not args.no_launch)
         if stage == "setup":
             from dpc.setup_check import main as setup_main
 
@@ -51,14 +83,24 @@ def main(argv: list[str] | None = None) -> int:
             from dpc.deep.train_risk import run_stage4
 
             run_stage4(cfg)
+        elif stage == "alpha":
+            from dpc.deep.train_alpha import run_stage4b
+
+            run_stage4b(cfg)
         elif stage == "e2e":
             from dpc.deep.e2e import run_stage5
 
             run_stage5(cfg)
+            run_stage5(cfg, tag="deep", views=True)
         elif stage == "robustness":
             from dpc.robustness import run_robustness
 
             run_robustness(cfg)
+        elif stage == "site":
+            from dpc.site_export import export, render_site_figures
+
+            export(cfg)
+            render_site_figures(cfg)
         elif stage == "evaluate":
             from dpc.evaluation import run_stage6
 

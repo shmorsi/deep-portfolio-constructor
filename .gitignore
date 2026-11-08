@@ -11,10 +11,9 @@ data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
 
-# Generated run artefacts
-reports/figures/*
-!reports/figures/.gitkeep
+# Generated run artefacts (figures ARE committed: the README and research note embed them)
 reports/run_manifest.json
+reports/run_manifest_*.json
 
 # Notebook checkpoints
 .ipynb_checkpoints/

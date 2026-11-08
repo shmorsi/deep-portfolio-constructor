@@ -1,0 +1,28 @@
+2026-11-08 04:24:46 | INFO    | dpc.deep.train_alpha | AlphaFormer bank: 262 months x 99 stocks, 23 static features, device cpu
+2026-11-08 04:24:52 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2008-01-31: 13 train / 24 val months, val IC per member [0.03, 0.039, 0.036]
+2026-11-08 04:24:57 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2009-01-30: 25 train / 24 val months, val IC per member [0.039, 0.03, 0.03]
+2026-11-08 04:25:10 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2010-01-29: 37 train / 24 val months, val IC per member [0.046, 0.099, 0.041]
+2026-11-08 04:25:21 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2011-01-31: 49 train / 24 val months, val IC per member [0.094, 0.085, 0.067]
+2026-11-08 04:25:54 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2012-01-31: 61 train / 24 val months, val IC per member [0.0, 0.027, 0.017]
+2026-11-08 04:26:08 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2013-01-31: 73 train / 24 val months, val IC per member [-0.06, -0.025, -0.051]
+2026-11-08 04:29:10 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2014-01-31: 85 train / 24 val months, val IC per member [0.015, 0.032, 0.04]
+2026-11-08 04:29:31 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2015-01-30: 97 train / 24 val months, val IC per member [0.068, 0.064, 0.037]
+2026-11-08 04:30:03 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2016-01-29: 109 train / 24 val months, val IC per member [0.072, 0.072, 0.088]
+2026-11-08 04:30:44 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2017-01-31: 121 train / 24 val months, val IC per member [0.086, 0.106, 0.085]
+2026-11-08 04:31:04 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2018-01-31: 133 train / 24 val months, val IC per member [0.05, 0.07, 0.088]
+2026-11-08 04:31:52 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2019-01-31: 145 train / 24 val months, val IC per member [0.06, 0.022, 0.097]
+2026-11-08 04:32:30 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2020-01-31: 157 train / 24 val months, val IC per member [-0.002, 0.035, 0.099]
+2026-11-08 04:32:58 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2021-01-29: 169 train / 24 val months, val IC per member [0.011, 0.071, 0.134]
+2026-11-08 04:34:19 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2022-01-31: 181 train / 24 val months, val IC per member [-0.018, 0.03, 0.088]
+2026-11-08 04:35:08 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2023-01-31: 193 train / 24 val months, val IC per member [-0.009, 0.014, 0.005]
+2026-11-08 04:35:50 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2024-01-31: 205 train / 24 val months, val IC per member [0.072, 0.118, 0.073]
+2026-11-08 04:36:23 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2025-01-31: 217 train / 24 val months, val IC per member [0.047, 0.102, 0.073]
+2026-11-08 04:37:24 | INFO    | dpc.deep.train_alpha | [main] AlphaFormer refit 2026-01-30: 229 train / 24 val months, val IC per member [-0.028, 0.066, 0.037]
+2026-11-08 04:37:26 | INFO    | dpc.deep.train_alpha | Out-of-sample IC, deep views vs classical:
+            mean_IC  IC_t_stat_NW  IC_IR_ann  IC_hit_rate  Q5_minus_Q1_monthly  Q5_Q1_t_stat_NW  n_months
+signal                                                                                                   
+momentum     0.0161        1.1512     0.2287       0.5402               0.0024           0.6717       224
+reversal     0.0015        0.1157     0.0268       0.5045              -0.0007          -0.2797       224
+low_vol     -0.0355       -2.0823    -0.4591       0.4464              -0.0112          -2.8238       224
+combined    -0.0039       -0.2800    -0.0599       0.5223              -0.0032          -0.9934       224
+deep_alpha   0.0165        1.2498     0.2836       0.5402               0.0047           1.6276       224
