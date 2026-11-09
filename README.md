@@ -61,6 +61,42 @@ The ablations were fixed in advance to be reported, not to choose a model. “De
 
 Every table (decades, costs, seeds, factor alphas, all comparisons) is in [`reports/wealth/results.md`](reports/wealth/results.md). The write-up is [`reports/wealth/research_note.md`](reports/wealth/research_note.md).
 
+## Against the S&P 500 and the NASDAQ
+
+Added after the pre-registered test, as context; the protocol's benchmark stays the whole US market. Comparisons use the same rule (Newey-West t and block bootstrap).
+
+| $1 invested | S&P 500, dividends reinvested | NASDAQ Composite, price only | Whole US market | Deep Growth Network |
+|---|---:|---:|---:|---:|
+| End of December 1959 | $831 | | $929 | $1,368 |
+| End of February 1971 | $360 | $265 | $388 | $586 |
+
+* **S&P 500:** the network against it, +0.75% a year (t = 1.56, no detectable difference). The whole market against it, +0.17% a year (t = 0.65, no detectable difference).
+* **NASDAQ Composite:** the network against it, +1.43% a year (t = 0.84, no detectable difference). The NASDAQ series is price only (no free dividend history before 2003), so these gaps flatter everything compared with it.
+* **Sources.** Yahoo Finance: `^SP500TR` (S&P 500 total return) from February 1988, `^GSPC` (price) and `^IXIC` (NASDAQ Composite); before 1988 the S&P 500's dividends come from Robert Shiller's monthly data. Where both exist (1988-02 to 2023-06, 425 months), the price-plus-dividends series tracks the official total-return index with a correlation of 0.9999 and a gap of −0.072% a year. Run `python -m dpc.cli wealth-benchmarks`.
+
+![Against the S&P 500 and the NASDAQ](reports/figures/wealth/benchmarks.png)
+
+## How often should it trade?
+
+Added after the pre-registered test. **The same trained network, with nothing retrained,** run on four schedules:
+
+* **Every month**: the tested policy. At each month-end it reads the features, sets a target and moves its trade fraction of the way there.
+* **Every quarter / every year**: the network is asked only at the end of March, June, September and December, or only each December; in between, the holdings drift with prices, untouched.
+* **Every day**: the network still decides at each month-end (its inputs are monthly), and then at every daily close the portfolio is traded back to the weights it chose, using Kenneth French's daily industry returns from the same CRSP vintage.
+
+Every schedule pays 10 bps per unit traded. "Before costs" re-runs the same decisions with free trading.
+
+| Rebalanced | $1 became | Before costs | Traded a year | Cost a year | Against the market |
+|---|---:|---:|---:|---:|---|
+| Every day | $1,217 | $1,630 | 218% | 0.44% | +0.41% (t = 0.97): no detectable difference |
+| Every month (as tested) | $1,368 | $1,685 | 155% | 0.31% | +0.58% (t = 1.40): no detectable difference |
+| Every quarter | $1,162 | $1,267 | 64% | 0.13% | +0.34% (t = 0.80): no detectable difference |
+| Every year | $902 | $930 | 22% | 0.05% | −0.04% (t = −0.12): no detectable difference |
+
+Here **every month (as tested)** grew the most. Trading every day only keeps the portfolio at the month's chosen mix, and it costs more; trading less often lets the network's tilts go stale, suggesting that what it knows about each industry fades within months. A check of the daily engine: trading only at month-ends on daily data gives $1,388, against $1,368 from the monthly engine (+0.021% a year). Run `python -m dpc.cli wealth-schedules`.
+
+![The same network on four schedules](reports/figures/wealth/schedules.png)
+
 ## How it works
 
 **Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to September 2026 (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of 0.9998. The T-bill rate and the Fama-French factors come from the same library.
@@ -124,6 +160,14 @@ python -m dpc.cli wealth-train --variants all   # the network (5 seeds) and the 
 
 ```bash
 python -m dpc.cli wealth-reference   # the network averaged over the ablations' two seeds
+```
+
+```bash
+python -m dpc.cli wealth-benchmarks  # S&P 500 and NASDAQ Composite monthly returns (added after the test)
+```
+
+```bash
+python -m dpc.cli wealth-schedules   # the same network rebalanced daily, monthly, quarterly, yearly (added after the test)
 ```
 
 ```bash

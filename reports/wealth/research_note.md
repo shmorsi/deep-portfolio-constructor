@@ -1,6 +1,6 @@
 # The Deep Growth Network: a pre-registered test of deep learning for long-term, long-only investing
 
-Sherif Morsi · Deep Portfolio Constructor, commit 9eab488 · every number below is generated from the committed results by `scripts/write_research_note.py`.
+Sherif Morsi · Deep Portfolio Constructor, commit 2f4613a · every number below is generated from the committed results by `scripts/write_research_note.py`.
 
 **Abstract.** A transformer allocates a long-only, fully invested portfolio across Kenneth French's 30 US industry portfolios and learns what fraction of the gap to its target to trade each month. It is trained in PyTorch on minus the log growth of wealth after trading costs, through a differentiable simulator of the investing rules, walk-forward with refits every five years. Out of sample from January 1960 to September 2026 (801 months, 10 bps per unit traded), $1 grew to $1,368 with the network and $929 in the market: +0.58% a year (Newey-West t 1.40, 95% interval −0.07% to +1.50%): no detectable difference. In words: the network's edge over holding the market is too small to tell from luck by the pre-registered test. The test was fixed in git before the network was run out of sample.
 
@@ -49,6 +49,12 @@ Fixed in the protocol, two seeds each (42 and 43), compared here with the full n
 | Deep, no learned holding | $1,775 | 252% | +0.82% a year (Newey-West t 1.83, 95% interval −0.11% to +1.55%): no detectable difference |
 | Deep, no attention | $701 | 91% | −0.57% a year (Newey-West t −1.57, 95% interval −1.24% to +0.15%): no detectable difference |
 | Deep, no market anchor | $387 | 354% | −1.46% a year (Newey-West t −0.55, 95% interval −6.69% to +3.79%): no detectable difference |
+
+## 6b. Added after the test: benchmarks and rebalancing schedules
+
+Against the S&P 500 with dividends reinvested ($1 became $831 from 1960), the network's difference was +0.75% a year (Newey-West t 1.56): no detectable difference. Against the NASDAQ Composite from March 1971 (price only, so understated), +1.43% a year (Newey-West t 0.84): no detectable difference.
+
+The same trained network on four rebalancing schedules, net of 10 bps per unit traded: daily $1,217 (218% traded a year, +0.41% against the market, t 0.97); monthly $1,368 (155% traded a year, +0.58% against the market, t 1.40); quarterly $1,162 (64% traded a year, +0.34% against the market, t 0.80); yearly $902 (22% traded a year, −0.04% against the market, t −0.12). Daily trading only re-centres the month's chosen mix and pays more for it; less frequent trading lets the tilts go stale. None of these were pre-registered, and none changes the primary verdict.
 
 ## 7. Limits
 
