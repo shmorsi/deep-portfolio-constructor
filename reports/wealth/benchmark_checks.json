@@ -1,0 +1,16 @@
+{
+ "sp500_splice": {
+  "overlap_months": 425,
+  "first": "1988-02",
+  "last": "2023-06",
+  "annual_log_gap": -0.0007202546286611056,
+  "monthly_tracking_sd": 0.0006229363579920873,
+  "correlation": 0.9998906635699716
+ },
+ "sources": {
+  "sp500_tr": "^SP500TR",
+  "sp500_price": "^GSPC",
+  "nasdaq_price": "^IXIC",
+  "shiller": "https://raw.githubusercontent.com/datasets/s-and-p-500/main/data/data.csv"
+ }
+}

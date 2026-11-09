@@ -123,6 +123,61 @@ def main() -> None:
         learned_kappa = (f"Its trade fraction started training at {pct(start, 0)} and had a median of {pct(tf.get('median', float('nan')), 0)} "
                          f"out of sample; it traded {pct(d['turnover_per_year'], 0)} of the portfolio a year.")
 
+    extras = ""
+    if site.get("benchmarks"):
+        bs = site["benchmarks"]
+        sp, nq = bs["sp500"], bs["nasdaq"]
+        chk = bs["checks"]["sp500_splice"]
+
+        def bvs(block: dict, key: str, who: str = "deep") -> str:
+            x = block["comparisons"][f"{who} - {key}"]
+            return f"{pct(x['diff_log_growth'], sign=True)} a year (t = {num(x['t_nw'])}, {x['verdict']})"
+
+        extras += f"""
+## Against the S&P 500 and the NASDAQ
+
+Added after the pre-registered test, as context; the protocol's benchmark stays the whole US market. Comparisons use the same rule (Newey-West t and block bootstrap).
+
+| $1 invested | S&P 500, dividends reinvested | NASDAQ Composite, price only | Whole US market | Deep Growth Network |
+|---|---:|---:|---:|---:|
+| End of {month_name(sp['start_wealth_date'])} | {money(sp['wealth']['sp500'])} | | {money(sp['wealth']['market'])} | {money(sp['wealth']['deep'])} |
+| End of {month_name(nq['start_wealth_date'])} | {money(nq['wealth'].get('sp500', float('nan'))) if 'sp500' in nq['wealth'] else ''} | {money(nq['wealth']['nasdaq'])} | {money(nq['wealth']['market'])} | {money(nq['wealth']['deep'])} |
+
+* **S&P 500:** the network against it, {bvs(sp, 'sp500')}. The whole market against it, {bvs(sp, 'sp500', 'market')}.
+* **NASDAQ Composite:** the network against it, {bvs(nq, 'nasdaq')}. The NASDAQ series is price only (no free dividend history before 2003), so these gaps flatter everything compared with it.
+* **Sources.** Yahoo Finance: `^SP500TR` (S&P 500 total return) from February 1988, `^GSPC` (price) and `^IXIC` (NASDAQ Composite); before 1988 the S&P 500's dividends come from Robert Shiller's monthly data. Where both exist ({chk['first']} to {chk['last']}, {chk['overlap_months']} months), the price-plus-dividends series tracks the official total-return index with a correlation of {chk['correlation']:.4f} and a gap of {pct(chk['annual_log_gap'], 3, sign=True)} a year. Run `python -m dpc.cli wealth-benchmarks`.
+
+![Against the S&P 500 and the NASDAQ](reports/figures/wealth/benchmarks.png)
+"""
+    if site.get("schedules"):
+        sc = site["schedules"]
+        words = {"daily": "Every day", "monthly": "Every month (as tested)", "quarterly": "Every quarter", "yearly": "Every year"}
+        rows_s = "\n".join(
+            f"| {words[n]} | {money(sc[n]['terminal_wealth'])} | {money(sc[n]['gross_terminal_wealth'])} | {pct(sc[n]['turnover_per_year'], 0)} | "
+            f"{pct(sc[n]['cost_per_year'])} | {pct(sc[n]['vs_market']['diff_log_growth'], sign=True)} (t = {num(sc[n]['vs_market']['t_nw'])}): {sc[n]['vs_market']['verdict']} |"
+            for n in ("daily", "monthly", "quarterly", "yearly"))
+        best = max(("daily", "monthly", "quarterly", "yearly"), key=lambda n: sc[n]["terminal_wealth"])
+        e = sc["engine_check"]
+        extras += f"""
+## How often should it trade?
+
+Added after the pre-registered test. **The same trained network, with nothing retrained,** run on four schedules:
+
+* **Every month**: the tested policy. At each month-end it reads the features, sets a target and moves its trade fraction of the way there.
+* **Every quarter / every year**: the network is asked only at the end of March, June, September and December, or only each December; in between, the holdings drift with prices, untouched.
+* **Every day**: the network still decides at each month-end (its inputs are monthly), and then at every daily close the portfolio is traded back to the weights it chose, using Kenneth French's daily industry returns from the same CRSP vintage.
+
+Every schedule pays {site['cost_bps']:g} bps per unit traded. "Before costs" re-runs the same decisions with free trading.
+
+| Rebalanced | $1 became | Before costs | Traded a year | Cost a year | Against the market |
+|---|---:|---:|---:|---:|---|
+{rows_s}
+
+Here **{words[best].lower()}** grew the most. Trading every day only keeps the portfolio at the month's chosen mix, and it costs more; trading less often lets the network's tilts go stale, suggesting that what it knows about each industry fades within months. A check of the daily engine: trading only at month-ends on daily data gives {money(e['daily_engine_month_end_only_wealth'])}, against {money(e['monthly_engine_wealth'])} from the monthly engine ({pct(e['annual_log_gap'], 3, sign=True)} a year). Run `python -m dpc.cli wealth-schedules`.
+
+![The same network on four schedules](reports/figures/wealth/schedules.png)
+"""
+
     text = f"""# Deep Portfolio Constructor
 
 **A neural network that builds a long-only portfolio for long-term wealth.** A transformer allocates across Kenneth French's 30 US industry portfolios and decides how much to trade each month. It is trained in PyTorch on the growth of wealth itself, after trading costs, through a differentiable simulator of buying, holding and paying to trade, and tested out of sample from January 1960 to {oos['end'][:4]} against the market and five classical long-only strategies, under a protocol committed to git before the test.
@@ -177,7 +232,7 @@ $1 invested in January 1960, out of sample to {end_name} ({oos['months']} months
 ![Rolling 10-year growth against the market](reports/figures/wealth/rolling.png)
 
 Every table (decades, costs, seeds, factor alphas, all comparisons) is in [`reports/wealth/results.md`](reports/wealth/results.md). The write-up is [`reports/wealth/research_note.md`](reports/wealth/research_note.md).
-
+{extras}
 ## How it works
 
 **Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to {end_name} (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of {site['data_check']['correlation']:.4f}. The T-bill rate and the Fama-French factors come from the same library.
@@ -241,6 +296,14 @@ python -m dpc.cli wealth-train --variants all   # the network (5 seeds) and the 
 
 ```bash
 python -m dpc.cli wealth-reference   # the network averaged over the ablations' two seeds
+```
+
+```bash
+python -m dpc.cli wealth-benchmarks  # S&P 500 and NASDAQ Composite monthly returns (added after the test)
+```
+
+```bash
+python -m dpc.cli wealth-schedules   # the same network rebalanced daily, monthly, quarterly, yearly (added after the test)
 ```
 
 ```bash

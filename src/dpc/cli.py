@@ -1,7 +1,8 @@
 """Command-line entry point: ``python -m dpc.cli <stage>``.
 
 The long-only wealth study: quickstart, wealth (every stage below, in order),
-wealth-data, wealth-baselines, wealth-train, wealth-reference, wealth-evaluate, wealth-site.
+wealth-data, wealth-baselines, wealth-train, wealth-reference, wealth-benchmarks, wealth-schedules,
+wealth-evaluate, wealth-site.
 The archived long-short study (docs/longshort.md): setup, data, signals, baselines, risk,
 alpha, e2e, robustness, evaluate, site, all.
 """
@@ -65,7 +66,7 @@ def quickstart(cfg: Config, launch: bool = True) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
     parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
-                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-evaluate", "wealth-site"])
+                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -77,7 +78,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.stage == "all":
         stages = ["data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate"]
     elif args.stage == "wealth":
-        stages = ["wealth-data", "wealth-baselines", "wealth-train", "wealth-evaluate", "wealth-site"]
+        stages = ["wealth-data", "wealth-baselines", "wealth-train", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site"]
     else:
         stages = [args.stage]
 
@@ -141,6 +142,10 @@ def main(argv: list[str] | None = None) -> int:
                 pipeline.stage_train(cfg, names, workers=args.workers)
             elif stage == "wealth-reference":
                 pipeline.stage_reference(cfg)
+            elif stage == "wealth-benchmarks":
+                pipeline.stage_benchmarks(cfg, refresh=args.refresh)
+            elif stage == "wealth-schedules":
+                pipeline.stage_schedules(cfg, refresh=args.refresh)
             elif stage == "wealth-evaluate":
                 from dpc.wealth.evaluate import run_evaluation
 

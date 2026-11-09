@@ -21,11 +21,13 @@ import pandas as pd  # noqa: E402
 
 from ..config import Config  # noqa: E402
 from ..logging_utils import get_logger  # noqa: E402
+from .frequency import SCHEDULES  # noqa: E402
 from .names import ABLATIONS, COLORS, LABELS, MAIN, REFERENCE  # noqa: E402
 from .model import DeepGrowthNet  # noqa: E402
 from .pipeline import load, load_result, results_dir  # noqa: E402
 
 log = get_logger(__name__)
+SCHEDULE_WORDS = {"daily": "every day", "monthly": "every month", "quarterly": "every quarter", "yearly": "every year"}
 
 
 def _bp(row: np.ndarray) -> list[int]:
@@ -103,6 +105,43 @@ def figures(cfg: Config, results: dict[str, pd.DataFrame], panel) -> list[str]:
     ax.grid(alpha=0.25)
     p = out / "rolling.png"
     fig.tight_layout(); fig.savefig(p, dpi=160); plt.close(fig); written.append(str(p))
+    rdir = results_dir(cfg)
+    if all((rdir / f"schedule_{n}.parquet").exists() for n in SCHEDULES):
+        fig, ax = plt.subplots(figsize=(10, 4.6))
+        for name, color, lw in (("daily", "#94a3b8", 1.3), ("monthly", COLORS["deep"], 2.4), ("quarterly", "#7c3aed", 1.3), ("yearly", "#ea580c", 1.3)):
+            w = (1 + load_result(cfg, f"schedule_{name}")["net"]).cumprod()
+            ax.plot(w.index, w.values, color=color, lw=lw, label=f"Network, rebalanced {SCHEDULE_WORDS[name]}: ${w.iloc[-1]:,.0f}")
+        m = (1 + results["market"]["net"]).cumprod()
+        ax.plot(m.index, m.values, color=COLORS["market"], lw=1.2, ls="--", label=f"Market: ${m.iloc[-1]:,.0f}")
+        ax.set_yscale("log")
+        ax.set_ylabel("Growth of $1 (log scale)")
+        ax.set_title("The same trained network on four rebalancing schedules (added after the pre-registered test)", loc="left", fontsize=10)
+        ax.legend(frameon=False, fontsize=8.5, loc="upper left")
+        ax.grid(alpha=0.25)
+        p = out / "schedules.png"
+        fig.tight_layout(); fig.savefig(p, dpi=160); plt.close(fig); written.append(str(p))
+    if (rdir / "benchmarks.parquet").exists():
+        bench = pd.read_parquet(rdir / "benchmarks.parquet")
+        fig, axes = plt.subplots(1, 2, figsize=(11, 4.4))
+        for ax, key in zip(axes, ("sp500", "nasdaq")):
+            idx = bench[key].dropna().index
+            for name, label, color, lw, ls in (("deep", "Deep Growth Network", COLORS["deep"], 2.4, "-"), ("market", "Whole US market", COLORS["market"], 1.2, "-"),
+                                               ("sp500", "S&P 500, dividends reinvested", "#b45309", 1.4, "--"), ("nasdaq", "NASDAQ Composite, price only", "#059669", 1.4, ":")):
+                if name in ("sp500", "nasdaq"):
+                    if name == "nasdaq" and key != "nasdaq":
+                        continue
+                    r = bench[name].loc[idx]
+                else:
+                    r = results[name]["net"].loc[idx]
+                w = (1 + r).cumprod()
+                ax.plot(w.index, w.values, color=color, lw=lw, ls=ls, label=f"{label}: ${w.iloc[-1]:,.0f}")
+            ax.set_yscale("log")
+            ax.set_title(f"$1 invested at the end of {idx[0] - pd.offsets.MonthEnd(1):%B %Y}", loc="left", fontsize=10)
+            ax.legend(frameon=False, fontsize=8, loc="upper left")
+            ax.grid(alpha=0.25)
+        fig.suptitle("Against the S&P 500 and the NASDAQ (added after the pre-registered test)", x=0.01, ha="left", fontsize=10.5)
+        p = out / "benchmarks.png"
+        fig.tight_layout(); fig.savefig(p, dpi=160); plt.close(fig); written.append(str(p))
     return written
 
 
@@ -147,6 +186,24 @@ def export_site(cfg: Config) -> dict:
         "tests": _test_count(cfg),
         "data_check": json.loads((cfg.paths.reports / "wealth" / "data_summary.json").read_text())["check_cap_weighted_vs_french_market"],
     }
+    rdir = results_dir(cfg)
+    if "benchmarks" in summary:
+        bench = pd.read_parquet(rdir / "benchmarks.parquet")
+        site["benchmarks"] = summary["benchmarks"]
+        site["benchmarks"]["checks"] = json.loads((cfg.paths.reports / "wealth" / "benchmark_checks.json").read_text())
+        for key in ("sp500", "nasdaq"):
+            r = bench[key].dropna()
+            path = {"sp500": r}
+            if key == "nasdaq":
+                path.update({n: results[n]["net"].loc[r.index] for n in ("deep", "market") if n in results})
+                path["sp500"] = bench["sp500"].loc[r.index]
+                path["nasdaq"] = r
+            site["benchmarks"][key]["dates"] = [f"{d:%Y-%m}" for d in r.index]
+            site["benchmarks"][key]["growth"] = {n: [1.0] + [round(float(v), 4) for v in (1 + x).cumprod()] for n, x in path.items()}
+    if "schedules" in summary:
+        site["schedules"] = summary["schedules"]
+        site["schedules"]["growth"] = {n: [1.0] + [round(float(v), 4) for v in (1 + load_result(cfg, f"schedule_{n}")["net"]).cumprod()]
+                                       for n in SCHEDULES}
     (cfg.paths.reports / "site_wealth.json").write_text(json.dumps(site, separators=(",", ":")) + "\n")
     (cfg.paths.reports / "wealth" / "results.md").write_text(results_markdown(site))
     # Each variant's training history (validation growth and best step per refit and seed), kept with the results:
@@ -213,6 +270,37 @@ def results_markdown(site: dict) -> str:
             p = site["seeds"][k]
             out.append(f"| {k.removeprefix('deep_seed')} | ${p['terminal_wealth']:,.0f} | {_pct(p['cagr'])} | {p['sharpe']:.2f} | "
                        f"{_pct(p['max_drawdown'], 0)} | {_pct(p['turnover_per_year'], 0)} |")
+    if site.get("benchmarks"):
+        out.append("\n## Against the S&P 500 and the NASDAQ (added after the pre-registered test)\n")
+        out.append("S&P 500: Yahoo Finance ^SP500TR (total return) from February 1988; before that, month-end ^GSPC prices plus "
+                   "Robert Shiller's monthly dividends. NASDAQ Composite: ^IXIC, price only (no free dividend history before 2003), "
+                   "so it is understated by its dividend yield.\n")
+        out.append("| Index | Window | $1 became: index | network | whole market | Network minus index (t) | Verdict |")
+        out.append("|---|---|---:|---:|---:|---:|---|")
+        for key, b in site["benchmarks"].items():
+            if key not in ("sp500", "nasdaq"):
+                continue
+            c = b["comparisons"][f"deep - {key}"]
+            out.append(f"| {b['label']} | {b['first']} to {b['last']} | ${b['wealth'][key]:,.0f} | ${b['wealth']['deep']:,.0f} | "
+                       f"${b['wealth']['market']:,.0f} | {_pct(c['diff_log_growth'], sign=True)} ({c['t_nw']:.2f}) | {c['verdict']} |")
+        chk = site["benchmarks"]["checks"]["sp500_splice"]
+        out.append(f"\nSplice check, {chk['first']} to {chk['last']} ({chk['overlap_months']} months): price plus Shiller dividends against "
+                   f"the official total-return index, correlation {chk['correlation']:.4f}, gap {_pct(chk['annual_log_gap'], 3, sign=True)} a year.")
+    if site.get("schedules"):
+        sch = site["schedules"]
+        out.append("\n## How often to trade: the same network on four schedules (added after the pre-registered test)\n")
+        out.append("Nothing is retrained. Monthly is the tested policy; quarterly and yearly trade only at those month-ends; daily trades "
+                   "back to the network's chosen weights at every close, on French's daily industry returns.\n")
+        out.append("| Schedule | $1 became | Before costs | CAGR | Traded / year | Cost / year | Max drawdown | Against the market (t) | Verdict |")
+        out.append("|---|---:|---:|---:|---:|---:|---:|---:|---|")
+        for n in SCHEDULES:
+            v = sch[n]
+            c = v["vs_market"]
+            out.append(f"| {n} | ${v['terminal_wealth']:,.0f} | ${v['gross_terminal_wealth']:,.0f} | {_pct(v['cagr'])} | {_pct(v['turnover_per_year'], 0)} | "
+                       f"{_pct(v['cost_per_year'])} | {_pct(v['max_drawdown'], 0)} | {_pct(c['diff_log_growth'], sign=True)} ({c['t_nw']:.2f}) | {c['verdict']} |")
+        e = sch["engine_check"]
+        out.append(f"\nDaily-engine check: trading only at month-ends on daily data gives ${e['daily_engine_month_end_only_wealth']:,.0f}, "
+                   f"against ${e['monthly_engine_wealth']:,.0f} from the monthly engine ({_pct(e['annual_log_gap'], 3, sign=True)} a year).")
     out.append("\n## Checks\n")
     if site.get("trade_fraction"):
         tf = site["trade_fraction"]

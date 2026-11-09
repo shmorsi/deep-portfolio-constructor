@@ -71,6 +71,11 @@ def learned(results: Path) -> dict:
     }
 
 
+def vs_block(block: dict, key: str) -> str:
+    x = block["comparisons"][key]
+    return f"{pct(x['diff_log_growth'], sign=True)} a year (Newey-West t {num(x['t_nw'])}): {x['verdict']}"
+
+
 def main() -> None:
     site = json.loads((ROOT / "reports" / "site_wealth.json").read_text())
     perf, comps, labels, oos = site["performance"], site["comparisons"], site["labels"], site["oos"]
@@ -128,6 +133,20 @@ def main() -> None:
         if n in perf and f"{n} - deep_pair" in comps:
             abl_rows.append(f"| {labels[n]} | {money(perf[n]['terminal_wealth'])} | {pct(perf[n]['turnover_per_year'], 0)} | {vs(f'{n} - deep_pair')} |")
 
+    added = ""
+    if site.get("benchmarks") and site.get("schedules"):
+        sp, nq, sc = site["benchmarks"]["sp500"], site["benchmarks"]["nasdaq"], site["schedules"]
+        added = (f"## 6b. Added after the test: benchmarks and rebalancing schedules\n\n"
+                 f"Against the S&P 500 with dividends reinvested ($1 became {money(sp['wealth']['sp500'])} from 1960), the network's difference "
+                 f"was {vs_block(sp, 'deep - sp500')}. Against the NASDAQ Composite from March 1971 (price only, so understated), "
+                 f"{vs_block(nq, 'deep - nasdaq')}.\n\n"
+                 f"The same trained network on four rebalancing schedules, net of {site['cost_bps']:g} bps per unit traded: "
+                 + "; ".join(f"{n} {money(sc[n]['terminal_wealth'])} ({pct(sc[n]['turnover_per_year'], 0)} traded a year, "
+                             f"{pct(sc[n]['vs_market']['diff_log_growth'], sign=True)} against the market, t {num(sc[n]['vs_market']['t_nw'])})"
+                             for n in ("daily", "monthly", "quarterly", "yearly"))
+                 + ". Daily trading only re-centres the month's chosen mix and pays more for it; less frequent trading lets the tilts go "
+                   "stale. None of these were pre-registered, and none changes the primary verdict.\n\n")
+
     text = f"""# The Deep Growth Network: a pre-registered test of deep learning for long-term, long-only investing
 
 Sherif Morsi · Deep Portfolio Constructor, commit {site['commit']} · every number below is generated from the committed results by `scripts/write_research_note.py`.
@@ -175,7 +194,7 @@ Fixed in the protocol, two seeds each (42 and 43), compared here with the full n
 |---|---:|---:|---|
 {chr(10).join(abl_rows)}
 
-## 7. Limits
+{added}## 7. Limits
 
 The 30 portfolios are industries, not funds an investor could have bought in 1960; costs are a flat {site['cost_bps']:g} bps with no taxes or market impact. The features carry hindsight: momentum, value and low volatility were documented decades after 1960, and the pre-registration fixes the test, not the feature list. The data are one country's century, among the best-performing markets in the world, and several strategies were compared; the pre-registered primary test is the one to read.
 

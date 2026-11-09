@@ -207,3 +207,85 @@ def test_results_table_lists_every_strategy_and_comparison():
     text = results_markdown(site)
     for needle in ("| Market (hold the index) |", "| Deep Growth Network |", "Deep Growth Network minus the market", "**better**", "1960s", "abc1234"):
         assert needle in text
+
+
+def test_sp500_total_return_adds_dividends_then_splices_to_the_official_index(tmp_path):
+    from dpc.wealth.benchmarks import sp500_total_return
+
+    days = pd.to_datetime(["1987-10-30", "1987-11-30", "1987-12-31", "1988-01-29", "1988-02-29", "1988-03-31"])
+    price = pd.Series([100.0, 101.0, 99.0, 102.0, 103.0, 104.0], index=days)
+    official = pd.Series([np.nan, np.nan, np.nan, 500.0, 510.0, 515.0], index=days)
+    price.rename("close").rename_axis("date").to_csv(tmp_path / "p.csv")
+    official.dropna().rename("close").rename_axis("date").to_csv(tmp_path / "tr.csv")
+    shiller = pd.DataFrame({"Date": pd.date_range("1987-10-01", periods=6, freq="MS").strftime("%Y-%m-%d"),
+                            "SP500": [100.0] * 6, "Dividend": [3.0] * 6})
+    shiller.to_csv(tmp_path / "s.csv", index=False)
+    tr, check = sp500_total_return({"sp500_price": tmp_path / "p.csv", "sp500_tr": tmp_path / "tr.csv", "shiller": tmp_path / "s.csv"})
+    built_jan = 102.0 / 99.0 - 1 + 0.03 / 12            # up to the splice month: price return plus a twelfth of the yield
+    assert tr.loc["1988-01-31"] == pytest.approx(built_jan)
+    assert tr.loc["1988-02-29"] == pytest.approx(510.0 / 500.0 - 1)   # after it: the official total-return index
+    assert check["overlap_months"] == 2
+
+
+def test_schedules_trade_only_in_their_months():
+    from dpc.wealth.frequency import on_schedule
+
+    p = synthetic_panel()
+    calls = []
+
+    def target(t, w):
+        calls.append(t)
+        return np.full(p.n_assets, 1 / p.n_assets)
+
+    res = run(p, on_schedule(target, p, frozenset({12})), 13, 100, 10.0, "yearly")
+    decided = [p.dates[t].month for t in calls]
+    assert decided[0] == p.dates[12].month and set(decided[1:]) == {12}      # the first purchase, then Decembers only
+    traded = res.turnover[1:] > 1e-12
+    assert all(p.dates[13 + 1 + k].month == 1 for k in np.flatnonzero(traded))  # trades land only in Januaries
+
+
+def _daily_from_monthly(p: IndustryPanel, seed: int = 4) -> pd.DataFrame:
+    """Two trading days per month that compound exactly to the panel's monthly returns."""
+    rng = np.random.default_rng(seed)
+    rows, idx = [], []
+    for t in range(1, p.n_months):
+        r1 = rng.normal(0, 0.01, p.n_assets)
+        rows += [r1, (1 + p.returns[t]) / (1 + r1) - 1]
+        idx += [p.dates[t] - pd.Timedelta(days=10), p.dates[t]]
+    return pd.DataFrame(rows, index=pd.DatetimeIndex(idx), columns=p.names)
+
+
+def test_daily_engine_reproduces_the_monthly_engine_without_intra_month_trades():
+    from dpc.wealth.frequency import run_daily
+
+    p = synthetic_panel()
+    daily = _daily_from_monthly(p)
+    rng = np.random.default_rng(7)
+    targets = {t: rng.dirichlet(np.ones(p.n_assets)) for t in range(p.n_months)}
+    decide = lambda t, w: w + 0.6 * (targets[t] - w) if w.sum() > 0.5 else targets[t]  # noqa: E731
+    a = run(p, decide, 30, 150, 25.0, "monthly")
+    b = run_daily(p, daily, decide, 30, 150, 25.0, "daily", true_up=False)
+    np.testing.assert_allclose(b.net, a.net, rtol=1e-10, atol=1e-12)
+    np.testing.assert_allclose(b.turnover, a.turnover, rtol=1e-10, atol=1e-12)
+
+
+def test_daily_true_up_holds_the_chosen_mix_every_day_and_pays_for_it():
+    from dpc.wealth.frequency import parse_daily, run_daily
+
+    p = synthetic_panel()
+    daily = _daily_from_monthly(p)
+    eq = np.full(p.n_assets, 1 / p.n_assets)
+    free = run_daily(p, daily, lambda t, w: eq, 30, 60, 0.0, "daily", true_up=True)
+    for k, t in enumerate(range(30, 61)):              # equal weights restored every day: the month compounds the daily means
+        days = daily[(daily.index > p.dates[t - 1]) & (daily.index <= p.dates[t])].to_numpy()
+        assert free.net[k] == pytest.approx(np.prod(1 + days.mean(axis=1)) - 1, rel=1e-12)
+    costly = run_daily(p, daily, lambda t, w: eq, 30, 60, 25.0, "daily", true_up=True)
+    np.testing.assert_allclose(costly.gross, free.net, rtol=1e-12)    # costs never change the path before costs
+    assert costly.wealth()[-1] < free.wealth()[-1]
+    once = run_daily(p, daily, lambda t, w: eq, 30, 60, 25.0, "daily", true_up=False)
+    assert (costly.turnover[1:] > once.turnover[1:] - 1e-12).any() and (costly.turnover[1:] > 0).all()
+    text = ("  Average Value Weighted Returns -- Daily\n,A,B\n19600104,   1.00,  -2.00\n19600105, -99.99,   0.50\n\n"
+            "  Average Equal Weighted Returns -- Daily\n,A,B\n19600104,   9.00,   9.00\n")
+    df = parse_daily(text, ["A", "B"])
+    assert list(df.index.strftime("%Y-%m-%d")) == ["1960-01-04", "1960-01-05"]
+    assert df.iloc[0].tolist() == [0.01, -0.02] and np.isnan(df.iloc[1, 0])

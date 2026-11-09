@@ -192,9 +192,69 @@ def run_evaluation(cfg: Config) -> dict:
         "seeds": seed_rows,
         "oracle_terminal_wealth": oracle_wealth(panel, start, w.max_tilt, w.cost_bps),
     }
+    bench_path = results_dir(cfg) / "benchmarks.parquet"
+    if bench_path.exists():
+        bench = pd.read_parquet(bench_path).reindex(mkt.index)
+        summary["benchmarks"] = benchmark_summary(results, bench, rf, ev, cfg.project.seed)
+    if all((results_dir(cfg) / f"schedule_{n}.parquet").exists() for n in SCHEDULE_ORDER + ["monthly_on_daily"]):
+        summary["schedules"] = schedule_summary(cfg, mkt, rf, ev)
     if "deep" in results and "kappa" in results["deep"].columns:
         k = results["deep"]["kappa"].iloc[1:]
         summary["deep_trade_fraction"] = {"mean": float(k.mean()), "median": float(k.median()), "min": float(k.min()), "max": float(k.max())}
     (out_dir / "summary.json").write_text(json.dumps(summary, indent=1))
     log.info("Evaluation written to %s", out_dir)
     return summary
+
+
+# ---------------------------------------------------------------- added after the pre-registered test
+
+SCHEDULE_ORDER = ["daily", "monthly", "quarterly", "yearly"]
+
+
+def _frame(net: pd.Series) -> pd.DataFrame:
+    return pd.DataFrame({"net": net.to_numpy(), "gross": net.to_numpy(), "turnover": np.zeros(len(net))}, index=net.index)
+
+
+def benchmark_summary(results: dict[str, pd.DataFrame], bench: pd.DataFrame, rf: pd.Series, ev, seed: int) -> dict:
+    """The network and the market against the S&P 500 (from 1960) and the NASDAQ Composite (from March 1971)."""
+    out = {}
+    names = [n for n in ("deep", "market", "momentum_tilt") if n in results]
+    for key, label in (("sp500", "S&P 500 (dividends reinvested)"), ("nasdaq", "NASDAQ Composite (price only)")):
+        idx = bench[key].dropna().index
+        b = _frame(bench[key].loc[idx])
+        block = {"label": label, "first": f"{idx[0]:%Y-%m}", "last": f"{idx[-1]:%Y-%m}", "months": int(len(idx)),
+                 "start_wealth_date": f"{idx[0] - pd.offsets.MonthEnd(1):%Y-%m}", "wealth": {}, "cagr": {}, "comparisons": {}}
+        bm = metrics(b, rf)
+        block["wealth"][key], block["cagr"][key] = bm["terminal_wealth"], bm["cagr"]
+        if key == "nasdaq":  # the S&P 500 over the NASDAQ's shorter window, for the same table
+            sm = metrics(_frame(bench["sp500"].loc[idx]), rf)
+            block["wealth"]["sp500"], block["cagr"]["sp500"] = sm["terminal_wealth"], sm["cagr"]
+        block["volatility"], block["max_drawdown"] = bm["volatility"], bm["max_drawdown"]
+        for n in names:
+            sub = results[n].loc[idx]
+            m = metrics(sub, rf)
+            block["wealth"][n], block["cagr"][n] = m["terminal_wealth"], m["cagr"]
+            block["comparisons"][f"{n} - {key}"] = compare(sub, b, ev.nw_lags, ev.bootstrap_block_months, ev.bootstrap_draws, seed)
+        out[key] = block
+    return out
+
+
+def schedule_summary(cfg: Config, mkt: pd.DataFrame, rf: pd.Series, ev) -> dict:
+    """The same network traded daily, monthly, quarterly or yearly (results from wealth-schedules)."""
+    out = {}
+    for name in SCHEDULE_ORDER:
+        df = load_result(cfg, f"schedule_{name}")
+        gross = df.copy()
+        gross["net"] = df["gross"]
+        m, mg = metrics(df, rf), metrics(gross, rf)
+        out[name] = {"terminal_wealth": m["terminal_wealth"], "cagr": m["cagr"], "sharpe": m["sharpe"], "max_drawdown": m["max_drawdown"],
+                     "turnover_per_year": m["turnover_per_year"], "holding_years": m["holding_years"],
+                     "gross_terminal_wealth": mg["terminal_wealth"], "gross_cagr": mg["cagr"],
+                     "cost_per_year": _ann_log_growth(gross["net"].to_numpy()) - _ann_log_growth(df["net"].to_numpy()),
+                     "gross_vs_market_log_growth": _ann_log_growth(gross["net"].to_numpy()) - _ann_log_growth(reprice(mkt, 0)["net"].to_numpy()),
+                     "vs_market": compare(df, mkt, ev.nw_lags, ev.bootstrap_block_months, ev.bootstrap_draws, cfg.project.seed)}
+    check = load_result(cfg, "schedule_monthly_on_daily")
+    out["engine_check"] = {"monthly_engine_wealth": out["monthly"]["terminal_wealth"],
+                           "daily_engine_month_end_only_wealth": float(np.prod(1 + check["net"].to_numpy())),
+                           "annual_log_gap": _ann_log_growth(check["net"].to_numpy()) - _ann_log_growth(load_result(cfg, "schedule_monthly")["net"].to_numpy())}
+    return out

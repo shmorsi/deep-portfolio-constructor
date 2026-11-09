@@ -121,3 +121,44 @@ def stage_reference(cfg: Config) -> None:
     res = run_policy(panel, policy, w.oos_start, w.cost_bps, "deep_pair")
     save_result(cfg, panel, res, {"kappa": np.array(policy.kappas)})
     log.info("deep with seeds %s only: $1 -> $%.0f", seeds, res.wealth()[-1])
+
+
+def stage_benchmarks(cfg: Config, refresh: bool = False) -> None:
+    """S&P 500 (dividends reinvested) and NASDAQ Composite monthly returns on the out-of-sample months.
+
+    Added after the pre-registered test, as context (see benchmarks.py for sources)."""
+    from .benchmarks import build
+
+    panel, _ = load(cfg)
+    dates = panel.dates[panel.index_of(cfg.wealth.oos_start):]
+    bench, meta = build(cfg.paths.data_raw / "benchmarks", dates, refresh)
+    bench.to_parquet(results_dir(cfg) / "benchmarks.parquet")
+    (cfg.paths.reports / "wealth" / "benchmark_checks.json").write_text(json.dumps(meta, indent=1))
+    log.info("Benchmarks: S&P 500 %s to %s, NASDAQ from %s; splice gap %.3f%% a year over %d months",
+             f"{bench['sp500'].first_valid_index():%Y-%m}", f"{bench.index[-1]:%Y-%m}", f"{bench['nasdaq'].first_valid_index():%Y-%m}",
+             100 * meta["sp500_splice"]["annual_log_gap"], meta["sp500_splice"]["overlap_months"])
+
+
+def stage_schedules(cfg: Config, refresh: bool = False) -> None:
+    """The deployed network, unchanged, on four rebalancing schedules (see frequency.py). Added after the test."""
+    from .frequency import SCHEDULES, load_daily, on_schedule, run_daily
+
+    w = cfg.wealth
+    panel, feats = load(cfg)
+    s = settings(cfg)
+    start, end = panel.index_of(w.oos_start), panel.n_months - 1
+    model_dir = cfg.paths.models / "wealth" / "deep"
+
+    def policy() -> EnsemblePolicy:  # a fresh copy per run: the policy records its trade fractions as it goes
+        return EnsemblePolicy.load(panel, feats, s, VARIANTS["deep"], w.train.seeds, w.oos_start, model_dir)
+
+    for name, months in SCHEDULES.items():
+        if months is not None:
+            res = run(panel, on_schedule(policy().decide, panel, months), start, end, w.cost_bps, f"schedule_{name}")
+            save_result(cfg, panel, res)
+            log.info("schedule %s: $1 -> $%.0f", name, res.wealth()[-1])
+    daily = load_daily(w.base_url, cfg.paths.data_raw / "french", panel.names, refresh)
+    for name, true_up in (("schedule_daily", True), ("schedule_monthly_on_daily", False)):
+        res = run_daily(panel, daily, policy().decide, start, end, w.cost_bps, name, true_up=true_up)
+        save_result(cfg, panel, res)
+        log.info("%s: $1 -> $%.0f", name, res.wealth()[-1])
