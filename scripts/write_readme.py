@@ -33,6 +33,12 @@ def num(x: float, digits: int = 2) -> str:
     text = f"{abs(x):.{digits}f}"
     return (MINUS if x < 0 and float(text) != 0 else "") + text
 
+def month_name(ym: str) -> str:
+    """'2026-09' -> 'September 2026'."""
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    return f"{months[int(ym[5:7]) - 1]} {ym[:4]}"
+
+
 
 def main() -> None:
     site = json.loads((ROOT / "reports" / "site_wealth.json").read_text())
@@ -41,6 +47,7 @@ def main() -> None:
     c, cm = comps["deep - market"], comps["momentum_tilt - market"]
     verdict = c["verdict"]
     oos = site["oos"]
+    end_name = month_name(oos["end"])
     years = oos["months"] // 12
 
     def cell(key: str) -> str:
@@ -74,7 +81,7 @@ def main() -> None:
 
     abl = []
     pair = perf.get("deep_pair")
-    for n, what in (("deep_trade_all", "trades all the way to its target every month (no learned patience)"),
+    for n, what in (("deep_trade_all", "trades all the way to its target every month (κ fixed at 1)"),
                     ("deep_mlp", "judges each industry on its own features and the market's (no attention across industries)"),
                     ("deep_unanchored", "allocates from scratch with no tilt bounds (no market anchor; untrained, it holds equal weights)")):
         if n in perf:
@@ -93,6 +100,28 @@ def main() -> None:
     seeds = [site["seeds"][k]["terminal_wealth"] for k in sorted(site["seeds"])]
     ahead = sum(x > m["terminal_wealth"] for x in seeds)
     tf = site.get("trade_fraction") or {}
+    start = site.get("init_trade", 0.25)
+    passed = [n for n in ("deep_trade_all", "deep_mlp", "deep_unanchored") if n in perf and comps[f"{n} - market"]["verdict"] != "no detectable difference"]
+    ablation_note = ("The ablations were fixed in advance to be reported, not to choose a model. " + (
+        " ".join(f"“{labels[n]}” came out {comps[f'{n} - market']['verdict']} than the market on its own "
+                 f"(t = {num(comps[f'{n} - market']['t_nw'])}), but "
+                 + ("it is not distinguishable from the full network with the same seeds"
+                    if f"{n} - deep_pair" in comps and comps[f"{n} - deep_pair"]["verdict"] == "no detectable difference"
+                    else f"against the full network with the same seeds it was {comps[f'{n} - deep_pair']['verdict']}")
+                 + "; with this many comparisons, one pass is weak evidence." for n in passed)
+        if passed else "None of them separated from the market by the pre-registered test."))
+    factor_title = ("Its edge over the market looks like a value tilt." if abs(d["alpha_t"]) < 2 and d["beta_hml"] > 0.1
+                    else "Factor-adjusted.")
+    if tf and tf["median"] > 2 * start:
+        learned_kappa = (f"It did not learn to sit still. Its trade fraction started training at {pct(start, 0)} and settled at a median of "
+                         f"{pct(tf['median'], 0)} (range {pct(tf['min'], 0)} to {pct(tf['max'], 0)}): it chased its moving target, trading "
+                         f"{pct(d['turnover_per_year'], 0)} of the portfolio a year.")
+    elif tf and tf["median"] < start / 2:
+        learned_kappa = (f"It learned to hold: its trade fraction fell from {pct(start, 0)} at the start of training to a median of "
+                         f"{pct(tf['median'], 0)}, and it traded {pct(d['turnover_per_year'], 0)} of the portfolio a year.")
+    else:
+        learned_kappa = (f"Its trade fraction started training at {pct(start, 0)} and had a median of {pct(tf.get('median', float('nan')), 0)} "
+                         f"out of sample; it traded {pct(d['turnover_per_year'], 0)} of the portfolio a year.")
 
     text = f"""# Deep Portfolio Constructor
 
@@ -117,14 +146,15 @@ flowchart LR
 
 **The answer:** {answer}
 
-* **It is a long-term investor's portfolio.** Long-only, fully invested, no leverage, no shorting, no market timing. The network traded {pct(d['turnover_per_year'], 0)} of the portfolio a year (an average holding period of {d['holding_years']:.1f} years) and its weights differed from the index's by {pct(d['active_share'], 0)} on average.
+* **The rules are a long-term investor's:** long-only, fully invested, no leverage, no shorting, no market timing. Within them the network traded {pct(d['turnover_per_year'], 0)} of the portfolio a year (an average holding period of {d['holding_years']:.1f} years, against {pct(m['turnover_per_year'], 0)} a year for the index), and its weights differed from the index's by {pct(d['active_share'], 0)} on average.
 * **The strongest classical rival is simple.** A momentum tilt grew {vs('momentum_tilt - market')} against the market, trading {pct(mom['turnover_per_year'], 0)} a year. The network against it: {vs('deep - momentum_tilt')}.
 * **{classical}
-* **Robustness.** Each seed's network on its own ended above the market in {ahead} of {len(seeds)} cases. Re-priced at 25 and 50 bps a trade, the network's growth against the market was {pct(site['costs']['deep@25bps']['vs_market_log_growth'], sign=True)} and {pct(site['costs']['deep@50bps']['vs_market_log_growth'], sign=True)} a year.
+* **{factor_title}** Its loading on the Fama-French value factor was {num(d['beta_hml'])}; after adjusting for market, size and value its alpha was {pct(d['alpha_annual'], sign=True)} a year (t = {num(d['alpha_t'])}).
+* **Robustness.** Each seed's network on its own ended above the market in {ahead} of {len(seeds)} cases ({money(min(seeds))} to {money(max(seeds))}); the deployed policy averages them. Re-priced at 25 and 50 bps a trade, the network's growth against the market was {pct(site['costs']['deep@25bps']['vs_market_log_growth'], sign=True)} and {pct(site['costs']['deep@50bps']['vs_market_log_growth'], sign=True)} a year.
 
 ## Results
 
-$1 invested in January 1960, out of sample to {oos['end']} ({oos['months']} months), long-only, fully invested, net of {site['cost_bps']:g} bps per unit traded. "Growth vs market" is the yearly difference in log growth with its Newey-West t; the verdict follows the pre-registered rule (t ≥ 2 and a 95% block-bootstrap interval that excludes zero).
+$1 invested in January 1960, out of sample to {end_name} ({oos['months']} months), long-only, fully invested, net of {site['cost_bps']:g} bps per unit traded. "Growth vs market" is the yearly difference in log growth with its Newey-West t; the verdict follows the pre-registered rule (t ≥ 2 and a 95% block-bootstrap interval that excludes zero).
 
 | Strategy | $1 became | CAGR | Sharpe | Max drawdown | Traded a year | Growth vs market (t) | Verdict |
 |---|---:|---:|---:|---:|---:|---:|---|
@@ -138,7 +168,9 @@ $1 invested in January 1960, out of sample to {oos['end']} ({oos['months']} mont
 |---|---|---:|---:|---|---|
 {chr(10).join(abl)}
 
-**What it learned.** The trade fraction κ started training at 25%; out of sample its median was {pct(tf.get('median', float('nan')), 0)} (range {pct(tf.get('min', float('nan')), 0)} to {pct(tf.get('max', float('nan')), 0)}). The tilts by industry over time:
+{ablation_note}
+
+**What it learned.** {learned_kappa} It leaned toward value: its loading on the Fama-French value factor was {num(d['beta_hml'])} (the market's {num(m['beta_hml'])}), and after adjusting for market, size and value its alpha was {pct(d['alpha_annual'], sign=True)} a year (t = {num(d['alpha_t'])}). The tilts by industry over time:
 
 ![The network's tilts by industry](reports/figures/wealth/tilts.png)
 
@@ -148,14 +180,14 @@ Every table (decades, costs, seeds, factor alphas, all comparisons) is in [`repo
 
 ## How it works
 
-**Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to {oos['end']} (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of {site['data_check']['correlation']:.4f}. The T-bill rate and the Fama-French factors come from the same library.
+**Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to {end_name} (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of {site['data_check']['correlation']:.4f}. The T-bill rate and the Fama-French factors come from the same library.
 
-**Features, known at each month-end.** For every industry, 13 features: returns over 1, 3, 12 (skipping the last month), 36 and 60 months; volatility over 1 and 5 years; downside deviation and drawdown over 3 years; beta and correlation with the market over 5 years; book-to-market (used from the July after it is formed); and its weight in the index. Each is ranked against the other industries (z-scored cross-sectionally, clipped at 4). For the market as a whole, 7 more: its 1- and 5-year return, volatility, 3-year drawdown, the T-bill rate, the spread of industry returns and the market's book-to-market, each z-scored against its own past only.
+**Features, known at each month-end.** For every industry, 13 features: returns over 1, 3, 12 (skipping the last month), 36 and 60 months; volatility over 1 and 5 years; downside deviation and drawdown over 3 years; beta and correlation with the market over 5 years; book-to-market (each year's value, formed at the end of June, used from the end of July); and its weight in the index. Each is compared across the 30 industries (z-scored cross-sectionally, clipped at 4). For the market as a whole, 7 more: its 1- and 5-year return, volatility, 3-year drawdown, the T-bill rate, the spread of industry returns and the market's book-to-market, each z-scored against its own past only.
 
 **The network** ([`src/dpc/wealth/model.py`](src/dpc/wealth/model.py), {site['params']:,} parameters). Each industry is a token (its features plus where its current holding sits against the market), with one more token for the market. Two pre-norm transformer blocks (d = 32, 4 heads) let every industry attend to every other. Two heads read the result:
 
 * **Tilt.** Target weights `softmax(log w_mkt + log 3 · tanh(score))`: each industry's market weight is scaled by a factor between a third and three, then the portfolio is rescaled to 100%. Long-only and fully invested by construction. The tilt head starts at zero, so the untrained network holds exactly the market and must earn every deviation on held-out data.
-* **Patience.** A trade fraction κ in (0, 1) from the market token: new holdings are `w + κ (target − w)`. κ = 0 is buy and hold, κ = 1 a full rebalance; holding still is a decision the network can learn.
+* **Trade fraction.** κ in (0, 1) from the market token: new holdings are `w + κ (target − w)`. κ = 0 is buy and hold, κ = 1 a full rebalance; how much to trade is learned, not set by hand.
 
 **The loss** ([`simulate`](src/dpc/wealth/model.py)). A differentiable copy of the backtest engine plays each policy forward over 60-month episodes: holdings drift with prices, every unit traded costs {site['cost_bps']:g} bps, and the loss is minus the average monthly log growth of wealth after costs (the Kelly criterion). Gradients flow back through every month of compounding, as in deep hedging, so a trade is judged by the years after it. A test checks that this PyTorch simulator reproduces the NumPy engine month by month.
 

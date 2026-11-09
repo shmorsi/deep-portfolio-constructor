@@ -41,6 +41,12 @@ def num(x: float, digits: int = 2) -> str:
     text = f"{abs(x):.{digits}f}"
     return (MINUS if x < 0 and float(text) != 0 else "") + text
 
+def month_name(ym: str) -> str:
+    """'2026-09' -> 'September 2026'."""
+    months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
+    return f"{months[int(ym[5:7]) - 1]} {ym[:4]}"
+
+
 
 def learned(results: Path) -> dict:
     """Descriptive facts about the deployed network, from its committed holdings and returns."""
@@ -68,12 +74,14 @@ def learned(results: Path) -> dict:
 def main() -> None:
     site = json.loads((ROOT / "reports" / "site_wealth.json").read_text())
     perf, comps, labels, oos = site["performance"], site["comparisons"], site["labels"], site["oos"]
+    end_name = month_name(oos["end"])
     d, m, mom = perf["deep"], perf["market"], perf["momentum_tilt"]
     c = comps["deep - market"]
     verdict = c["verdict"]
     L = learned(ROOT / "reports" / "results" / "wealth")
     seeds = [site["seeds"][k]["terminal_wealth"] for k in sorted(site["seeds"])]
     tf = site.get("trade_fraction") or {}
+    start = site.get("init_trade", 0.25)
 
     def vs(key: str) -> str:
         x = comps[key]
@@ -98,14 +106,23 @@ def main() -> None:
     }.get(verdict, ("Trained on the right objective, with a market anchor and a learned trade fraction, the network did not separate "
                     "from holding the market by a test fixed in advance. For a long-only investor in 30 broad industries, the index is a "
                     "hard benchmark; the learned tilts neither clearly helped nor clearly hurt."))
+    if tf and tf["median"] > 2 * start:
+        conclusion += (f" Two things it learned are worth knowing. Given the choice, it did not sit still: its trade fraction rose from "
+                       f"{pct(start, 0)} to a median of {pct(tf['median'], 0)}, so the {site['cost_bps']:g} bps cost per trade was not enough "
+                       f"to teach patience on these features.")
+    if abs(d["alpha_t"]) < 2 and d["beta_hml"] > 0.1:
+        conclusion += (f" And its gain over the market is about what its value tilt would have paid: a value loading of "
+                       f"{num(d['beta_hml'])} and a three-factor alpha of {pct(d['alpha_annual'], sign=True)} (t {num(d['alpha_t'])}).")
+    conclusion += (" A fresh test needs fresh data: the honest next step is forward, publishing the network's holdings each month "
+                   "from now on and scoring them as the months arrive, under the same protocol.")
     over = ", ".join(f"{NAMES.get(k, k)} ({r:.2f}x)" for k, r in L["over"])
     under = ", ".join(f"{NAMES.get(k, k)} ({r:.2f}x)" for k, r in L["under"])
     kappa_line = ""
     if L["kappa_calm"] is not None:
-        kappa_line = (f" Its trade fraction, which training starts at 25%, had a median of {pct(tf['median'], 0)} out of sample. In the "
+        kappa_line = (f" Its trade fraction, which training starts at {pct(start, 0)}, had a median of {pct(tf['median'], 0)} out of sample. In the "
                       f"{L['stress_months']} months when the market stood 20% or more below its peak it averaged {pct(L['kappa_stress'], 0)}, "
                       f"against {pct(L['kappa_calm'], 0)} in other months." if L["kappa_stress"] is not None else
-                      f" Its trade fraction, which training starts at 25%, had a median of {pct(tf['median'], 0)} out of sample.")
+                      f" Its trade fraction, which training starts at {pct(start, 0)}, had a median of {pct(tf['median'], 0)} out of sample.")
     abl_rows = []
     for n in ("deep_trade_all", "deep_mlp", "deep_unanchored"):
         if n in perf and f"{n} - deep_pair" in comps:
@@ -115,7 +132,7 @@ def main() -> None:
 
 Sherif Morsi · Deep Portfolio Constructor, commit {site['commit']} · every number below is generated from the committed results by `scripts/write_research_note.py`.
 
-**Abstract.** A transformer allocates a long-only, fully invested portfolio across Kenneth French's 30 US industry portfolios and learns what fraction of the gap to its target to trade each month. It is trained in PyTorch on minus the log growth of wealth after trading costs, through a differentiable simulator of the investing rules, walk-forward with refits every five years. Out of sample from January 1960 to {oos['end']} ({oos['months']} months, {site['cost_bps']:g} bps per unit traded), $1 grew to {money(d['terminal_wealth'])} with the network and {money(m['terminal_wealth'])} in the market: {vs('deep - market')}. In words: {headline}. The test was fixed in git before the network was run out of sample.
+**Abstract.** A transformer allocates a long-only, fully invested portfolio across Kenneth French's 30 US industry portfolios and learns what fraction of the gap to its target to trade each month. It is trained in PyTorch on minus the log growth of wealth after trading costs, through a differentiable simulator of the investing rules, walk-forward with refits every five years. Out of sample from January 1960 to {end_name} ({oos['months']} months, {site['cost_bps']:g} bps per unit traded), $1 grew to {money(d['terminal_wealth'])} with the network and {money(m['terminal_wealth'])} in the market: {vs('deep - market')}. In words: {headline}. The test was fixed in git before the network was run out of sample.
 
 ## 1. Question
 
@@ -123,7 +140,7 @@ Can a neural network, trained on the growth of wealth after trading costs, build
 
 ## 2. Data and rules
 
-Kenneth French's 30 value-weighted industry portfolios, July 1926 to {oos['end']}. Each holds every listed firm in its industry at each date, so there is no survivorship bias among firms. Industry market caps give the market portfolio, which tracks French's own market return with a correlation of {site['data_check']['correlation']:.4f}. Every strategy is long-only and fully invested, with no leverage and no cash; a decision at the end of month t is held through month t+1, holdings drift with prices between trades, and every unit traded costs {site['cost_bps']:g} bps.
+Kenneth French's 30 value-weighted industry portfolios, July 1926 to {end_name}. Each holds every listed firm in its industry at each date, so there is no survivorship bias among firms. Industry market caps give the market portfolio, which tracks French's own market return with a correlation of {site['data_check']['correlation']:.4f}. Every strategy is long-only and fully invested, with no leverage and no cash; a decision at the end of month t is held through month t+1, holdings drift with prices between trades, and every unit traded costs {site['cost_bps']:g} bps.
 
 ## 3. Model and training
 
@@ -148,7 +165,7 @@ Training plays the policy through a differentiable copy of the backtest engine (
 
 ## 5. What the network learned
 
-Averaged over the {oos['months']} months, its largest overweights were {over}, and its largest underweights {under} (its average weight over the market's average weight). Its monthly active return (network minus market, in log growth) had a correlation of {num(L['corr_momentum'])} with the momentum tilt's.{kappa_line} It traded {pct(d['turnover_per_year'], 0)} of the portfolio a year, an average holding period of {d['holding_years']:.1f} years, against {pct(m['turnover_per_year'], 0)} for the index and {pct(mom['turnover_per_year'], 0)} for the momentum tilt. Its weights ranged from {L['min_ratio']:.2f} to {L['max_ratio']:.2f} times the market's.
+Averaged over the {oos['months']} months, its largest overweights were {over}, and its largest underweights {under} (its average weight over the market's average weight). Its monthly active return (network minus market, in log growth) had a correlation of {num(L['corr_momentum'])} with the momentum tilt's.{kappa_line} It traded {pct(d['turnover_per_year'], 0)} of the portfolio a year, an average holding period of {d['holding_years']:.1f} years, against {pct(m['turnover_per_year'], 0)} for the index and {pct(mom['turnover_per_year'], 0)} for the momentum tilt. Its weights ranged from {L['min_ratio']:.2f} to {L['max_ratio']:.2f} times the market's. Its loadings on the Fama-French factors were {num(d['beta_mkt'])} on the market, {num(d['beta_smb'])} on size and {num(d['beta_hml'])} on value (the market's own: {num(m['beta_smb'])} and {num(m['beta_hml'])}), with a three-factor alpha of {pct(d['alpha_annual'], sign=True)} a year (t {num(d['alpha_t'])}).
 
 ## 6. Ablations
 

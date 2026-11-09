@@ -143,6 +143,7 @@ def export_site(cfg: Config) -> dict:
         "trade_fraction": summary.get("deep_trade_fraction"),
         "holdings": holdings,
         "params": _params(cfg, panel),
+        "init_trade": cfg.wealth.model.init_trade,
         "tests": _test_count(cfg),
         "data_check": json.loads((cfg.paths.reports / "wealth" / "data_summary.json").read_text())["check_cap_weighted_vs_french_market"],
     }

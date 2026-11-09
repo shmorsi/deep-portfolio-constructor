@@ -63,7 +63,7 @@ plt.plot(100 * x, 100 * growth, lw=2.5, label="growth of wealth")
 plt.axvline(100 * best, color="grey", lw=0.8)
 plt.xlabel("% in the risky industry"); plt.ylabel("% a year"); plt.legend(frameon=False)
 plt.title(f"Most growth at {100 * best:.0f}% risky", loc="left"); plt.show()
-print(f"$1 after 66 years: {np.exp(66 * growth[-1]):,.0f} at 100% risky, {np.exp(66 * growth.max()):,.0f} at {100 * best:.0f}% risky")"""),
+print(f"$1 after 66 years: ${np.exp(66 * growth[-1]):,.0f} at 100% risky, ${np.exp(66 * growth.max()):,.0f} at {100 * best:.0f}% risky")"""),
     md("""A simulation agrees: draw 66 years of monthly returns many times. The *average* final wealth rewards risk, but the *typical* (median) investor ends up richer with the growth-optimal mix. A long-term investor lives one path, so the median, and the growth rate behind it, is what matters."""),
     code("""def simulate_wealth(share, years=66, paths=20000, seed=1):
     r = np.random.default_rng(seed).multivariate_normal(mu / 12, cov / 12, size=(paths, 12 * years))
@@ -132,7 +132,10 @@ plt.yscale("log"); plt.ylabel("growth of $1 (log scale)"); plt.legend(frameon=Fa
 plt.title("$1 invested in January 1960, net of costs", loc="left"); plt.show()
 c = summary["comparisons"]["deep - market"]
 print(f"Pre-registered test, network minus market: {100 * c['diff_log_growth']:+.2f}% a year, "
-      f"Newey-West t {c['t_nw']:.2f}, 95% interval {100 * c['ci_low']:+.2f}% to {100 * c['ci_high']:+.2f}%: {c['verdict']}.")"""),
+      f"Newey-West t {c['t_nw']:.2f}, 95% interval {100 * c['ci_low']:+.2f}% to {100 * c['ci_high']:+.2f}%: {c['verdict']}.")
+tf, deep = summary["deep_trade_fraction"], summary["performance"]["deep"]
+print(f"What it chose: a median trade fraction of {100 * tf['median']:.0f}% (training starts it at 25%), "
+      f"{100 * deep['turnover_per_year']:.0f}% of the portfolio traded a year.")"""),
     code("""perf = pd.DataFrame(summary["performance"]).T
 cols = ["terminal_wealth", "cagr", "volatility", "sharpe", "max_drawdown", "turnover_per_year", "active_share"]
 perf.loc[[n for n in ["market", "equal_weight", "min_variance", "risk_parity", "growth_classical", "momentum_tilt", "deep"] if n in perf.index], cols].astype(float).round(3)"""),
@@ -140,7 +143,7 @@ perf.loc[[n for n in ["market", "equal_weight", "min_variance", "risk_parity", "
 
 * **Train on what the investor keeps.** The loss is the growth of wealth after costs, so volatility and trading are penalised in the units that matter, not through a hand-set risk or turnover penalty.
 * **Start from the market and earn every deviation.** The tilt head starts at zero, so the untrained network is the index fund; training moves it only where that grew wealth on held-out years.
-* **Holding still is a decision.** The trade fraction lets the network learn how much patience costs and pays.
+* **Holding still is a decision.** The trade fraction lets the network learn how much patience costs and pays; section 4 prints what it chose.
 * **Judge it by a rule fixed in advance.** The verdict above comes from the pre-registered test, whatever it says.
 
 Read next: `reports/wealth/research_note.md` (the write-up) and `reports/wealth/results.md` (every table)."""),

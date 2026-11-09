@@ -1,86 +1,86 @@
 # Deep Portfolio Constructor
 
-**A market-neutral long-short equity portfolio with PyTorch at every layer: a transformer return model, a transformer covariance model, and end-to-end training through a differentiable constrained optimiser. Built as an ablation, so each deep component's contribution is measured, and tested honestly against classical portfolio construction.**
+**A neural network that builds a long-only portfolio for long-term wealth.** A transformer allocates across Kenneth French's 30 US industry portfolios and decides how much to trade each month. It is trained in PyTorch on the growth of wealth itself, after trading costs, through a differentiable simulator of buying, holding and paying to trade, and tested out of sample from January 1960 to 2026 against the market and five classical long-only strategies, under a protocol committed to git before the test.
 
-**Explore it:** [shmorsi.github.io/projects/deep-portfolio-constructor.html](https://shmorsi.github.io/projects/deep-portfolio-constructor.html). Step through the ablation, scrub through the real portfolio month by month, and neutralise a toy portfolio yourself.
+**Explore it:** [shmorsi.github.io/projects/deep-portfolio-constructor.html](https://shmorsi.github.io/projects/deep-portfolio-constructor.html). Slide the growth toy, pick a strategy and a start year, and scrub through the network's holdings since 1960.
 
 ```mermaid
 flowchart LR
-  D["Prices, factors, sectors<br/>99 US and Canadian large caps"] --> A["AlphaFormer<br/>transformer over 12 months,<br/>attention across stocks"]
-  D --> R["Deep risk model<br/>patch transformer,<br/>Σ = D(BBᵀ + Ψ)D"]
-  A -- "views μ" --> O["Differentiable optimiser<br/>cvxpylayers: dollar-, sector-,<br/>beta-, size-, value-neutral"]
-  R -- "risk B, Ψ" --> O
-  O -- "weights w*" --> P["Next month's<br/>realised return − costs"]
-  P -. "gradient through the KKT conditions" .-> O
-  O -. " " .-> A
-  O -. " " .-> R
+  D["30 US industries, 1926 to 2026<br/>13 point-in-time features each<br/>+ 7 market-wide features"] --> T["Transformer<br/>industries attend to each other<br/>and to a market token"]
+  T -- "tilt each market weight<br/>by 1/3x to 3x" --> G["Target portfolio<br/>long-only, fully invested"]
+  T -- "trade fraction κ" --> H["New holdings<br/>w + κ (target − w)"]
+  G --> H
+  H --> S["Differentiable simulator<br/>prices drift the holdings,<br/>every trade costs 10 bps"]
+  S --> L["Loss: minus the log growth<br/>of wealth over 60 months"]
+  L -. "gradient through every month of compounding" .-> T
 ```
 
 ## Summary
 
-Three textbook signals (12-1 momentum, short-term reversal, low volatility) are turned into a dollar-neutral portfolio of 99 US and Canadian large caps, in six ways. Every long-short strategy uses the same convex optimiser (neutral to sectors, market beta, size and value, with position caps and a turnover limit). Only the inputs change, one deep component at a time:
+**The question** ([pre-registered](docs/wealth_protocol.md)): can a neural network, trained on the growth of wealth after trading costs, build a better long-only, fully invested, long-term portfolio than simply holding the market, and than the classical rules, from 1960 to 2026?
 
-1. **Classical:** Ledoit-Wolf covariance, signal-based expected returns.
-2. **+ Deep risk:** a PyTorch transformer forecasts the covariance matrix.
-3. **+ Deep views:** **AlphaFormer**, a PyTorch transformer, forecasts next month's cross-sectional returns.
-4. **+ End-to-end:** the risk model is trained *through* the optimiser (cvxpylayers) on realised risk-adjusted return after costs.
-5. **Fully deep:** AlphaFormer, the risk model and the optimiser are all trained together end to end.
+**The answer:** **Not detectably, by the test fixed in advance.** $1 invested in January 1960 grew to **$1,368** with the network, against **$929** for the market: +0.58% a year in log growth, a gap the pre-registered test cannot tell from luck (Newey-West t = 1.40, 95% interval −0.07% to +1.50%).
 
-Everything is walk-forward and out of sample from January 2008 to September 2026. Models refit yearly, and the look-ahead checks are explicit.
-
-**Findings:**
-* **The optimiser does the risk work.** It raises the share of risk from intended stock bets from **17% to 61%**.
-* **End-to-end training through the optimiser gives the best net Sharpe** (**0.58 vs −0.03** classical), but the edge is not statistically significant (t = 1.70). About 37% of it is market beta that leaked through the beta constraint.
-* **More deep learning was not better.** Adding AlphaFormer to end-to-end training fell to 0.15 (t = −1.90 against the end-to-end model).
+* **The rules are a long-term investor's:** long-only, fully invested, no leverage, no shorting, no market timing. Within them the network traded 155% of the portfolio a year (an average holding period of 0.6 years, against 4% a year for the index), and its weights differed from the index's by 32% on average.
+* **The strongest classical rival is simple.** A momentum tilt grew +0.96% a year (t = 2.93, better) against the market, trading 110% a year. The network against it: −0.38% a year (t = −0.69, no detectable difference).
+* **Classical portfolio rules did not beat holding the market.** Minimum variance, risk parity, equal weight and a classical growth (Kelly) optimiser with the network's own goal and bounds all finished within the noise of the market by the same test.
+* **Its edge over the market looks like a value tilt.** Its loading on the Fama-French value factor was 0.17; after adjusting for market, size and value its alpha was +0.15% a year (t = 0.38).
+* **Robustness.** Each seed's network on its own ended above the market in 4 of 5 cases ($574 to $1,794); the deployed policy averages them. Re-priced at 25 and 50 bps a trade, the network's growth against the market was +0.13% and −0.63% a year.
 
 ## Results
 
-Out-of-sample, January 2008 to September 2026 (225 months), monthly rebalancing, net of 10 bps per unit traded:
+$1 invested in January 1960, out of sample to September 2026 (801 months), long-only, fully invested, net of 10 bps per unit traded. "Growth vs market" is the yearly difference in log growth with its Newey-West t; the verdict follows the pre-registered rule (t ≥ 2 and a 95% block-bootstrap interval that excludes zero).
 
-| Strategy | Net Sharpe | Return | Vol | Max DD | FF6 alpha t | Market beta | % risk from intended bets |
-|---|---|---|---|---|---|---|---|
-| L/S naive signal (no risk model) | −0.40 | −8.7% | 18.4% | −88% | −3.47 | −0.16 | 17% |
-| L/S classical (Ledoit-Wolf + optimiser) | −0.03 | −0.6% | 8.0% | −32% | −0.69 | 0.02 | **61%** |
-| + deep risk model | −0.05 | −0.9% | 9.5% | −36% | −1.24 | 0.05 | 41% |
-| + deep views (AlphaFormer), two-stage | 0.33 | 2.5% | 8.5% | −26% | 0.80 | 0.15 | 50% |
-| **End-to-end through the optimiser (primary)** | **0.58** | **4.7%** | 8.6% | −28% | 1.48 | 0.19 | 47% |
-| Fully deep end-to-end (adds AlphaFormer) | 0.15 | 1.0% | 9.3% | −31% | 0.04 | 0.17 | 48% |
-| Equal weight, long-only (context) | 0.72 | 12.8% | 19.1% | −49% | 3.83* | 0.92 | 1% |
+| Strategy | $1 became | CAGR | Sharpe | Max drawdown | Traded a year | Growth vs market (t) | Verdict |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Market (hold the index) | $929 | 10.78% | 0.47 | −50% | 4% | benchmark |  |
+| Equal weight | $1,377 | 11.44% | 0.49 | −53% | 6% | +0.59% (0.87) | no detectable difference |
+| Minimum variance | $1,180 | 11.18% | 0.56 | −41% | 20% | +0.36% (0.33) | no detectable difference |
+| Risk parity | $1,418 | 11.49% | 0.51 | −49% | 7% | +0.63% (0.94) | no detectable difference |
+| Classical growth optimiser | $905 | 10.74% | 0.47 | −48% | 9% | −0.04% (−0.09) | no detectable difference |
+| Momentum tilt | $1,764 | 11.85% | 0.53 | −46% | 110% | +0.96% (2.93) | better |
+| **Deep Growth Network** | $1,368 | 11.43% | 0.51 | −52% | 155% | +0.58% (1.40) | no detectable difference |
 
-\* Long-only alphas are inflated by survivorship bias (see Limitations). "% risk from intended bets" is the ex-ante stock-specific share of variance under an *independent*, evaluation-only Barra-style model (6 style factors and 11 sectors).
+![Growth of $1 since 1960](reports/figures/wealth/growth.png)
 
-**What each deep component did:**
+**What each part of the network adds.** Each ablation was fixed in the protocol and trained with seeds 42 and 43. The full network averaged over the same two seeds turned $1 into $1,026.
 
-| Component | Test | Result |
-|---|---|---|
-| AlphaFormer (views) | Out-of-sample rank IC vs the classical composite | **0.0165** (t 1.25) vs −0.004 for the composite and 0.0161 for momentum alone. Top-minus-bottom quintile +0.47% a month (t 1.63), about double momentum's 0.24%. Not significant. |
-| Deep risk model | Gaussian NLL and minimum-variance realised vol vs Ledoit-Wolf | Better likelihood (−2.941 vs −2.899), worse hedge (14.0% vs 13.3%), at every model size. |
-| End-to-end training | Paired monthly return vs classical, Newey-West | +0.43% a month, **t 1.70**. Hedging its own trailing beta point-in-time: Sharpe 0.64 → 0.40. |
-| Fully deep | Paired vs the end-to-end model | −0.30% a month, t −1.90: overfit (about 250 monthly decisions per refit). |
+| Ablation | What changes | $1 became | Traded a year | Against the market | Against the full network, same seeds |
+|---|---|---:|---:|---|---|
+| Deep, no learned holding | trades all the way to its target every month (κ fixed at 1) | $1,775 | 252% | +0.97% a year, t 2.11: better | +0.82% a year, t 1.83: no detectable difference |
+| Deep, no attention | judges each industry on its own features and the market's (no attention across industries) | $701 | 91% | −0.42% a year, t −0.95: no detectable difference | −0.57% a year, t −1.57: no detectable difference |
+| Deep, no market anchor | allocates from scratch with no tilt bounds (no market anchor; untrained, it holds equal weights) | $387 | 354% | −1.31% a year, t −0.47: no detectable difference | −1.46% a year, t −0.55: no detectable difference |
 
-**Robustness:**
-* End-to-end Sharpe across seeds 42/43/44: 0.58 / 0.46 / 0.49.
-* Across position caps of 3–10% and sector limits of 2.5–10%: 0.54 to 0.67.
-* At 40 bps costs: 0.19.
+The ablations were fixed in advance to be reported, not to choose a model. “Deep, no learned holding” came out better than the market on its own (t = 2.11), but it is not distinguishable from the full network with the same seeds; with this many comparisons, one pass is weak evidence.
 
-Full tables, crisis years (2008, 2020, 2022) and sensitivity tests are in [`reports/stage6_evaluation.md`](reports/stage6_evaluation.md). The 2-page write-up is [`reports/research_note.md`](reports/research_note.md).
+**What it learned.** It did not learn to sit still. Its trade fraction started training at 25% and settled at a median of 81% (range 40% to 100%): it chased its moving target, trading 155% of the portfolio a year. It leaned toward value: its loading on the Fama-French value factor was 0.17 (the market's 0.01), and after adjusting for market, size and value its alpha was +0.15% a year (t = 0.38). The tilts by industry over time:
 
-![Risk decomposition](reports/figures/stage6_risk_decomposition.png)
+![The network's tilts by industry](reports/figures/wealth/tilts.png)
 
-## The deep learning (all PyTorch)
+![Rolling 10-year growth against the market](reports/figures/wealth/rolling.png)
 
-| Model | File | Architecture | Loss | Parameters |
-|---|---|---|---|---|
-| **AlphaFormer** | `src/dpc/deep/alpha_model.py` | transformer over each stock's 12 monthly returns, then self-attention across stocks (permutation-equivariant), 3-seed ensemble | negative information coefficient | 28,033 per member |
-| **Deep risk model** | `src/dpc/deep/risk_model.py` | patch transformer over 60 days + 6 factor returns, cross-stock attention, factor-structured Σ = D(BBᵀ+Ψ)D (positive definite by construction) | Gaussian negative log-likelihood (Woodbury) | 29,033 |
-| **End-to-end model** | `src/dpc/deep/e2e.py` | the two networks above feed a cvxpylayers optimiser layer; a zero-initialised residual starts it at the classical answer | −(realised return − costs) + λ·realised variance | both, fine-tuned |
-| **First-principles optimiser** | `src/dpc/deep/torch_qp.py` | equality-constrained mean-variance solved through its KKT system with `torch.linalg.solve` | used for teaching and tests | none |
+Every table (decades, costs, seeds, factor alphas, all comparisons) is in [`reports/wealth/results.md`](reports/wealth/results.md). The write-up is [`reports/wealth/research_note.md`](reports/wealth/research_note.md).
 
-Shared PyTorch infrastructure is in `src/dpc/deep/trainer.py`: a `Dataset`/`DataLoader` per month, AdamW, gradient clipping, early stopping on a validation metric, best-weights restore, and device selection (CUDA, Apple MPS or CPU).
+## How it works
+
+**Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to September 2026 (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of 0.9998. The T-bill rate and the Fama-French factors come from the same library.
+
+**Features, known at each month-end.** For every industry, 13 features: returns over 1, 3, 12 (skipping the last month), 36 and 60 months; volatility over 1 and 5 years; downside deviation and drawdown over 3 years; beta and correlation with the market over 5 years; book-to-market (each year's value, formed at the end of June, used from the end of July); and its weight in the index. Each is compared across the 30 industries (z-scored cross-sectionally, clipped at 4). For the market as a whole, 7 more: its 1- and 5-year return, volatility, 3-year drawdown, the T-bill rate, the spread of industry returns and the market's book-to-market, each z-scored against its own past only.
+
+**The network** ([`src/dpc/wealth/model.py`](src/dpc/wealth/model.py), 20,066 parameters). Each industry is a token (its features plus where its current holding sits against the market), with one more token for the market. Two pre-norm transformer blocks (d = 32, 4 heads) let every industry attend to every other. Two heads read the result:
+
+* **Tilt.** Target weights `softmax(log w_mkt + log 3 · tanh(score))`: each industry's market weight is scaled by a factor between a third and three, then the portfolio is rescaled to 100%. Long-only and fully invested by construction. The tilt head starts at zero, so the untrained network holds exactly the market and must earn every deviation on held-out data.
+* **Trade fraction.** κ in (0, 1) from the market token: new holdings are `w + κ (target − w)`. κ = 0 is buy and hold, κ = 1 a full rebalance; how much to trade is learned, not set by hand.
+
+**The loss** ([`simulate`](src/dpc/wealth/model.py)). A differentiable copy of the backtest engine plays each policy forward over 60-month episodes: holdings drift with prices, every unit traded costs 10 bps, and the loss is minus the average monthly log growth of wealth after costs (the Kelly criterion). Gradients flow back through every month of compounding, as in deep hedging, so a trade is judged by the years after it. A test checks that this PyTorch simulator reproduces the NumPy engine month by month.
+
+**Walk-forward training** ([`src/dpc/wealth/train.py`](src/dpc/wealth/train.py)). Refits every five years at the end of December, 1959 to 2024, on data before the refit only. Inside each refit the last 10 years are validation (early stopping on validation growth) and no training label is dated after the first validation decision (asserted in code and tested). Five seeds (42 to 46), each warm-started from its own previous refit; the deployed policy averages their targets and trade fractions. AdamW, gradient clipping, batches of 32 episodes.
+
+**The classical strategies** ([`src/dpc/wealth/baselines.py`](src/dpc/wealth/baselines.py)), fixed before the network was run: the market; equal weight and risk parity, each January; minimum variance (Ledoit-Wolf, at most 20% per industry); a classical growth optimiser with the network's own goal and bounds (maximise μ'w − w'Σw/2 within a third and three times the market weights, plug-in estimates); and a momentum tilt within the same bounds, monthly.
 
 ## Quick start
 
-**See the results in a minute.** This needs no download, no training and no PyTorch:
+**See the results in a minute**, with no download, no training and no PyTorch:
 
 ```bash
 pip install -r requirements-dashboard.txt
@@ -94,80 +94,70 @@ pip install -e .
 python -m dpc.cli quickstart
 ```
 
-`quickstart` prints the headline table and opens the Streamlit dashboard (current weights, risk breakdown, exposures against limits, performance against every baseline). It reads only committed results.
+`quickstart` prints the headline table and opens a Streamlit dashboard (growth of $1, the network's holdings against the market's at any month, rolling 10-year growth, every table). It reads only committed results.
 
-**Understand it from first principles:** open [`notebooks/01_first_principles.ipynb`](notebooks/01_first_principles.ipynb). It covers:
-* why a naive long-short portfolio hides a factor bet
-* an optimiser differentiated with autograd
-* a model learning the right signal from portfolio P&L alone
-* the real models and results
+**Understand it from first principles:** [`notebooks/02_wealth_from_first_principles.ipynb`](notebooks/02_wealth_from_first_principles.ipynb) shows why growth is not average return, finds the Kelly mix by gradient ascent in PyTorch, shows why trading costs teach a policy to trade less, then reads the real results. It runs in a few minutes on a laptop.
 
-It runs in seconds on a fresh clone.
-
-**Reproduce everything from raw data** (about 2 hours on a 4-core laptop CPU; a GPU is used automatically if present):
+**Reproduce everything from raw data** (about two hours on a 4-core laptop CPU):
 
 ```bash
 pip install -r requirements.txt
 ```
 
 ```bash
-python -m dpc.cli all
+python -m dpc.cli wealth
 ```
 
-To run the stages one at a time:
+Or stage by stage:
 
 ```bash
-python -m dpc.cli data          # Stage 1: download, quality-check, build the panel
-```
-
-```bash
-python -m dpc.cli signals       # Stage 2: signals and information coefficients
+python -m dpc.cli wealth-data        # download French's files, build the panel, check it against French's market
 ```
 
 ```bash
-python -m dpc.cli baselines     # Stage 3: classical baselines on the shared engine
+python -m dpc.cli wealth-baselines   # the six classical strategies
 ```
 
 ```bash
-python -m dpc.cli risk          # Stage 4: walk-forward deep covariance model
+python -m dpc.cli wealth-train --variants all   # the network (5 seeds) and the three ablations (2 seeds each)
 ```
 
 ```bash
-python -m dpc.cli alpha         # Stage 4b: walk-forward AlphaFormer
+python -m dpc.cli wealth-reference   # the network averaged over the ablations' two seeds
 ```
 
 ```bash
-python -m dpc.cli e2e           # Stage 5: end-to-end models through the optimiser layer
+python -m dpc.cli wealth-evaluate    # metrics, pre-registered comparisons, decades, costs, seeds
 ```
 
 ```bash
-python -m dpc.cli robustness    # Stage 6a: model-size and seed reruns
+python -m dpc.cli wealth-site        # figures, reports/wealth/results.md and the website export
 ```
 
 ```bash
-python -m dpc.cli evaluate      # Stage 6b: metrics, risk decomposition, sensitivity, look-ahead checks
+python scripts/write_readme.py       # this README, from the export
 ```
 
 ```bash
-python -m dpc.cli site          # figures for the portfolio website, each with its source
+pytest
 ```
 
-```bash
-pytest                          # 89 tests
-```
-
-Every setting lives in [`config.yaml`](config.yaml), and the loader rejects unknown or missing keys.
+Every setting lives in [`config.yaml`](config.yaml) (section `wealth`), and the loader rejects unknown or missing keys.
 
 ## Look-ahead safeguards
 
-* **Point-in-time access.** Strategies see only a `PointInTimeView` that slices data at the decision date.
-* **Labels end before refits.** Deep-model training labels must end on or before each refit date, with an embargo between training and validation. Both are asserted in code for the risk model, AlphaFormer and the end-to-end models.
-* **Truncation invariance.** Scrambling every return after a date T must leave every decision and every model input up to T unchanged. This is tested and also checked at runtime on the real data.
-* **Oracle calibration.** A deliberately cheating strategy that trades on next month's returns scores a Sharpe of 10.6, which shows what look-ahead would look like.
+* **Point-in-time features.** Features at any date are identical whether or not later data exists (tested by truncating the panel). Book-to-market is used only from the July after it is formed; market caps are those known at the decision.
+* **Labels end before validation.** No training episode's last return is dated after the first validation decision (asserted in code and tested).
+* **One simulator.** The PyTorch training simulator reproduces the NumPy backtest engine month by month (tested), so the network is trained on exactly the rules it is scored on.
+* **Pre-registration.** [`docs/wealth_protocol.md`](docs/wealth_protocol.md) fixed the question, the comparisons and the decision rule in git before the network was run out of sample. The classical strategies' parameters were fixed before they were run.
+* **Calibration.** A deliberately cheating policy that sees next month's returns, inside the same bounds and costs, turns $1 into $729 million: the simulator pays for real foresight, so an honest result should look nothing like that.
 
 ## Limitations
 
-* ⚠️ **Survivorship bias.** No point-in-time index membership was available (no WRDS/CRSP), so the universe is *today's* large caps. This inflates long-only results and penalises the low-volatility signal. Sector labels are current, not point-in-time.
-* **Returns-based exposures.** Size and value exposure are rolling betas to SMB and HML, not fundamental characteristics. Beta estimation error is how the end-to-end models carried a realised market beta of about 0.17–0.19 despite an ex-ante limit of ±0.05.
-* **No significant improvement.** No deep model's improvement is statistically significant. Six market-neutral variants were compared, so a multiple-testing haircut applies. The fully deep model was run with one seed.
-* **Simplified execution.** Trades fill at the monthly close at a flat 10 bps, with no borrow costs, market impact or capacity limits. The sample ends in September 2026 because the Fama-French factors are published with a lag.
+* **Industries, not funds.** An investor in 1960 could not buy these 30 portfolios cheaply; sector funds came decades later. Costs are a flat 10 bps per unit traded, with no taxes or market impact. A taxable investor also pays tax on realised gains, which favours trading even less.
+* **The features carry hindsight.** Momentum, value and low volatility were documented by finance research long after 1960, so the network was handed inputs an investor then would not have known to look at. The pre-registration fixes the test, not the feature list.
+* **One country, one century.** The US market from 1960 was among the best in the world, and five seeds of one network on one history is a small sample. Several strategies were compared; the pre-registered primary test is the one to read.
+
+## The first study (archived)
+
+This repository began as a market-neutral long-short study (a transformer return model, a transformer covariance model and end-to-end training through a differentiable optimiser, on 99 large caps since 2008). It is archived in [`docs/longshort.md`](docs/longshort.md), with its research note under [`reports/archive/`](reports/archive/); its code, notebook (`notebooks/01_first_principles.ipynb`) and dashboard (`dashboard/longshort_app.py`) still run.
