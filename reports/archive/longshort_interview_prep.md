@@ -1,3 +1,5 @@
+> **Archived:** written for the market-neutral long-short study. The project now studies long-only, long-term portfolios; see the [README](../../README.md).
+
 # Interview prep: Deep Portfolio Constructor, stage by stage
 
 For each stage: what was built, the finance in plain English, and three interview questions with model answers. Numbers refer to the results in `stage6_evaluation.md`.

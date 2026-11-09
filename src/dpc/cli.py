@@ -1,6 +1,9 @@
 """Command-line entry point: ``python -m dpc.cli <stage>``.
 
-Stages: setup, quickstart, data, signals, baselines, risk, alpha, e2e, robustness, evaluate, all.
+The long-only wealth study: quickstart, wealth (every stage below, in order),
+wealth-data, wealth-baselines, wealth-train, wealth-reference, wealth-evaluate, wealth-site.
+The archived long-short study (docs/longshort.md): setup, data, signals, baselines, risk,
+alpha, e2e, robustness, evaluate, site, all.
 """
 
 from __future__ import annotations
@@ -24,25 +27,34 @@ def _prepare(config_path: str | None) -> Config:
 def quickstart(cfg: Config, launch: bool = True) -> int:
     """See the results in about a minute: no download, no training, no GPU.
 
-    Prints the headline table from the committed evaluation files and opens the
-    dashboard, which reads only committed results. Reproducing every number
-    from raw data is `python -m dpc.cli all` (about 2 hours on a laptop CPU).
+    Prints the long-only wealth study's headline table from the committed
+    evaluation and opens the dashboard, which reads only committed results.
+    Reproducing every number from raw data is `python -m dpc.cli wealth`.
     """
+    import json
     import subprocess
 
     import pandas as pd
 
-    perf_path = cfg.paths.reports / "stage6_performance.csv"
-    if not perf_path.exists():
-        print("No committed results found. Run `python -m dpc.cli all` first.")
+    from dpc.wealth.names import LABELS, MAIN
+
+    summary_path = cfg.paths.reports / "wealth" / "summary.json"
+    if not summary_path.exists():
+        print("No committed results found. Run `python -m dpc.cli wealth` first.")
         return 1
-    perf = pd.read_csv(perf_path, index_col=0)
-    cols = ["sharpe", "ann_return", "ann_vol", "max_drawdown", "alpha_t_ff6"]
+    s = json.loads(summary_path.read_text())
+    rows = [{"strategy": LABELS[n], "$1 became": f"${p['terminal_wealth']:,.0f}", "CAGR": f"{100 * p['cagr']:.2f}%",
+             "Sharpe": f"{p['sharpe']:.2f}", "worst fall": f"{100 * p['max_drawdown']:.0f}%", "traded a year": f"{100 * p['turnover_per_year']:.0f}%"}
+            for n in MAIN if (p := s["performance"].get(n))]
     pd.set_option("display.width", 140)
-    print("\nOut-of-sample, Jan 2008 onward, monthly rebalancing, net of costs:\n")
-    print(perf[cols].round(3).to_string())
-    print("\nFirst-principles walkthrough: notebooks/01_first_principles.ipynb")
-    print("Research note:                reports/research_note.md")
+    print(f"\n$1 invested in January 1960, out of sample to {s['oos']['end']}: long-only, fully invested, {s['cost_bps']:g} bps per trade.\n")
+    print(pd.DataFrame(rows).to_string(index=False))
+    if (c := s["comparisons"].get("deep - market")):
+        print(f"\nPre-registered test, Deep Growth Network minus the market: {100 * c['diff_log_growth']:+.2f}% a year, "
+              f"Newey-West t {c['t_nw']:.2f}: {c['verdict']}.")
+    print("\nResearch note: reports/wealth/research_note.md")
+    print("Every table:   reports/wealth/results.md")
+    print("Protocol:      docs/wealth_protocol.md")
     if launch:
         app = cfg.root / "dashboard" / "app.py"
         print(f"\nOpening the dashboard ({app.relative_to(cfg.root)}); press Ctrl+C to stop.\n")
@@ -53,8 +65,10 @@ def quickstart(cfg: Config, launch: bool = True) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
     parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
-                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-evaluate", "wealth-site"])
-    parser.add_argument("--variants", default="deep", help="wealth-train: comma-separated variants, or 'all' (deep + ablations)")
+                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-evaluate", "wealth-site"])
+    parser.add_argument("--variants", default=None,
+                        help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
+    parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
     parser.add_argument("--config", default=None, help="path to config.yaml (default: search upward)")
     parser.add_argument("--refresh", action="store_true", help="re-download data instead of using the cache")
     parser.add_argument("--no-launch", action="store_true", help="quickstart: print results only, do not open the dashboard")
@@ -122,8 +136,11 @@ def main(argv: list[str] | None = None) -> int:
             elif stage == "wealth-train":
                 from dpc.wealth.train import VARIANTS
 
-                names = list(VARIANTS) if args.variants == "all" else args.variants.split(",")
-                pipeline.stage_train(cfg, names)
+                chosen = args.variants or ("all" if args.stage == "wealth" else "deep")
+                names = list(VARIANTS) if chosen == "all" else chosen.split(",")
+                pipeline.stage_train(cfg, names, workers=args.workers)
+            elif stage == "wealth-reference":
+                pipeline.stage_reference(cfg)
             elif stage == "wealth-evaluate":
                 from dpc.wealth.evaluate import run_evaluation
 

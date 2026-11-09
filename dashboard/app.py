@@ -1,32 +1,41 @@
-"""Deep Portfolio Constructor - Streamlit dashboard.
+"""Deep Portfolio Constructor: explore the long-only wealth study.
 
 Run from the project root:   streamlit run dashboard/app.py
+
+It reads only committed results (reports/results/wealth/*.parquet and
+reports/wealth/summary.json): no download, no training, no PyTorch. The
+archived long-short dashboard is dashboard/longshort_app.py.
 """
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from dpc.config import load_config
-from dpc.dashboard_data import load_dashboard_data
-from dpc.strategies import COLORS as COLOR, FLAGSHIP, LABELS, LONG_SHORT
+from dpc.wealth.names import ABLATIONS, COLORS, LABELS, MAIN, REFERENCE
 
-# Same validated palette as the static report; colour follows the strategy.
-BLUE, ORANGE, AQUA, YELLOW, VIOLET = "#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#6250d6"
-RED, GRAY, GRID = "#e34948", "#898781", "#e1e0d9"
+ROOT = Path(__file__).resolve().parents[1]
+RESULTS = ROOT / "reports" / "results" / "wealth"
+SUMMARY = ROOT / "reports" / "wealth" / "summary.json"
+GRID, MARKET_BAR = "#e1e0d9", "#c9c8c1"
 
 st.set_page_config(page_title="Deep Portfolio Constructor", layout="wide")
 
 
-@st.cache_resource
-def data():
-    return load_dashboard_data(load_config())
+@st.cache_data
+def load() -> tuple[dict[str, pd.DataFrame], dict]:
+    names = [n for n in MAIN + ABLATIONS + REFERENCE if (RESULTS / f"{n}.parquet").exists()]
+    summary = json.loads(SUMMARY.read_text()) if SUMMARY.exists() else {}
+    return {n: pd.read_parquet(RESULTS / f"{n}.parquet") for n in names}, summary
 
 
-def style(fig: go.Figure, height: int = 360) -> go.Figure:
-    fig.update_layout(height=height, margin=dict(l=10, r=10, t=40, b=10), hovermode="x unified",
+def style(fig: go.Figure, height: int = 400) -> go.Figure:
+    fig.update_layout(height=height, margin=dict(l=10, r=10, t=30, b=10), hovermode="x unified",
                       plot_bgcolor="rgba(0,0,0,0)", paper_bgcolor="rgba(0,0,0,0)",
                       legend=dict(orientation="h", yanchor="top", y=-0.12, x=0))
     fig.update_xaxes(gridcolor=GRID, zeroline=False)
@@ -34,106 +43,106 @@ def style(fig: go.Figure, height: int = 360) -> go.Figure:
     return fig
 
 
-D = data()
-cfg = D.cfg
-ls_names = [n for n in reversed(LONG_SHORT) if n in D.results]
-default = FLAGSHIP if FLAGSHIP in ls_names else ls_names[0]
+def pct(x: float | None, digits: int = 1, sign: bool = False) -> str:
+    if x is None:
+        return "n/a"
+    return f"{100 * x:+.{digits}f}%" if sign else f"{100 * x:.{digits}f}%"
+
+
+results, summary = load()
+if "market" not in results:
+    st.error("No committed results in reports/results/wealth/. Run `python -m dpc.cli wealth` first.")
+    st.stop()
+mkt = results["market"]
+wealth = {n: (1 + df["net"]).cumprod() for n, df in results.items()}
 
 st.title("Deep Portfolio Constructor")
-st.caption("Market-neutral long-short equity: keep the intended stock bets, remove unintended sector and factor risk. "
-           "All results are walk-forward and out-of-sample, net of transaction costs. Universe: 99 US & Canadian large caps "
-           "(today's constituents, so survivorship bias applies). The models are PyTorch: a transformer return model, "
-           "a transformer covariance model, and both trained end to end through a differentiable optimiser.")
+st.caption(f"A neural network that builds a long-only portfolio for long-term wealth. Out of sample {mkt.index[0]:%B %Y} to "
+           f"{mkt.index[-1]:%B %Y}, fully invested, never short, every trade costs {summary.get('cost_bps', 10):g} bps. "
+           "Every number on this page is read from the committed results.")
 
-with st.sidebar:
-    strat = st.selectbox("Strategy", ls_names, index=ls_names.index(default), format_func=lambda s: LABELS.get(s, s))
-    dates = D.results[strat].weights.index
-    date = st.selectbox("Rebalance date", list(dates[::-1]), format_func=lambda d: d.strftime("%Y-%m-%d"))
-    st.markdown("---")
-    oc = cfg.optimizer
-    st.markdown(f"**Limits**  \nmax position ±{oc.max_weight:.0%}  \nsector net ±{oc.sector_limit:.1%}  \n"
-                f"beta/size/value ±{oc.factor_limit:g}  \ngross ≤ {oc.gross_leverage:.0%}  \nturnover ≤ {oc.turnover_limit:.0%} / month  \n"
-                f"costs {cfg.backtest.transaction_cost_bps:g} bps")
+head = st.columns(4)
+if "deep" in wealth:
+    head[0].metric("$1 in January 1960: the network", f"${wealth['deep'].iloc[-1]:,.0f}")
+head[1].metric("$1 in January 1960: the market", f"${wealth['market'].iloc[-1]:,.0f}")
+primary = summary.get("comparisons", {}).get("deep - market")
+if primary:
+    head[2].metric("Growth vs the market, a year", pct(primary["diff_log_growth"], 2, sign=True),
+                   help="Annualised difference in net log growth, the protocol's primary metric")
+    head[3].metric("Pre-registered verdict", primary["verdict"],
+                   help=f"Newey-West t {primary['t_nw']:.2f}; 95% block-bootstrap interval "
+                        f"{pct(primary['ci_low'], 2, sign=True)} to {pct(primary['ci_high'], 2, sign=True)} a year")
 
-# KPI row
-perf = D.performance
-label = LABELS.get(strat, strat)
-if perf is not None and label in perf.index:
-    p = perf.loc[label]
-    dec = D.decomposition.loc[label] if D.decomposition is not None and label in D.decomposition.index else None
-    c = st.columns(6)
-    c[0].metric("Net Sharpe", f"{p['sharpe']:.2f}")
-    c[1].metric("Ann. return", f"{p['ann_return']:.1%}")
-    c[2].metric("Ann. volatility", f"{p['ann_vol']:.1%}")
-    c[3].metric("Max drawdown", f"{p['max_drawdown']:.1%}")
-    c[4].metric("FF6 alpha t-stat", f"{p['alpha_t_ff6']:.2f}")
-    if dec is not None:
-        c[5].metric("Risk from stock bets", f"{dec['exante_share_specific']:.0%}")
+tab_growth, tab_hold, tab_roll, tab_tables = st.tabs(["Growth of $1", "Holdings", "Rolling 10 years", "Tables"])
 
-tab1, tab2, tab3, tab4 = st.tabs(["Current weights", "Risk breakdown", "Exposures vs limits", "Performance vs baselines"])
-
-with tab1:
-    w = D.weights_at(strat, date)
-    left, right = st.columns([3, 2])
-    top = pd.concat([w.head(15), w.tail(15)]).drop_duplicates()
-    fig = go.Figure(go.Bar(x=top["weight"] * 100, y=top.index, orientation="h",
-                           marker_color=[BLUE if v > 0 else RED for v in top["weight"]],
-                           customdata=top[["name", "sector"]], hovertemplate="%{y} · %{customdata[0]}<br>%{customdata[1]}<br>%{x:.2f}%<extra></extra>"))
-    fig.add_vline(x=cfg.optimizer.max_weight * 100, line_dash="dot", line_color=GRAY)
-    fig.add_vline(x=-cfg.optimizer.max_weight * 100, line_dash="dot", line_color=GRAY)
-    fig.update_yaxes(autorange="reversed")
-    left.plotly_chart(style(fig, 640).update_layout(title=f"Largest longs (blue) and shorts (red) on {date:%Y-%m-%d}", xaxis_title="Weight (%)"), use_container_width=True)
-    right.markdown(f"**{(w['weight'] > 0).sum()} longs, {(w['weight'] < 0).sum()} shorts**  \n"
-                   f"Gross {w['weight'].abs().sum():.0%} · net {w['weight'].sum():+.2%}")
-    right.dataframe(w.assign(weight=lambda d: (d["weight"] * 100).round(2)).rename(columns={"weight": "weight %"}), height=560)
-
-with tab2:
-    rd = D.risk_decomp(strat)
-    if rd is None:
-        st.info("Run `python -m dpc.cli evaluate` to compute the risk decomposition.")
-    else:
-        fig = go.Figure()
-        for col, name, color in [("share_specific", "Stock-specific (intended)", BLUE), ("share_style", "Style factors", ORANGE), ("share_sector", "Sectors", YELLOW)]:
-            fig.add_trace(go.Scatter(x=rd.index, y=rd[col].clip(lower=0) * 100, name=name, stackgroup="one", line=dict(width=0.5, color=color)))
-        st.plotly_chart(style(fig, 380).update_layout(title="Share of predicted variance over time (independent Barra-style model)", yaxis_title="%"), use_container_width=True)
-        if D.decomposition is not None:
-            st.markdown("**Average over all out-of-sample rebalances, every strategy**")
-            st.dataframe(D.decomposition[["exante_share_specific", "exante_share_style", "exante_share_sector", "realised_share_specific", "exante_vol_ann"]]
-                         .style.format("{:.1%}"))
-
-with tab3:
-    a, b = st.columns(2)
-    sec = D.sector_exposure(strat, date) * 100
-    lim = cfg.optimizer.sector_limit * 100
-    fig = go.Figure(go.Bar(x=sec.values, y=sec.index, orientation="h", marker_color=[BLUE if abs(v) <= lim + 1e-6 else RED for v in sec.values],
-                           hovertemplate="%{y}: %{x:.2f}%<extra></extra>"))
-    fig.add_vrect(x0=-lim, x1=lim, fillcolor=GRID, opacity=0.5, line_width=0, layer="below")
-    a.plotly_chart(style(fig, 420).update_layout(title=f"Net sector exposure vs ±{lim:g}% limit", xaxis_title="% of capital"), use_container_width=True)
-    fx = D.factor_exposure(strat, date)
-    flim = cfg.optimizer.factor_limit
-    fig = go.Figure(go.Bar(x=fx.index, y=fx.values, marker_color=[BLUE if abs(v) <= flim + 1e-6 else RED for v in fx.values],
-                           hovertemplate="%{x}: %{y:.3f}<extra></extra>"))
-    fig.add_hrect(y0=-flim, y1=flim, fillcolor=GRID, opacity=0.5, line_width=0, layer="below")
-    b.plotly_chart(style(fig, 420).update_layout(title=f"Portfolio beta to market, size, value vs ±{flim:g}", yaxis_title="beta"), use_container_width=True)
-    to = D.results[strat].turnover
-    fig = go.Figure(go.Scatter(x=to.index, y=to.values * 100, mode="lines", line=dict(color=COLOR.get(strat, BLUE), width=2), name="turnover"))
-    fig.add_hline(y=cfg.optimizer.turnover_limit * 100, line_dash="dot", line_color=GRAY, annotation_text="limit")
-    st.plotly_chart(style(fig, 280).update_layout(title="Turnover per rebalance (sum |Δw|)", yaxis_title="% of capital"), use_container_width=True)
-
-with tab4:
-    sel = st.multiselect("Compare with", [n for n in D.results if n != strat],
-                         default=[n for n in ("e2e", "ls_classical", "ls_naive", "equal_weight") if n in D.results and n != strat],
-                         format_func=lambda s: LABELS.get(s, s))
-    names = [strat, *sel]
-    cum = D.cumulative(names)
+with tab_growth:
+    pick = st.multiselect("Strategies", list(results), format_func=LABELS.get,
+                          default=[n for n in ("market", "momentum_tilt", "deep") if n in results])
     fig = go.Figure()
-    for s, col in zip(names, cum.columns):
-        color = COLOR.get(s, GRAY)
-        fig.add_trace(go.Scatter(x=cum.index, y=cum[col], name=col, line=dict(color=color, width=2.5 if s == strat else 1.5)))
-    ticks = [0.1, 0.2, 0.5, 1, 2, 5, 10, 20]
-    fig.update_yaxes(type="log", tickvals=ticks, ticktext=[f"${t:g}" for t in ticks])
-    st.plotly_chart(style(fig, 460).update_layout(title="Growth of $1 (excess of cash, net of costs, log scale)"), use_container_width=True)
-    if perf is not None:
-        cols = ["sharpe", "sortino", "ann_return", "ann_vol", "max_drawdown", "hit_rate_monthly", "alpha_ann_ff6", "alpha_t_ff6", "turnover_ann"]
-        st.dataframe(perf[cols].style.format({c: "{:.2f}" for c in ("sharpe", "sortino", "alpha_t_ff6", "turnover_ann")} |
-                                               {c: "{:.1%}" for c in ("ann_return", "ann_vol", "max_drawdown", "hit_rate_monthly", "alpha_ann_ff6")}))
+    for n in pick:
+        w = wealth[n]
+        fig.add_trace(go.Scatter(x=w.index, y=w.values, name=LABELS[n],
+                                 line=dict(color=COLORS[n], width=3 if n == "deep" else 1.6)))
+    fig.update_yaxes(type="log", title="Growth of $1 (log scale)", tickprefix="$")
+    st.plotly_chart(style(fig, 480), width="stretch")
+
+with tab_hold:
+    if "deep" not in results:
+        st.info("The Deep Growth Network has not been run yet: `python -m dpc.cli wealth-train`.")
+    else:
+        deep = results["deep"]
+        wcols = [c for c in deep.columns if c.startswith("w:")]
+        dates = list(deep.index)
+        when = st.select_slider("Month", options=dates, value=dates[-1], format_func=lambda d: f"{d:%b %Y}")
+        net_w = deep.loc[when, wcols].astype(float)
+        mkt_w = mkt.loc[when, wcols].astype(float)
+        order = mkt_w.sort_values(ascending=False).index
+        fig = go.Figure()
+        fig.add_trace(go.Bar(x=[c[2:] for c in order], y=100 * mkt_w[order], name="Market", marker_color=MARKET_BAR))
+        fig.add_trace(go.Bar(x=[c[2:] for c in order], y=100 * net_w[order], name=LABELS["deep"], marker_color=COLORS["deep"]))
+        fig.update_layout(barmode="group", hovermode="x")
+        fig.update_yaxes(title="Weight, %")
+        st.plotly_chart(style(fig, 440), width="stretch")
+        ratio = net_w / mkt_w
+        cols = st.columns(4)
+        cols[0].metric("Differs from the index", pct(0.5 * float(np.abs(net_w - mkt_w).sum()), 0), help="Active share")
+        cols[1].metric("Biggest overweight", f"{ratio.idxmax()[2:]} {ratio.max():.2f}×")
+        cols[2].metric("Biggest underweight", f"{ratio.idxmin()[2:]} {ratio.min():.2f}×")
+        if "kappa" in deep:
+            cols[3].metric("Share of the gap to its target traded", pct(float(deep.loc[when, "kappa"]), 0))
+        st.caption("Bars are the weights held during the month after the decision. The network scales each industry's market "
+                   "weight by a factor between a third and three, then rescales the portfolio to 100%.")
+
+with tab_roll:
+    pick = st.multiselect("Strategies", [n for n in results if n != "market"], format_func=LABELS.get, key="roll",
+                          default=[n for n in ("momentum_tilt", "deep") if n in results])
+    base = np.log1p(mkt["net"]).rolling(120).sum() / 10
+    fig = go.Figure()
+    for n in pick:
+        r = 100 * (np.log1p(results[n]["net"]).rolling(120).sum() / 10 - base)
+        fig.add_trace(go.Scatter(x=r.index, y=r.values, name=LABELS[n], line=dict(color=COLORS[n], width=2.6 if n == "deep" else 1.4)))
+    fig.add_hline(y=0, line_color="#111827", line_width=1)
+    fig.update_yaxes(title="Growth above the market over 10 years, % a year")
+    st.plotly_chart(style(fig, 420), width="stretch")
+
+with tab_tables:
+    if not summary:
+        st.info("Run `python -m dpc.cli wealth-evaluate` to write reports/wealth/summary.json.")
+    else:
+        perf = summary["performance"]
+        rows = [{"Strategy": LABELS[n], "$1 became": f"${perf[n]['terminal_wealth']:,.0f}", "CAGR": pct(perf[n]["cagr"], 2),
+                 "Volatility": pct(perf[n]["volatility"]), "Sharpe": f"{perf[n]['sharpe']:.2f}", "Max drawdown": pct(perf[n]["max_drawdown"], 0),
+                 "Traded a year": pct(perf[n]["turnover_per_year"], 0), "Active share": pct(perf[n].get("active_share"), 0),
+                 "FF3 alpha (t)": f"{pct(perf[n]['alpha_annual'], 2, sign=True)} ({perf[n]['alpha_t']:.2f})"}
+                for n in MAIN + ABLATIONS + REFERENCE if n in perf]
+        st.subheader("Performance")
+        st.dataframe(pd.DataFrame(rows), hide_index=True, width="stretch")
+        st.subheader("Pre-registered comparisons")
+        comps = [{"Comparison": k.replace(" - ", " minus "), "Growth a year": pct(c["diff_log_growth"], 2, sign=True),
+                  "Newey-West t": f"{c['t_nw']:.2f}", "95% interval": f"{pct(c['ci_low'], 2, sign=True)} to {pct(c['ci_high'], 2, sign=True)}",
+                  "Verdict": c["verdict"]} for k, c in summary["comparisons"].items()]
+        st.dataframe(pd.DataFrame(comps), hide_index=True, width="stretch")
+        st.subheader("Compound growth by decade")
+        dec = pd.DataFrame(summary["decades"]).rename(index=LABELS)
+        st.dataframe(dec.map(lambda v: pct(v) if pd.notna(v) else ""), width="stretch")
+        st.caption("Full tables: reports/wealth/results.md. Protocol: docs/wealth_protocol.md.")

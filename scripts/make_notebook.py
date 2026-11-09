@@ -25,6 +25,8 @@ code = nbf.v4.new_code_cell
 CELLS = [
     md("""# Deep Portfolio Constructor, from first principles
 
+*Archived with the project's first study, a market-neutral long-short portfolio ([docs/longshort.md](../docs/longshort.md)). The current study is long-only: see the [README](../README.md).*
+
 **The question:** a long-short equity book should be paid for its *intended* stock views, not for accidental bets on the market, a sector, or a style factor. Can deep learning help build such a book?
 
 This notebook builds the answer up from three ideas, each in a few lines of PyTorch, then shows the real results.
@@ -213,7 +215,7 @@ if seeds_path.exists():
 * **Deep learning can improve the decision and still re-introduce unintended risk.** End-to-end training optimises *realised* P&L, so it will exploit any bet that paid in the training years, including estimation error in the constraints themselves.
 * **Honest evaluation is the product.** Walk-forward refits, label-date assertions, an independent risk model, seeds, and a cheating-oracle calibration are what make any of these numbers believable.
 
-Read next: `reports/research_note.md` (2 pages) and `reports/stage6_evaluation.md` (every table)."""),
+Read next: `reports/archive/longshort_research_note.md` (2 pages) and `reports/stage6_evaluation.md` (every table)."""),
 ]
 
 

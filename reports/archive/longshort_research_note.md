@@ -1,3 +1,5 @@
+> **Archived:** written for the market-neutral long-short study. The project now studies long-only, long-term portfolios; see the [README](../../README.md).
+
 # Deep Portfolio Construction: Can Deep Learning Keep the Bets We Want and Drop the Ones We Don't?
 
 **Author:** Sherif Morsi · **Date:** November 2026 · **Universe:** 99 US & Canadian large caps · **Sample:** Jan 2008 – Sep 2026, out-of-sample, monthly, net of 10 bps

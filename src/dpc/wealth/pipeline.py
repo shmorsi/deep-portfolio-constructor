@@ -88,7 +88,7 @@ def stage_baselines(cfg: Config) -> None:
         log.info("%s: $1 -> $%.0f", name, res.wealth()[-1])
 
 
-def stage_train(cfg: Config, variants: list[str]) -> None:
+def stage_train(cfg: Config, variants: list[str], workers: int | None = None) -> None:
     w = cfg.wealth
     panel, feats = load(cfg)
     s = settings(cfg)
@@ -96,7 +96,7 @@ def stage_train(cfg: Config, variants: list[str]) -> None:
         v = VARIANTS[name]
         seeds = w.train.seeds if name == "deep" else w.evaluation.ablation_seeds
         model_dir = cfg.paths.models / "wealth" / name
-        train_walk_forward(panel, feats, s, v, seeds, w.oos_start, model_dir, w.train.workers)
+        train_walk_forward(panel, feats, s, v, seeds, w.oos_start, model_dir, workers or w.train.workers)
         policy = EnsemblePolicy.load(panel, feats, s, v, seeds, w.oos_start, model_dir)
         res = run_policy(panel, policy, w.oos_start, w.cost_bps, name)
         save_result(cfg, panel, res, {"kappa": np.array(policy.kappas)})
@@ -107,3 +107,17 @@ def stage_train(cfg: Config, variants: list[str]) -> None:
                 r1 = run_policy(panel, single, w.oos_start, w.cost_bps, f"deep_seed{seed}")
                 save_result(cfg, panel, r1, {"kappa": np.array(single.kappas)})
                 log.info("deep seed %d alone: $1 -> $%.0f", seed, r1.wealth()[-1])
+            stage_reference(cfg)
+
+
+def stage_reference(cfg: Config) -> None:
+    """The primary network averaged over the ablation seeds only: the like-for-like reference for the ablations.
+
+    No training: it reuses the primary network's saved refits for those seeds."""
+    w = cfg.wealth
+    panel, feats = load(cfg)
+    seeds = w.evaluation.ablation_seeds
+    policy = EnsemblePolicy.load(panel, feats, settings(cfg), VARIANTS["deep"], seeds, w.oos_start, cfg.paths.models / "wealth" / "deep")
+    res = run_policy(panel, policy, w.oos_start, w.cost_bps, "deep_pair")
+    save_result(cfg, panel, res, {"kappa": np.array(policy.kappas)})
+    log.info("deep with seeds %s only: $1 -> $%.0f", seeds, res.wealth()[-1])

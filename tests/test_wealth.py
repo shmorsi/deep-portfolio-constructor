@@ -157,3 +157,53 @@ def test_baselines_respect_their_constraints():
     assert (w_g >= lo - 1e-7).all() and (w_g <= hi + 1e-7).all()
     w_m = momentum_tilt(p, 3.0)(t, np.zeros(p.n_assets))
     assert abs(w_m.sum() - 1) < 1e-12 and (w_m > 0).all()
+
+
+def _returns_frame(net: np.ndarray) -> pd.DataFrame:
+    idx = pd.date_range("1960-01-31", periods=len(net), freq="ME")
+    return pd.DataFrame({"net": net, "gross": net, "turnover": np.zeros(len(net))}, index=idx)
+
+
+def test_verdict_rule_follows_the_protocol():
+    from dpc.wealth.evaluate import compare
+
+    rng = np.random.default_rng(3)
+    base = rng.normal(0.008, 0.04, 600)
+    noise = rng.normal(0.0, 0.01, 600)
+    args = dict(lags=12, block=12, draws=1000, seed=0)
+    better = compare(_returns_frame(base + 0.004 + noise), _returns_frame(base), **args)
+    worse = compare(_returns_frame(base - 0.004 + noise), _returns_frame(base), **args)
+    tie = compare(_returns_frame(base + noise - noise.mean()), _returns_frame(base), **args)
+    assert better["verdict"] == "better" and better["t_nw"] >= 2 and better["ci_low"] > 0
+    assert worse["verdict"] == "worse" and worse["t_nw"] <= -2 and worse["ci_high"] < 0
+    assert tie["verdict"] == "no detectable difference"
+    assert better["diff_log_growth"] == pytest.approx(12 * np.mean(np.log1p(base + 0.004 + noise) - np.log1p(base)))
+
+
+def test_repricing_at_the_run_cost_reproduces_the_net_returns():
+    from dpc.wealth.evaluate import reprice
+    from dpc.wealth.engine import run as run_engine
+
+    p = synthetic_panel()
+    rng = np.random.default_rng(5)
+    res = run_engine(p, lambda t, w: rng.dirichlet(np.ones(p.n_assets)), 30, 120, cost_bps=25.0, name="random")
+    df = pd.DataFrame({"net": res.net, "gross": res.gross, "turnover": res.turnover}, index=res.dates)
+    np.testing.assert_allclose(reprice(df, 25.0)["net"], res.net, rtol=1e-12, atol=1e-14)
+    assert (reprice(df, 0.0)["net"] >= res.net - 1e-15).all()          # free trading never earns less
+
+
+def test_results_table_lists_every_strategy_and_comparison():
+    from dpc.wealth.report import results_markdown
+
+    perf = {n: {"terminal_wealth": 2.0, "cagr": 0.1, "volatility": 0.15, "sharpe": 0.5, "max_drawdown": -0.3, "worst_year": -0.2,
+                "turnover_per_year": 0.1, "active_share": 0.2, "alpha_annual": 0.0, "alpha_t": 0.0, "beat_market_rolling": 0.5}
+            for n in ("market", "deep")}
+    comp = {"diff_log_growth": 0.01, "t_nw": 2.5, "ci_low": 0.001, "ci_high": 0.02, "verdict": "better"}
+    site = {"commit": "abc1234", "oos": {"start": "1960-01", "end": "2026-09", "months": 801}, "cost_bps": 10, "performance": perf,
+            "labels": {"market": "Market (hold the index)", "deep": "Deep Growth Network"}, "comparisons": {"deep - market": comp},
+            "decades": {"1960s": {"market": 0.08, "deep": 0.09}}, "costs": {"deep@0bps": {"terminal_wealth": 2.1, "cagr": 0.11, "vs_market_log_growth": 0.01}},
+            "seeds": {}, "oracle_terminal_wealth": 1e8, "trade_fraction": None, "data_check": {"correlation": 0.9998, "mean_abs_diff_monthly": 0.0004},
+            "tests": 1, "params": 10}
+    text = results_markdown(site)
+    for needle in ("| Market (hold the index) |", "| Deep Growth Network |", "Deep Growth Network minus the market", "**better**", "1960s", "abc1234"):
+        assert needle in text
