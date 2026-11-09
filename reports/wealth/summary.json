@@ -125,9 +125,137 @@
    "beta_smb": 0.016934017147818104,
    "beta_hml": -0.04210939985408681,
    "beat_market_rolling": 0.9897360703812317
+  },
+  "deep": {
+   "terminal_wealth": 1368.2431821226107,
+   "cagr": 0.11425276317184796,
+   "log_growth": 0.10818401269054276,
+   "volatility": 0.15076537963546338,
+   "sharpe": 0.5131357951024049,
+   "max_drawdown": -0.5189740168214997,
+   "worst_year": -0.3853250809611075,
+   "best_year": 0.40526920299881386,
+   "turnover_per_year": 1.5499971666427876,
+   "holding_years": 0.6451624696617655,
+   "calmar": 0.22015122042448038,
+   "active_share": 0.3156792130063698,
+   "alpha_annual": 0.0015059350281822516,
+   "alpha_t": 0.37628557743196933,
+   "beta_mkt": 0.9808147403543105,
+   "beta_smb": 0.009526459219653009,
+   "beta_hml": 0.16782069101721733,
+   "beat_market_rolling": 0.7947214076246334
+  },
+  "deep_trade_all": {
+   "terminal_wealth": 1775.13472777684,
+   "cagr": 0.11860723195579048,
+   "log_growth": 0.11208436856931685,
+   "volatility": 0.15617524203179983,
+   "sharpe": 0.5257312760126557,
+   "max_drawdown": -0.5267451984820999,
+   "worst_year": -0.390909920332838,
+   "best_year": 0.45859917359154,
+   "turnover_per_year": 2.516568800793813,
+   "holding_years": 0.39736644580691194,
+   "calmar": 0.2251700296416106,
+   "active_share": 0.36623230158121833,
+   "alpha_annual": 0.0059610930022473176,
+   "alpha_t": 1.2592191951329132,
+   "beta_mkt": 1.0065774081472285,
+   "beta_smb": -0.006708666683536199,
+   "beta_hml": 0.13162805572577868,
+   "beat_market_rolling": 0.8079178885630498
+  },
+  "deep_mlp": {
+   "terminal_wealth": 700.6816247422885,
+   "cagr": 0.10313718451384313,
+   "log_growth": 0.09815810653016649,
+   "volatility": 0.1570654176504917,
+   "sharpe": 0.43459248904107733,
+   "max_drawdown": -0.5334652276978779,
+   "worst_year": -0.3873007278916547,
+   "best_year": 0.4595530243519286,
+   "turnover_per_year": 0.9118738757223855,
+   "holding_years": 1.0966428873815484,
+   "calmar": 0.19333440899029644,
+   "active_share": 0.3349752169520719,
+   "alpha_annual": -0.011879570283998499,
+   "alpha_t": -3.281811043953873,
+   "beta_mkt": 1.0163468957760615,
+   "beta_smb": 0.04316473660245801,
+   "beta_hml": 0.20197711908249985,
+   "beat_market_rolling": 0.5175953079178885
+  },
+  "deep_unanchored": {
+   "terminal_wealth": 386.8175049858565,
+   "cagr": 0.09336240479183133,
+   "log_growth": 0.08925772312306791,
+   "volatility": 0.24719291293877158,
+   "sharpe": 0.3144491338731846,
+   "max_drawdown": -0.8094081856684571,
+   "worst_year": -0.5455023881779268,
+   "best_year": 0.75214854221584,
+   "turnover_per_year": 3.5375119863676705,
+   "holding_years": 0.2826845545269243,
+   "calmar": 0.11534650432862517,
+   "active_share": 0.8085259772986074,
+   "alpha_annual": -0.025189755799829183,
+   "alpha_t": -1.0236566334286008,
+   "beta_mkt": 1.0926891660488494,
+   "beta_smb": 0.4557406603393241,
+   "beta_hml": 0.511056039806042,
+   "beat_market_rolling": 0.4897360703812317
+  },
+  "deep_pair": {
+   "terminal_wealth": 1025.549128432312,
+   "cagr": 0.10945058142511588,
+   "log_growth": 0.10386492109623419,
+   "volatility": 0.15469868676904427,
+   "sharpe": 0.47570161777058523,
+   "max_drawdown": -0.5386119326630345,
+   "worst_year": -0.3824430690348811,
+   "best_year": 0.43214251888296484,
+   "turnover_per_year": 1.4948125268113341,
+   "holding_years": 0.6689802112731517,
+   "calmar": 0.20320860862470005,
+   "active_share": 0.36804054795894936,
+   "alpha_annual": -0.0037769337555813463,
+   "alpha_t": -0.8600355173680719,
+   "beta_mkt": 1.0010801411754229,
+   "beta_smb": 0.01177069084266171,
+   "beta_hml": 0.16946464654827742,
+   "beat_market_rolling": 0.5982404692082112
   }
  },
  "comparisons": {
+  "deep - market": {
+   "diff_log_growth": 0.00580408421718935,
+   "t_nw": 1.3989546709456884,
+   "ci_low": -0.0007041069661620198,
+   "ci_high": 0.015041888504600365,
+   "verdict": "no detectable difference"
+  },
+  "deep - equal_weight": {
+   "diff_log_growth": -9.03357313751092e-05,
+   "t_nw": -0.014319386157959652,
+   "ci_low": -0.012086471367425784,
+   "ci_high": 0.012343666345280505,
+   "verdict": "no detectable difference"
+  },
+  "deep - momentum_tilt": {
+   "diff_log_growth": -0.0038030995522672006,
+   "t_nw": -0.6914033491788675,
+   "ci_low": -0.012751900810517997,
+   "ci_high": 0.008479483728984813,
+   "verdict": "no detectable difference"
+  },
+  "deep - growth_classical": {
+   "diff_log_growth": 0.006195643344651763,
+   "t_nw": 1.0451514226174314,
+   "ci_low": -0.004629731368601492,
+   "ci_high": 0.01876062213316246,
+   "verdict": "no detectable difference"
+  },
   "equal_weight - market": {
    "diff_log_growth": 0.005894419948564458,
    "t_nw": 0.8719397245927819,
@@ -162,6 +290,55 @@
    "ci_low": 0.0028476985131228134,
    "ci_high": 0.015633559404262667,
    "verdict": "better"
+  },
+  "deep_trade_all - market": {
+   "diff_log_growth": 0.009704440095963407,
+   "t_nw": 2.111091251639037,
+   "ci_low": 0.0011690994116546115,
+   "ci_high": 0.018937456886772244,
+   "verdict": "better"
+  },
+  "deep_mlp - market": {
+   "diff_log_growth": -0.00422182194318694,
+   "t_nw": -0.9520485342728925,
+   "ci_low": -0.011052475100045724,
+   "ci_high": 0.005510842598286264,
+   "verdict": "no detectable difference"
+  },
+  "deep_unanchored - market": {
+   "diff_log_growth": -0.01312220535028552,
+   "t_nw": -0.4703695825131206,
+   "ci_low": -0.06590670676002494,
+   "ci_high": 0.04396335547893137,
+   "verdict": "no detectable difference"
+  },
+  "deep_pair - market": {
+   "diff_log_growth": 0.001484992622880751,
+   "t_nw": 0.32815829113323247,
+   "ci_low": -0.005659989860704259,
+   "ci_high": 0.011219907016256895,
+   "verdict": "no detectable difference"
+  },
+  "deep_trade_all - deep_pair": {
+   "diff_log_growth": 0.008219447473082658,
+   "t_nw": 1.8333088945158484,
+   "ci_low": -0.0010729008167196803,
+   "ci_high": 0.015536707936393413,
+   "verdict": "no detectable difference"
+  },
+  "deep_mlp - deep_pair": {
+   "diff_log_growth": -0.00570681456606769,
+   "t_nw": -1.5660624923266586,
+   "ci_low": -0.012411326071879846,
+   "ci_high": 0.0015056308939730033,
+   "verdict": "no detectable difference"
+  },
+  "deep_unanchored - deep_pair": {
+   "diff_log_growth": -0.014607197973166279,
+   "t_nw": -0.5452826955416339,
+   "ci_low": -0.06692244598205752,
+   "ci_high": 0.03789353437365804,
+   "verdict": "no detectable difference"
   }
  },
  "decades": {
@@ -171,7 +348,12 @@
    "min_variance": 0.1107218638,
    "risk_parity": 0.1116657669,
    "growth_classical": 0.080700331,
-   "momentum_tilt": 0.0993455085
+   "momentum_tilt": 0.0993455085,
+   "deep": 0.076766831,
+   "deep_trade_all": 0.0969741033,
+   "deep_mlp": 0.0752655384,
+   "deep_unanchored": 0.1444267333,
+   "deep_pair": 0.0724167259
   },
   "1970s": {
    "market": 0.062958753,
@@ -179,7 +361,12 @@
    "min_variance": 0.0923979996,
    "risk_parity": 0.0764554081,
    "growth_classical": 0.0539680417,
-   "momentum_tilt": 0.0710121926
+   "momentum_tilt": 0.0710121926,
+   "deep": 0.0754778057,
+   "deep_trade_all": 0.0854317299,
+   "deep_mlp": 0.0792400074,
+   "deep_unanchored": 0.1124077534,
+   "deep_pair": 0.0654166772
   },
   "1980s": {
    "market": 0.1691724618,
@@ -187,7 +374,12 @@
    "min_variance": 0.2441585903,
    "risk_parity": 0.1916567827,
    "growth_classical": 0.162124276,
-   "momentum_tilt": 0.1775103653
+   "momentum_tilt": 0.1775103653,
+   "deep": 0.1916623523,
+   "deep_trade_all": 0.1837683868,
+   "deep_mlp": 0.1686961371,
+   "deep_unanchored": 0.1351596507,
+   "deep_pair": 0.171024447
   },
   "1990s": {
    "market": 0.1786272343,
@@ -195,7 +387,12 @@
    "min_variance": 0.0885303626,
    "risk_parity": 0.1335985166,
    "growth_classical": 0.1800025367,
-   "momentum_tilt": 0.2024782546
+   "momentum_tilt": 0.2024782546,
+   "deep": 0.187216375,
+   "deep_trade_all": 0.208292235,
+   "deep_mlp": 0.1804460746,
+   "deep_unanchored": 0.1232038791,
+   "deep_pair": 0.1858478962
   },
   "2000s": {
    "market": -0.0006934922,
@@ -203,7 +400,12 @@
    "min_variance": 0.0435971309,
    "risk_parity": 0.0531786072,
    "growth_classical": 0.0086196166,
-   "momentum_tilt": 0.0067173082
+   "momentum_tilt": 0.0067173082,
+   "deep": 0.012434683,
+   "deep_trade_all": 0.003563813,
+   "deep_mlp": -0.0019041116,
+   "deep_unanchored": 0.1466853453,
+   "deep_pair": 0.0062203095
   },
   "2010s": {
    "market": 0.1361669348,
@@ -211,7 +413,12 @@
    "min_variance": 0.1366541016,
    "risk_parity": 0.1255757009,
    "growth_classical": 0.1549993664,
-   "momentum_tilt": 0.1389516843
+   "momentum_tilt": 0.1389516843,
+   "deep": 0.1348492489,
+   "deep_trade_all": 0.1310637564,
+   "deep_mlp": 0.1205955021,
+   "deep_unanchored": -0.0588791184,
+   "deep_pair": 0.1358841778
   },
   "2020s": {
    "market": 0.1507598499,
@@ -219,10 +426,35 @@
    "min_variance": 0.0608981533,
    "risk_parity": 0.1180632242,
    "growth_classical": 0.1294232324,
-   "momentum_tilt": 0.15900572
+   "momentum_tilt": 0.15900572,
+   "deep": 0.141923265,
+   "deep_trade_all": 0.1409440805,
+   "deep_mlp": 0.1136272831,
+   "deep_unanchored": 0.0535542087,
+   "deep_pair": 0.1563705857
   }
  },
  "costs": {
+  "deep@0bps": {
+   "terminal_wealth": 1684.529092950159,
+   "cagr": 0.11772961187101072,
+   "vs_market_log_growth": 0.008830358581661882
+  },
+  "deep@10bps": {
+   "terminal_wealth": 1368.2431821226107,
+   "cagr": 0.11425276317184796,
+   "vs_market_log_growth": 0.005804084217189323
+  },
+  "deep@25bps": {
+   "terminal_wealth": 1001.4638326428337,
+   "cagr": 0.10905564674100043,
+   "vs_market_log_growth": 0.0012628025338186077
+  },
+  "deep@50bps": {
+   "terminal_wealth": 595.1245549071364,
+   "cagr": 0.10044200397731817,
+   "vs_market_log_growth": -0.0063109936788893345
+  },
   "market@0bps": {
    "terminal_wealth": 934.3161752492545,
    "cagr": 0.10790310822814253,
@@ -284,6 +516,78 @@
    "vs_market_log_growth": 0.005741188709225464
   }
  },
- "seeds": {},
- "oracle_terminal_wealth": 728834372.2563375
+ "seeds": {
+  "deep_seed42": {
+   "terminal_wealth": 1794.4672157176371,
+   "cagr": 0.11878876838604091,
+   "log_growth": 0.11224664331247455,
+   "volatility": 0.1554112855638101,
+   "sharpe": 0.5283936569710361,
+   "max_drawdown": -0.49244722700980126,
+   "worst_year": -0.3336126586983229,
+   "best_year": 0.4468437432578869,
+   "turnover_per_year": 1.3186223914911894,
+   "holding_years": 0.7583672220741913,
+   "calmar": 0.24122131645930994
+  },
+  "deep_seed43": {
+   "terminal_wealth": 573.9972974812061,
+   "cagr": 0.09984626100312521,
+   "log_growth": 0.09517040731217363,
+   "volatility": 0.15664068396715697,
+   "sharpe": 0.41609962628745073,
+   "max_drawdown": -0.5669331597767518,
+   "worst_year": -0.3984710894701049,
+   "best_year": 0.409924683440825,
+   "turnover_per_year": 1.4866087585452152,
+   "holding_years": 0.6726719415931552,
+   "calmar": 0.176116459729473
+  },
+  "deep_seed44": {
+   "terminal_wealth": 1731.4979365161494,
+   "cagr": 0.11819020864166707,
+   "log_growth": 0.11171149321512855,
+   "volatility": 0.1478917231333751,
+   "sharpe": 0.5438510864443431,
+   "max_drawdown": -0.43953248506707066,
+   "worst_year": -0.32810693348735476,
+   "best_year": 0.4295996096007182,
+   "turnover_per_year": 1.7737413153704205,
+   "holding_years": 0.5637800683416817,
+   "calmar": 0.2688998257401425
+  },
+  "deep_seed45": {
+   "terminal_wealth": 1091.184527145777,
+   "cagr": 0.11048215373130632,
+   "log_growth": 0.1047942937426248,
+   "volatility": 0.15101959673164544,
+   "sharpe": 0.4901632170656485,
+   "max_drawdown": -0.5160121015314408,
+   "worst_year": -0.3687858891783523,
+   "best_year": 0.5067509022666499,
+   "turnover_per_year": 2.3391604636385583,
+   "holding_years": 0.42750380555103196,
+   "calmar": 0.21410767965211103
+  },
+  "deep_seed46": {
+   "terminal_wealth": 1066.068212851111,
+   "cagr": 0.11009481666293186,
+   "log_growth": 0.10444543209318244,
+   "volatility": 0.1572936841325199,
+   "sharpe": 0.4745759839190968,
+   "max_drawdown": -0.5301079600323332,
+   "worst_year": -0.4168105580334648,
+   "best_year": 0.43008034828096164,
+   "turnover_per_year": 1.6559101970757393,
+   "holding_years": 0.603897482946813,
+   "calmar": 0.2076837643717268
+  }
+ },
+ "oracle_terminal_wealth": 728834372.2563375,
+ "deep_trade_fraction": {
+  "mean": 0.8502173333987594,
+  "median": 0.8116641044616699,
+  "min": 0.4012395441532135,
+  "max": 0.9996621012687683
+ }
 }

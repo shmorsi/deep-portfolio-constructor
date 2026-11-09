@@ -58,3 +58,20 @@
 2026-11-09 00:36:33 | INFO    | dpc.wealth.train | deep seed 45 refit 2019-12: best val 0.01154/month at step 50 (166s)
 2026-11-09 00:37:07 | INFO    | dpc.wealth.train | deep seed 46 refit 1969-12: best val 0.00867/month at step 90 (204s)
 2026-11-09 00:38:20 | INFO    | dpc.wealth.train | deep seed 46 refit 1974-12: best val 0.00213/month at step 0 (73s)
+2026-11-09 00:39:32 | INFO    | dpc.wealth.train | deep seed 46 refit 1979-12: best val 0.00618/month at step 0 (72s)
+2026-11-09 00:39:42 | INFO    | dpc.wealth.train | deep seed 45 refit 2024-12: best val 0.01104/month at step 130 (189s)
+2026-11-09 00:43:50 | INFO    | dpc.wealth.train | deep seed 46 refit 1984-12: best val 0.01610/month at step 210 (258s)
+2026-11-09 00:45:45 | INFO    | dpc.wealth.train | deep seed 46 refit 1989-12: best val 0.01636/month at step 50 (115s)
+2026-11-09 00:46:58 | INFO    | dpc.wealth.train | deep seed 46 refit 1994-12: best val 0.01320/month at step 0 (72s)
+2026-11-09 00:50:13 | INFO    | dpc.wealth.train | deep seed 46 refit 1999-12: best val 0.01560/month at step 140 (196s)
+2026-11-09 00:51:24 | INFO    | dpc.wealth.train | deep seed 46 refit 2004-12: best val 0.00884/month at step 0 (70s)
+2026-11-09 00:53:11 | INFO    | dpc.wealth.train | deep seed 46 refit 2009-12: best val 0.00341/month at step 40 (107s)
+2026-11-09 00:54:32 | INFO    | dpc.wealth.train | deep seed 46 refit 2014-12: best val 0.00748/month at step 10 (82s)
+2026-11-09 00:56:10 | INFO    | dpc.wealth.train | deep seed 46 refit 2019-12: best val 0.01077/month at step 30 (98s)
+2026-11-09 00:57:40 | INFO    | dpc.wealth.train | deep seed 46 refit 2024-12: best val 0.01070/month at step 20 (90s)
+2026-11-09 00:57:43 | INFO    | dpc.wealth.pipeline | deep (ensemble of 5): $1 -> $1368
+2026-11-09 00:57:44 | INFO    | dpc.wealth.pipeline | deep seed 42 alone: $1 -> $1794
+2026-11-09 00:57:45 | INFO    | dpc.wealth.pipeline | deep seed 43 alone: $1 -> $574
+2026-11-09 00:57:46 | INFO    | dpc.wealth.pipeline | deep seed 44 alone: $1 -> $1731
+2026-11-09 00:57:47 | INFO    | dpc.wealth.pipeline | deep seed 45 alone: $1 -> $1091
+2026-11-09 00:57:48 | INFO    | dpc.wealth.pipeline | deep seed 46 alone: $1 -> $1066
