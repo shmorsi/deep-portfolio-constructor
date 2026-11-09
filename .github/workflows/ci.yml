@@ -1,0 +1,34 @@
+name: ci
+
+# Tests, then the guard the website depends on: reports/site_wealth.json must
+# match a fresh `python -m dpc.cli wealth-site` run on the committed results.
+# shmorsi.github.io reads only that file (scripts/sync_all.py there).
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install (CPU PyTorch)
+        run: |
+          pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+          pip install -r requirements.txt
+          pip install -e . --no-deps
+      - name: Tests
+        run: pytest -q
+      - name: The site export matches the committed results
+        run: |
+          python -m dpc.cli wealth-site
+          python scripts/check_site_export.py
