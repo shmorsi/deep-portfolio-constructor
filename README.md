@@ -140,6 +140,17 @@ Cost is everything the sponsor pays in over 20 years plus any shortfall left at 
 
 ![What the learned policy holds: by funded ratio at three yields, and by the yield in the test futures](reports/figures/pension/anatomy.png)
 
+### The three studies meet: what a Fed surprise does to this plan
+
+[World Shock Lab](https://github.com/shmorsi/world-shock-lab), the third study, measures what a surprise in US monetary policy does to markets. Its estimates (commit 9707616) are applied here to the plan's funded ratio, at 90% funded, on the announcement day, per 10 bp of surprise:
+
+| Surprise (+10 bp) | Stocks | 10-year yield | The promise | 60/40 | Liability-driven 40/60 | Fully matched | Glide path | Learned policy |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fed policy surprise | −0.98% | +3.4 bp | −0.48% | −0.20 (±0.37) | −0.18 (±0.22) | +0.00 (±0.00) | −0.24 (±0.29) | −0.13 (±0.15) |
+| Fed information surprise | +0.41% | +4.1 bp | −0.57% | +0.62 (±0.79) | +0.35 (±0.46) | +0.00 (±0.00) | +0.47 (±0.61) | +0.25 (±0.32) |
+
+A **policy surprise** sends stocks down (-0.98%) and the yield up (+3.4 bp). For a 60/40 plan the stocks cost 0.53 points of funded ratio and the cheaper promise gives 0.34 back: a net of −0.20, inside its band. An **information surprise** of the same size, the Fed revealing good news about the economy, sends stocks and the yield up together, so both channels help (+0.62, also inside its band). A fully matched plan does not move in either case, by construction. So the same rise in rates can hurt or help a pension plan depending on why it happened, and the two channels are of similar size: the net is small and its sign is not settled by these estimates. First order, not a forecast, not pre-registered. `python -m dpc.cli pension-stress`.
+
 Every table is in [reports/pension/results.md](reports/pension/results.md); the page is [shmorsi.github.io/projects/pension-lab.html](https://shmorsi.github.io/projects/pension-lab.html). The code is [src/dpc/pension/](src/dpc/pension/), with its own tests in [tests/test_pension.py](tests/test_pension.py). `python -m dpc.cli pension` downloads the public data, trains the 24 networks and writes every number above; `python -m dpc.cli pension-anatomy` adds the description of what the policy holds.
 <!-- pension:end -->
 

@@ -28,7 +28,17 @@ def _cost(x: float) -> str:
 ORDER = [SIXTY, LDI, MATCHED, GLIDE, LEARNED]
 
 
-def results_markdown(s: dict, anatomy: dict | None = None) -> str:
+def _stress_rows(stress: dict, horizon: str) -> list[str]:
+    names = list(next(iter(stress["shocks"].values()))["horizons"][horizon]["policies"])
+    rows = ["| Surprise (+10 bp) | Stocks | 10-year yield | The promise | " + " | ".join(names) + " |", "|---|---:|---:|---:|" + "---:|" * len(names)]
+    for sh in stress["shocks"].values():
+        r = sh["horizons"][horizon]
+        cells = " | ".join(f"{v['points']:+.2f} (±{v['half_width']:.2f})".replace("-", "−") for v in r["policies"].values())
+        rows.append(f"| {sh['name']} | {r['stocks_pct']:+.2f}% | {r['yield_bp']:+.1f} bp | {r['promise_pct']:+.2f}% | {cells} |".replace("-", "−").replace("| −−−", "| ---"))
+    return rows
+
+
+def results_markdown(s: dict, anatomy: dict | None = None, stress: dict | None = None) -> str:
     """reports/pension/results.md: every table of the study, generated from summary.json. Do not edit by hand."""
     sim, walk, hist = s["simulated"], s["model_risk"], s["history"]
     c = lambda x: f"${100 * x:.1f}"  # noqa: E731
@@ -122,6 +132,16 @@ def results_markdown(s: dict, anatomy: dict | None = None) -> str:
                 d = om[key]
                 out.append(f"| {name} | {sg(d['difference'])} | {sg(d['lo'])} to {sg(d['hi'])} | {d['verdict']} |")
             out.append("")
+    if stress:
+        out.append("## What a Fed surprise does to the plan (World Shock Lab's estimates; not pre-registered)\n")
+        out.append(f"World Shock Lab (commit {stress['lab']['lab_commit'][:7]}, `{stress['lab']['source'].split(' ', 1)[1]}`) measures what a 10 bp surprise in US monetary policy does to "
+                   f"stocks and to the 10-year yield. Applied to this plan at {100 * stress['at']['funded']:.0f}% funded and a {100 * stress['at']['yield']:.0f}% yield: the move in the "
+                   "funded ratio, in points, with a band that adds the two estimates' 90% half-widths (the widest it can be whatever their correlation).\n")
+        out.append("On the announcement day:\n")
+        out += _stress_rows(stress, "0")
+        out.append("\nTwenty trading days later:\n")
+        out += _stress_rows(stress, "20")
+        out.append("")
     return "\n".join(out) + "\n"
 
 
@@ -129,7 +149,7 @@ START, END = "<!-- pension:start -->", "<!-- pension:end -->"
 READING = {"better": "better than", "worse": "worse than", "no detectable difference": "not detectably different from"}
 
 
-def readme_section(s: dict, anatomy: dict | None = None) -> str:
+def readme_section(s: dict, anatomy: dict | None = None, stress: dict | None = None) -> str:
     """The Pension Lab block of README.md, between the pension:start and pension:end markers. Every number comes from summary.json."""
     sim, walk, hist = s["simulated"], s["model_risk"], s["history"]
     P, W, H = sim["policies"], walk["policies"], hist["policies"]
@@ -218,6 +238,25 @@ def readme_section(s: dict, anatomy: dict | None = None) -> str:
                           "A plan cannot rely on them: real history, where every network had seen only the past, gave the same answer." if kept < 0.5 else
                           "The saving does not depend on reading runs of history."))
         out += ["", "![What the learned policy holds: by funded ratio at three yields, and by the yield in the test futures](reports/figures/pension/anatomy.png)"]
+    if stress:
+        mp, cbi = stress["shocks"]["fed_mp"]["horizons"]["0"], stress["shocks"]["fed_cbi"]["horizons"]["0"]
+        f = lambda v: f"{v['points']:+.2f}".replace("-", "−")  # noqa: E731
+        out += ["",
+                "### The three studies meet: what a Fed surprise does to this plan",
+                "",
+                f"[World Shock Lab](https://github.com/shmorsi/world-shock-lab), the third study, measures what a surprise in US monetary policy does to markets. Its estimates "
+                f"(commit {stress['lab']['lab_commit'][:7]}) are applied here to the plan's funded ratio, at {100 * stress['at']['funded']:.0f}% funded, on the announcement day, per 10 bp of surprise:",
+                "",
+                *_stress_rows(stress, "0"),
+                "",
+                f"A **policy surprise** sends stocks down ({mp['stocks_pct']:+.2f}%) and the yield up ({mp['yield_bp']:+.1f} bp). For a 60/40 plan the stocks cost "
+                f"{abs(mp['policies']['60/40']['from_stocks']):.2f} points of funded ratio and the cheaper promise gives {abs(mp['policies']['60/40']['from_yield']):.2f} back: "
+                f"a net of {f(mp['policies']['60/40'])}, " + ("outside" if mp['policies']['60/40']['excludes_zero'] else "inside") + " its band. "
+                f"An **information surprise** of the same size, the Fed revealing good news about the economy, sends stocks and the yield up together, so both channels help "
+                f"({f(cbi['policies']['60/40'])}, " + ("outside" if cbi['policies']['60/40']['excludes_zero'] else "also inside") + " its band). "
+                "A fully matched plan does not move in either case, by construction. So the same rise in rates can hurt or help a pension plan depending on why it happened, "
+                "and the two channels are of similar size: the net is small and its sign is not settled by these estimates. "
+                "First order, not a forecast, not pre-registered. `python -m dpc.cli pension-stress`."]
     out += ["",
             "Every table is in [reports/pension/results.md](reports/pension/results.md); the page is "
             "[shmorsi.github.io/projects/pension-lab.html](https://shmorsi.github.io/projects/pension-lab.html). "
@@ -228,14 +267,14 @@ def readme_section(s: dict, anatomy: dict | None = None) -> str:
     return "\n".join(out)
 
 
-def write_readme(root: Path, s: dict, anatomy: dict | None) -> bool:
+def write_readme(root: Path, s: dict, anatomy: dict | None, stress: dict | None = None) -> bool:
     """Replace the block between the markers in README.md. Returns False when the markers are not there."""
     readme = root / "README.md"
     text = readme.read_text() if readme.is_file() else ""
     if START not in text or END not in text:
         return False
     head, rest = text.split(START, 1)
-    readme.write_text(head + readme_section(s, anatomy) + rest.split(END, 1)[1])
+    readme.write_text(head + readme_section(s, anatomy, stress) + rest.split(END, 1)[1])
     return True
 
 
@@ -300,7 +339,10 @@ def export(root: Path) -> dict:
     if anatomy.is_file():
         a = json.loads(anatomy.read_text())
         out["anatomy"] = {key: a[key] for key in ("note", "assets", "by_funded", "by_yield", "by_year", "overall", "curve", "tuned_glide", "one_month_blocks") if key in a}
-    (src / "results.md").write_text(results_markdown(s, out.get("anatomy")))
-    write_readme(root, s, out.get("anatomy"))
+    stress = src / "stress.json"            # World Shock Lab's estimates applied to the plan (stress.py), when it has been run
+    if stress.is_file():
+        out["stress"] = json.loads(stress.read_text())
+    (src / "results.md").write_text(results_markdown(s, out.get("anatomy"), out.get("stress")))
+    write_readme(root, s, out.get("anatomy"), out.get("stress"))
     (src / "site_pension.json").write_text(json.dumps(out, indent=1) + "\n")
     return out

@@ -1,0 +1,233 @@
+{
+ "note": "First-order effect of a Fed surprise on the plan's funded ratio, from World Shock Lab's estimates. Added after the test; not pre-registered; not a forecast.",
+ "lab": {
+  "source": "world-shock-lab web/public/data/catalog.json",
+  "lab_commit": "9707616421a3b636c8d52553bb1b2c0ca0958f7e",
+  "generated_at": "2026-10-13T05:57:46Z"
+ },
+ "at": {
+  "funded": 0.9,
+  "yield": 0.04
+ },
+ "weights": {
+  "60/40": [
+   0.6000000238418579,
+   0.4000000059604645,
+   0.0
+  ],
+  "Liability-driven 40/60": [
+   0.4000000059604645,
+   0.0,
+   0.6000000238418579
+  ],
+  "Fully matched": [
+   0.0,
+   0.0,
+   1.0
+  ],
+  "Glide path": [
+   0.533333420753479,
+   0.0,
+   0.466666579246521
+  ],
+  "Learned policy": [
+   0.27802109718322754,
+   0.0005332271684892476,
+   0.7214457392692566
+  ]
+ },
+ "shocks": {
+  "fed_mp": {
+   "name": "Fed policy surprise",
+   "per": 10.0,
+   "unit": "bp",
+   "events": 287,
+   "horizons": {
+    "0": {
+     "stocks_pct": -0.981305,
+     "stocks_se": 0.166573,
+     "yield_bp": 3.41539,
+     "yield_se": 1.39297,
+     "promise_pct": -0.4811870226870574,
+     "policies": {
+      "60/40": {
+       "points": -0.19746331831558495,
+       "half_width": 0.3727710239984315,
+       "excludes_zero": false,
+       "from_stocks": -0.52990472105652,
+       "from_yield": 0.3350035642800875
+      },
+      "Liability-driven 40/60": {
+       "points": -0.18091301738394683,
+       "half_width": 0.21539475456335003,
+       "excludes_zero": false,
+       "from_stocks": -0.35326980526413476,
+       "from_yield": 0.17406489553053017
+      },
+      "Fully matched": {
+       "points": 0.0,
+       "half_width": 0.0,
+       "excludes_zero": false,
+       "from_stocks": 0.0,
+       "from_yield": 0.0
+      },
+      "Glide path": {
+       "points": -0.24121737516431874,
+       "half_width": 0.28719306047769144,
+       "excludes_zero": false,
+       "from_stocks": -0.4710264772072448,
+       "from_yield": 0.23208657924943088
+      },
+      "Learned policy": {
+       "points": -0.12564558377359925,
+       "half_width": 0.14977692554373825,
+       "excludes_zero": false,
+       "from_stocks": -0.24554114349425116,
+       "from_yield": 0.12108278461059996
+      }
+     }
+    },
+    "20": {
+     "stocks_pct": -1.40525,
+     "stocks_se": 0.515799,
+     "yield_bp": 4.55433,
+     "yield_se": 3.08741,
+     "promise_pct": -0.6407212308470855,
+     "policies": {
+      "60/40": {
+       "points": -0.31706121908283147,
+       "half_width": 0.9563611673481967,
+       "excludes_zero": false,
+       "from_stocks": -0.758835030153393,
+       "from_yield": 0.44666718107639003
+      },
+      "Liability-driven 40/60": {
+       "points": -0.2770052093687625,
+       "half_width": 0.5642843451078555,
+       "excludes_zero": false,
+       "from_stocks": -0.5058900075383488,
+       "from_yield": 0.23214704475913006
+      },
+      "Fully matched": {
+       "points": 0.0,
+       "half_width": 0.0,
+       "excludes_zero": false,
+       "from_stocks": 0.0,
+       "from_yield": 0.0
+      },
+      "Glide path": {
+       "points": -0.36934031113260324,
+       "half_width": 0.7523792646359535,
+       "excludes_zero": false,
+       "from_stocks": -0.6745201105624477,
+       "from_yield": 0.309529462197371
+      },
+      "Learned policy": {
+       "points": -0.1924020166201923,
+       "half_width": 0.3923538985793055,
+       "excludes_zero": false,
+       "from_stocks": -0.35162023213505256,
+       "from_yield": 0.16148564892133344
+      }
+     }
+    }
+   }
+  },
+  "fed_cbi": {
+   "name": "Fed information surprise",
+   "per": 10.0,
+   "unit": "bp",
+   "events": 287,
+   "horizons": {
+    "0": {
+     "stocks_pct": 0.407528,
+     "stocks_se": 0.383161,
+     "yield_bp": 4.06642,
+     "yield_se": 2.79208,
+     "promise_pct": -0.572435048544162,
+     "policies": {
+      "60/40": {
+       "points": 0.6201669036975677,
+       "half_width": 0.7908984034938876,
+       "excludes_zero": false,
+       "from_stocks": 0.22006512874459982,
+       "from_yield": 0.3988347923740765
+      },
+      "Liability-driven 40/60": {
+       "points": 0.35481778876025105,
+       "half_width": 0.4609680960635503,
+       "excludes_zero": false,
+       "from_stocks": 0.14671008218614778,
+       "from_yield": 0.2072630515424856
+      },
+      "Fully matched": {
+       "points": 0.0,
+       "half_width": 0.0,
+       "excludes_zero": false,
+       "from_stocks": 0.0,
+       "from_yield": 0.0
+      },
+      "Glide path": {
+       "points": 0.4730904760993737,
+       "half_width": 0.6146242429226404,
+       "excludes_zero": false,
+       "from_stocks": 0.19561347206354718,
+       "from_yield": 0.27635079715919053
+      },
+      "Learned policy": {
+       "points": 0.24673428167811373,
+       "half_width": 0.3205296782857299,
+       "excludes_zero": false,
+       "from_stocks": 0.10197124352358866,
+       "from_yield": 0.1441759583666813
+      }
+     }
+    },
+    "20": {
+     "stocks_pct": 0.397297,
+     "stocks_se": 0.925352,
+     "yield_bp": 3.58194,
+     "yield_se": 6.12824,
+     "promise_pct": -0.5045449792125067,
+     "policies": {
+      "60/40": {
+       "points": 0.5669623394760581,
+       "half_width": 1.8105261570240845,
+       "excludes_zero": false,
+       "from_stocks": 0.21454038852507074,
+       "from_yield": 0.35133400903599066
+      },
+      "Liability-driven 40/60": {
+       "points": 0.3263094819291812,
+       "half_width": 1.061958593833532,
+       "excludes_zero": false,
+       "from_stocks": 0.1430269221312619,
+       "from_yield": 0.18255726520593374
+      },
+      "Fully matched": {
+       "points": 0.0,
+       "half_width": 0.0,
+       "excludes_zero": false,
+       "from_stocks": 0.0,
+       "from_yield": 0.0
+      },
+      "Glide path": {
+       "points": 0.4350793922062013,
+       "half_width": 1.4159450538281424,
+       "excludes_zero": false,
+       "from_stocks": 0.19070259125857802,
+       "from_yield": 0.24340974134754445
+      },
+      "Learned policy": {
+       "points": 0.22690558773248437,
+       "half_width": 0.7384072272768407,
+       "excludes_zero": false,
+       "from_stocks": 0.09941125306285326,
+       "from_yield": 0.12699021668153732
+      }
+     }
+    }
+   }
+  }
+ }
+}

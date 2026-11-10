@@ -111,3 +111,21 @@ The simulated futures of tests 1 and 1b replay history in runs averaging 12 mont
 | Glide path | −20.2 | −23.7 to −16.8 | better |
 | Tuned glide path | −2.4 | −4.5 to −0.3 | better |
 
+## What a Fed surprise does to the plan (World Shock Lab's estimates; not pre-registered)
+
+World Shock Lab (commit 9707616, `web/public/data/catalog.json`) measures what a 10 bp surprise in US monetary policy does to stocks and to the 10-year yield. Applied to this plan at 90% funded and a 4% yield: the move in the funded ratio, in points, with a band that adds the two estimates' 90% half-widths (the widest it can be whatever their correlation).
+
+On the announcement day:
+
+| Surprise (+10 bp) | Stocks | 10-year yield | The promise | 60/40 | Liability-driven 40/60 | Fully matched | Glide path | Learned policy |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fed policy surprise | −0.98% | +3.4 bp | −0.48% | −0.20 (±0.37) | −0.18 (±0.22) | +0.00 (±0.00) | −0.24 (±0.29) | −0.13 (±0.15) |
+| Fed information surprise | +0.41% | +4.1 bp | −0.57% | +0.62 (±0.79) | +0.35 (±0.46) | +0.00 (±0.00) | +0.47 (±0.61) | +0.25 (±0.32) |
+
+Twenty trading days later:
+
+| Surprise (+10 bp) | Stocks | 10-year yield | The promise | 60/40 | Liability-driven 40/60 | Fully matched | Glide path | Learned policy |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Fed policy surprise | −1.41% | +4.6 bp | −0.64% | −0.32 (±0.96) | −0.28 (±0.56) | +0.00 (±0.00) | −0.37 (±0.75) | −0.19 (±0.39) |
+| Fed information surprise | +0.40% | +3.6 bp | −0.50% | +0.57 (±1.81) | +0.33 (±1.06) | +0.00 (±0.00) | +0.44 (±1.42) | +0.23 (±0.74) |
+

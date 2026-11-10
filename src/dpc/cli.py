@@ -67,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
     parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
                                           "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site",
-                                          "pension", "pension-run", "pension-site", "pension-anatomy", "pension-figures"])
+                                          "pension", "pension-run", "pension-site", "pension-anatomy", "pension-figures", "pension-stress"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -95,6 +95,14 @@ def main(argv: list[str] | None = None) -> int:
             from dpc.pension.anatomy import anatomy
 
             anatomy(cfg.root)
+            continue
+        if stage == "pension-stress":    # what a Fed surprise does to the plan, from World Shock Lab's estimates (a sister repository)
+            from dpc.pension import stress
+
+            lab = next((d for d in cfg.root.parent.iterdir() if d.is_dir() and d.name.lower() == "world-shock-lab"), None)
+            if lab is not None:              # refresh the committed extract when the lab is checked out next to this repository
+                stress.extract(lab, cfg.root / "reports" / "pension")
+            stress.stress(cfg.root)
             continue
         if stage == "pension-figures":
             from dpc.pension.figures import render

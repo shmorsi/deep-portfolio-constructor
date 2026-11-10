@@ -337,3 +337,16 @@ def test_tuning_the_glide_path_does_not_make_its_validation_score_worse(plan):
         assert float(score_t(run(rule, val, plan)["cost"])) <= float(score_t(run(Glide(), val, plan)["cost"])) + 1e-6
         w = rule(torch.rand(20, 10) * 2)
     assert float(w.min()) >= 0 and torch.allclose(w.sum(dim=1), torch.ones(20), atol=1e-6)
+
+
+def test_a_matched_plan_does_not_move_when_the_yield_does_and_a_stock_plan_does():
+    from dpc.pension.stress import funded_move
+
+    plan = Plan()
+    matched, stocks, sixty = np.array([0.0, 0.0, 1.0]), np.array([1.0, 0.0, 0.0]), np.array([0.6, 0.4, 0.0])
+    assert funded_move(matched, -0.05, 0.0025, plan) == pytest.approx(0.0, abs=1e-9)          # assets and promise are repriced together
+    assert funded_move(stocks, -0.01, 0.0, plan) == pytest.approx(-0.9, abs=1e-9)              # 90% funded, all in stocks, stocks down 1%
+    up = funded_move(sixty, 0.0, 0.001, plan)                                                   # yields up: the promise falls by more than the bonds
+    assert up > 0 and up == pytest.approx(-funded_move(sixty, 0.0, -0.001, plan), rel=0.05)
+    hit = funded_move(sixty, -0.01, 0.0, plan)
+    assert funded_move(sixty, -0.01, 0.001, plan) == pytest.approx(hit + up, abs=0.01)          # first order: the two effects add
