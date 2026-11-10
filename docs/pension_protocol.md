@@ -135,4 +135,31 @@ detectable difference**. The headline comparison is against the glide path, on t
 
 ## Deviations
 
-None.
+None. The study ran once, at commit `304f7c8`, and its output is committed as it came out
+(`reports/pension/summary.json`; every table in `reports/pension/results.md`).
+
+## After the test
+
+Written after the results above existed. Nothing here was pre-registered, and none of it changes a
+verdict. It is in `src/dpc/pension/anatomy.py` (`python -m dpc.cli pension-anatomy`), which retrains
+the three networks of test 1 from the same seeds and stops unless they reproduce the committed
+result to the last digit; their weights are in `reports/pension/learned_policy.pt`.
+
+The tests said: better in simulation, no detectable difference on real history. These three
+additions ask why.
+
+1. **What the policy holds.** Its average weights in the test-1 futures, by funded ratio, by the
+   level of the yield and by year, next to the glide path in the same situations.
+2. **A tuned glide path.** The protocol's glide path has textbook numbers (70% stocks under 80%
+   funded, sliding to 20% at 110%). Here those four numbers are trained on the same scenarios, with
+   the same score and steps as the network, and the result is run on the test-1 and test-1b
+   futures. It separates "a rule tuned to the cost" from "a network with more inputs".
+3. **Futures with nothing to recognise.** The scenario generator resamples history in runs
+   averaging 12 months, and the network sees the last 12 months of returns, yields and prices. The
+   same policies, not retrained, are run on 10,000 futures whose months are drawn one at a time
+   (seed 2028, used by nothing else). If the network's lead survives, it does not come from reading
+   runs of history; if it does not, it does.
+
+The readings use the protocol's rule (a 95% bootstrap interval that excludes zero), but an
+analysis chosen after seeing a result is weaker evidence than a test fixed before it, and is
+labelled as such wherever it is quoted.

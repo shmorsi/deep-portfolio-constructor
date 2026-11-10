@@ -62,3 +62,52 @@ Differences in test 2 are in the average cost, per $100 promised, with start yea
 - Yield: AR(1) with coefficient 0.9939 a month around 5.98%. Inflation: AR(1) with coefficient 0.545. Shocks are resampled from history in blocks averaging 12 months.
 - 24 networks of 1,507 parameters each (3 seeds for the simulated tests and for each of the walk-forward refits), 300 steps of 1,024 scenarios, 8,192 training and 4,096 validation scenarios per network.
 
+## What the learned policy holds (a description made after the test; not pre-registered)
+
+Average weights in the test-1 futures, by the funded ratio at each monthly decision, next to the glide path at the same funded ratio.
+
+| Funded ratio | Share of months | Glide path: stocks | Learned: stocks | Learned: 10-year bonds | Learned: matching bonds |
+|---|---:|---:|---:|---:|---:|
+| under 70% | 1% | 70% | 49% | 2% | 49% |
+| 70% to 80% | 2% | 70% | 37% | 2% | 61% |
+| 80% to 90% | 7% | 59% | 26% | 2% | 72% |
+| 90% to 100% | 12% | 45% | 21% | 1% | 77% |
+| 100% to 110% | 10% | 28% | 18% | 2% | 80% |
+| 110% to 120% | 9% | 20% | 16% | 2% | 82% |
+| 120% to 150% | 20% | 20% | 15% | 3% | 81% |
+| over 150% | 39% | 20% | 16% | 3% | 81% |
+
+The same, by the level of the yield, for plans between 85% and 100% funded.
+
+| Yield | Share of those months | Glide path: stocks | Learned: stocks | Learned: 10-year bonds | Learned: matching bonds |
+|---|---:|---:|---:|---:|---:|
+| under 3% | 8% | 49% | 54% | 1% | 45% |
+| 3% to 5% | 18% | 48% | 37% | 1% | 62% |
+| 5% to 7% | 28% | 48% | 24% | 2% | 75% |
+| 7% to 10% | 35% | 49% | 12% | 2% | 87% |
+| over 10% | 11% | 49% | 5% | 2% | 94% |
+
+## A glide path tuned on the same simulations (added after the test; not pre-registered)
+
+The protocol's glide path has textbook numbers. Here its four numbers are trained on the same scenarios, by the same method and for the same score as the network (3 seeds, averaged). Tuned: stocks 32% while the plan is under 63% funded, sliding to 22% at 79% funded (the protocol's: 70% under 80%, sliding to 20% at 110%).
+
+| Test | Tuned glide path: average cost | Worst 5% | Fully funded at year 20 | Average in stocks | Learned minus tuned (score) | 95% interval | Reading |
+|---|---:|---:|---:|---:|---:|---|---|
+| Test 1 futures | $10.9 | $53.5 | 86% | 23% | −29.2 | −31.0 to −27.5 | better |
+| Test 1b futures (no pull to an average) | $14.5 | $83.1 | 80% | 23% | −40.8 | −43.4 to −38.1 | better |
+
+## Futures with nothing to recognise (added after the test; not pre-registered)
+
+The simulated futures of tests 1 and 1b replay history in runs averaging 12 months, and the network sees the last 12 months. Here the same policies, not retrained, are run on 10,000 futures whose months are drawn one at a time (seed 2028): there is no run of history to recognise.
+
+| Policy | Average cost | Worst 5% | Fully funded at year 20 | Average in stocks |
+|---|---:|---:|---:|---:|
+| Glide path | $10.4 | $79.0 | 95% | 30% |
+| Tuned glide path | $11.7 | $59.9 | 86% | 23% |
+| Learned policy | $10.2 | $59.0 | 90% | 19% |
+
+| Learned policy minus | Difference (score) | 95% interval | Reading |
+|---|---:|---|---|
+| Glide path | −20.2 | −23.7 to −16.8 | better |
+| Tuned glide path | −2.4 | −4.5 to −0.3 | better |
+

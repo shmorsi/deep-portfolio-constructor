@@ -282,3 +282,58 @@ def test_the_panel_uses_month_end_yields_from_1962_and_monthly_averages_before(t
     assert panel.loc["1962-01-31", "yield"] == pytest.approx((4 + 31 / 100) / 100)      # the last trading day of January 1962
     assert panel["equity"].iloc[0] == pytest.approx(0.012)
     assert panel["infl"].iloc[5] == pytest.approx(0.002, abs=1e-4)   # the fake index is written to four decimals
+
+
+def test_anatomy_buckets_average_within_each_range():
+    from dpc.pension.anatomy import bucket_means
+
+    key = np.array([0.5, 0.75, 0.78, 0.95, 2.0])
+    w = np.array([[1, 0, 0], [0.5, 0, 0.5], [0.3, 0, 0.7], [0, 1, 0], [0, 0, 1]], dtype=float)
+    out = bucket_means(key, (0.70, 0.80, 0.90), {"w": w})
+    assert out["share_of_months"] == pytest.approx([0.2, 0.4, 0.0, 0.4])
+    assert out["w"][0] == pytest.approx([1, 0, 0])
+    assert out["w"][1] == pytest.approx([0.4, 0, 0.6])
+    assert out["w"][2] is None                       # nothing fell in 80% to 90%
+    assert out["w"][3] == pytest.approx([0, 0.5, 0.5])
+    kept = bucket_means(key, (0.70, 0.80, 0.90), {"w": w}, keep=key < 1.0)
+    assert kept["share_of_months"] == pytest.approx([0.25, 0.5, 0.0, 0.25])
+
+
+def test_anatomy_describes_the_glide_path_as_itself(plan):
+    """An untrained network is the glide path with a 2% floor, so its description must sit on the glide path's."""
+    from dpc.pension.anatomy import describe
+    from dpc.pension.policy import Ensemble, Learned
+
+    exo = exogenous(sc.simulate(sc.fit(make_panel()), 40, plan.horizon, seed=5), plan)
+    d = describe(Ensemble([Learned()]), exo, plan)
+    for learned, glide in zip(d["by_funded"]["learned"], d["by_funded"]["glide"]):
+        if learned is not None:
+            assert sum(learned) == pytest.approx(1.0, abs=1e-6) and sum(glide) == pytest.approx(1.0, abs=1e-6)
+            assert learned[0] == pytest.approx(glide[0], abs=0.03)
+    assert sum(d["by_funded"]["share_of_months"]) == pytest.approx(1.0)
+    assert d["curve"]["glide"][0] == pytest.approx([0.7, 0.0, 0.3], abs=1e-6)
+
+
+def test_the_tunable_glide_path_starts_as_the_protocols_glide_path():
+    from dpc.pension.anatomy import TunedGlide
+
+    rule = TunedGlide()
+    n = {k: float(v.detach()) for k, v in rule.numbers().items()}
+    assert n == pytest.approx({"slide_from": 0.80, "slide_to": 1.10, "stocks_when_short": 0.70, "stocks_when_funded": 0.20}, abs=1e-6)
+    state = torch.zeros(7, 10)
+    state[:, 0] = torch.tensor([0.5, 0.8, 0.9, 1.0, 1.1, 1.3, 2.0])
+    with torch.no_grad():
+        assert torch.allclose(rule(state), Glide()(state), atol=1e-6)
+
+
+def test_tuning_the_glide_path_does_not_make_its_validation_score_worse(plan):
+    from dpc.pension.anatomy import tune_glide
+
+    model = sc.fit(make_panel())
+    cfg = TrainConfig(steps=6, batch=64, n_train=128, n_val=128, check_every=3)
+    rule = tune_glide(model, plan, seed=1, cfg=cfg)
+    val = exogenous(sc.simulate(model, cfg.n_val, plan.horizon, seed=5001), plan)
+    with torch.no_grad():
+        assert float(score_t(run(rule, val, plan)["cost"])) <= float(score_t(run(Glide(), val, plan)["cost"])) + 1e-6
+        w = rule(torch.rand(20, 10) * 2)
+    assert float(w.min()) >= 0 and torch.allclose(w.sum(dim=1), torch.ones(20), atol=1e-6)
