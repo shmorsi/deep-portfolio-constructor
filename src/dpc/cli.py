@@ -66,7 +66,8 @@ def quickstart(cfg: Config, launch: bool = True) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
     parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
-                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site"])
+                                          "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site",
+                                          "pension", "pension-run", "pension-site"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -79,10 +80,23 @@ def main(argv: list[str] | None = None) -> int:
         stages = ["data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate"]
     elif args.stage == "wealth":
         stages = ["wealth-data", "wealth-baselines", "wealth-train", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site"]
+    elif args.stage == "pension":
+        stages = ["pension-run", "pension-site"]
     else:
         stages = [args.stage]
 
     for stage in stages:
+        if stage == "pension-run":
+            from dpc.pension.run import study
+
+            study(cfg.root, refresh=args.refresh)
+            continue
+        if stage == "pension-site":
+            from dpc.pension.site import export
+
+            export(cfg.root)
+            print("wrote reports/pension/site_pension.json")
+            continue
         if stage == "quickstart":
             return quickstart(cfg, launch=not args.no_launch)
         if stage == "setup":
