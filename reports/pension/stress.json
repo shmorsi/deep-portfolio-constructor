@@ -41,7 +41,10 @@
    "name": "Fed policy surprise",
    "per": 10.0,
    "unit": "bp",
-   "events": 287,
+   "events": {
+    "stocks": 287,
+    "yield": 334
+   },
    "horizons": {
     "0": {
      "stocks_pct": -0.981305,
@@ -137,7 +140,10 @@
    "name": "Fed information surprise",
    "per": 10.0,
    "unit": "bp",
-   "events": 287,
+   "events": {
+    "stocks": 287,
+    "yield": 334
+   },
    "horizons": {
     "0": {
      "stocks_pct": 0.407528,

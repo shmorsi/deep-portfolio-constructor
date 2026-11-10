@@ -105,7 +105,7 @@ def stress(root: Path, log=print) -> dict:
                             "yield_bp": s["yield"]["coef"][h], "yield_se": s["yield"]["se"][h],
                             "promise_pct": 100.0 * float(plan.schedule.unit_value(YIELD + dy) / plan.schedule.unit_value(YIELD) - 1.0),
                             "policies": policies}
-        result["shocks"][sid] = {"name": name, "per": s["per"], "unit": s["unit"], "events": s["stocks"]["n"][0], "horizons": rows}
+        result["shocks"][sid] = {"name": name, "per": s["per"], "unit": s["unit"], "events": {"stocks": s["stocks"]["n"][0], "yield": s["yield"]["n"][0]}, "horizons": rows}
         day0 = rows["0"]
         log(f"  {name}, +{s['per']:g} {s['unit']}: stocks {day0['stocks_pct']:+.2f}%, yield {day0['yield_bp']:+.1f} bp, the promise {day0['promise_pct']:+.2f}%; "
             + ", ".join(f"{p} {v['points']:+.2f}" for p, v in day0["policies"].items()))
