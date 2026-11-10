@@ -4,7 +4,15 @@
 
 **Explore it:** [shmorsi.github.io/projects/deep-portfolio-constructor.html](https://shmorsi.github.io/projects/deep-portfolio-constructor.html). Slide the growth toy, pick a strategy and a start year, and scrub through the network's holdings since 1960.
 
-**Also in this repository: the [Pension Lab](#pension-lab-what-it-costs-to-keep-a-pension-promise).** The same method (train a policy through a differentiable simulator, fix the test before running it) pointed at a pension plan: liabilities indexed to inflation, a funded ratio, and a sponsor who pays for every shortfall.
+**One question, three studies: can AI help someone who invests for decades, and how would you know?**
+
+| | Study | What it asks | Where |
+|---|---|---|---|
+| 1 | **Wealth study** | Can a network trained on the growth of wealth build a better long-only portfolio than holding the market? | this README, from the top |
+| 2 | **[Pension Lab](#pension-lab-what-it-costs-to-keep-a-pension-promise)** | What does it cost to keep a pension promise funded, and does a learned policy cost less than a glide path? | this repository, `src/dpc/pension/` |
+| 3 | **[World Shock Lab](https://github.com/shmorsi/world-shock-lab)** | What does a central-bank or oil surprise do to the markets a long-term investor holds? | its own repository; [the lab](https://shmorsi.github.io/shock-lab/) |
+
+The three share one method: fix the test before running it, score on data the model never saw, and publish the answer when it is no.
 
 ```mermaid
 flowchart LR
