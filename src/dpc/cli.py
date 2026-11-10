@@ -67,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Deep Portfolio Constructor pipeline")
     parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
                                           "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site",
-                                          "pension", "pension-run", "pension-site"])
+                                          "pension", "pension-run", "pension-site", "pension-anatomy", "pension-figures"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None) -> int:
     elif args.stage == "wealth":
         stages = ["wealth-data", "wealth-baselines", "wealth-train", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site"]
     elif args.stage == "pension":
-        stages = ["pension-run", "pension-site"]
+        stages = ["pension-run", "pension-figures", "pension-site"]
     else:
         stages = [args.stage]
 
@@ -90,6 +90,17 @@ def main(argv: list[str] | None = None) -> int:
             from dpc.pension.run import study
 
             study(cfg.root, refresh=args.refresh)
+            continue
+        if stage == "pension-anatomy":   # after the test: what the scored policy holds, and when (a description, not a test)
+            from dpc.pension.anatomy import anatomy
+
+            anatomy(cfg.root)
+            continue
+        if stage == "pension-figures":
+            from dpc.pension.figures import render
+
+            for path in render(cfg.root):
+                print(f"wrote {path.relative_to(cfg.root)}")
             continue
         if stage == "pension-site":
             from dpc.pension.site import export

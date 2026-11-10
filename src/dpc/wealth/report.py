@@ -49,7 +49,9 @@ def _params(cfg: Config, panel) -> int:
 
 
 def _test_count(cfg: Config) -> int:
-    out = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q"], cwd=cfg.root, capture_output=True, text=True)
+    """Tests of this study and the code it shares. The Pension Lab's tests are counted in its own export (dpc.pension.site)."""
+    out = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "--ignore=tests/test_pension.py"],
+                         cwd=cfg.root, capture_output=True, text=True)
     return len([ln for ln in out.stdout.splitlines() if "::" in ln])
 
 

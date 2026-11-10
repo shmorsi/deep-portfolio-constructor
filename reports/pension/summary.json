@@ -1,0 +1,312 @@
+{
+ "commit": "304f7c8",
+ "data": {
+  "first_month": "1953-04",
+  "last_month": "2026-09",
+  "months": 882,
+  "equity_mean_annual": 0.11928027210884354,
+  "equity_vol_annual": 0.15024310004306357,
+  "yield_min": 0.0055000000000000005,
+  "yield_max": 0.15839999999999999,
+  "inflation_mean_annual": 0.03466885426649159,
+  "sources": {
+   "equity": "Kenneth French data library, F-F_Research_Data_Factors (Mkt-RF + RF)",
+   "yield": "FRED DGS10 (month-end, from 1962-01) and GS10 (monthly average, before)",
+   "inflation": "FRED CPIAUCNS"
+  }
+ },
+ "plan": {
+  "funded_at_start": 0.9,
+  "amortisation_months": 120,
+  "cost_bps": 10.0,
+  "horizon_months": 240,
+  "schedule_years": 60,
+  "assets": [
+   "stocks",
+   "10-year bonds",
+   "matching bonds"
+  ],
+  "liability_duration_at_4pct": 14.150245533176918,
+  "liability_convexity_at_4pct": 361.27889793534706,
+  "first_year_benefit_share_at_4pct": 0.06556792090679536
+ },
+ "generator": {
+  "yield_phi": 0.9939438264727519,
+  "yield_mean": 0.059803145057291805,
+  "inflation_phi": 0.545218534890182,
+  "block_months": 12,
+  "months_fitted": 881
+ },
+ "training": {
+  "seeds": [
+   1,
+   2,
+   3
+  ],
+  "steps": 300,
+  "batch": 1024,
+  "train_scenarios": 8192,
+  "validation_scenarios": 4096,
+  "parameters": 1507,
+  "networks": 24
+ },
+ "simulated": {
+  "scenarios": 10000,
+  "seed": 2026,
+  "policies": {
+   "60/40": {
+    "mean_cost": 0.1429460644721985,
+    "cvar_cost": 0.8597734570503235,
+    "score": 1.002719521522522,
+    "funded_end_share": 0.9017,
+    "funded_end_median": 2.5914478302001953,
+    "funded_low_mean": 0.7059034705162048,
+    "funded_low_p05": 0.4417855441570282,
+    "stocks_mean": 0.5999999642372131,
+    "bonds_mean": 0.40000006556510925,
+    "matching_mean": 0.0,
+    "left_mean": 0.018270833417773247
+   },
+   "Liability-driven 40/60": {
+    "mean_cost": 0.10104847699403763,
+    "cvar_cost": 0.5853546857833862,
+    "score": 0.6864031627774239,
+    "funded_end_share": 0.9111,
+    "funded_end_median": 2.0668187141418457,
+    "funded_low_mean": 0.7803720831871033,
+    "funded_low_p05": 0.5728133320808411,
+    "stocks_mean": 0.40000006556510925,
+    "bonds_mean": 0.0,
+    "matching_mean": 0.5999999642372131,
+    "left_mean": 0.010572925209999084
+   },
+   "Fully matched": {
+    "mean_cost": 0.18229497969150543,
+    "cvar_cost": 0.6241151094436646,
+    "score": 0.80641008913517,
+    "funded_end_share": 0.5734,
+    "funded_end_median": 1.0541961193084717,
+    "funded_low_mean": 0.7546681761741638,
+    "funded_low_p05": 0.5398178100585938,
+    "stocks_mean": 0.0,
+    "bonds_mean": 0.0,
+    "matching_mean": 1.0,
+    "left_mean": 0.03645872697234154
+   },
+   "Glide path": {
+    "mean_cost": 0.09886429458856583,
+    "cvar_cost": 0.6907019019126892,
+    "score": 0.789566196501255,
+    "funded_end_share": 0.9272,
+    "funded_end_median": 1.730324149131775,
+    "funded_low_mean": 0.7505063414573669,
+    "funded_low_p05": 0.47521480917930603,
+    "stocks_mean": 0.30957886576652527,
+    "bonds_mean": 0.0,
+    "matching_mean": 0.6904212236404419,
+    "left_mean": 0.010654919780790806
+   },
+   "Learned policy": {
+    "mean_cost": 0.04950309172272682,
+    "cvar_cost": 0.30213916301727295,
+    "score": 0.35164225473999977,
+    "funded_end_share": 0.9793,
+    "funded_end_median": 2.2036166191101074,
+    "funded_low_mean": 0.8189948797225952,
+    "funded_low_p05": 0.6172055006027222,
+    "stocks_mean": 0.1819130778312683,
+    "bonds_mean": 0.02504495345056057,
+    "matching_mean": 0.793042004108429,
+    "left_mean": 0.001716967555694282
+   }
+  },
+  "learned_minus": {
+   "60/40": {
+    "difference": -0.6510772667825222,
+    "lo": -0.6854553238488734,
+    "hi": -0.6181468110531569,
+    "verdict": "better"
+   },
+   "Liability-driven 40/60": {
+    "difference": -0.3347609080374241,
+    "lo": -0.3568458126857877,
+    "hi": -0.31390736624598503,
+    "verdict": "better"
+   },
+   "Fully matched": {
+    "difference": -0.4547678343951702,
+    "lo": -0.47312015453353523,
+    "hi": -0.4368472184054554,
+    "verdict": "better"
+   },
+   "Glide path": {
+    "difference": -0.43792394176125526,
+    "lo": -0.46904637273401023,
+    "hi": -0.40683191707357763,
+    "verdict": "better"
+   }
+  }
+ },
+ "model_risk": {
+  "scenarios": 10000,
+  "seed": 2027,
+  "policies": {
+   "60/40": {
+    "mean_cost": 0.18429407477378845,
+    "cvar_cost": 1.2110759019851685,
+    "score": 1.395369976758957,
+    "funded_end_share": 0.8535,
+    "funded_end_median": 2.840798854827881,
+    "funded_low_mean": 0.6865614056587219,
+    "funded_low_p05": 0.36281734704971313,
+    "stocks_mean": 0.5999999642372131,
+    "bonds_mean": 0.40000006556510925,
+    "matching_mean": 0.0,
+    "left_mean": 0.0377250500023365
+   },
+   "Liability-driven 40/60": {
+    "mean_cost": 0.14242787659168243,
+    "cvar_cost": 0.9585543870925903,
+    "score": 1.1009822636842728,
+    "funded_end_share": 0.8486,
+    "funded_end_median": 2.1063249111175537,
+    "funded_low_mean": 0.7548945546150208,
+    "funded_low_p05": 0.491366446018219,
+    "stocks_mean": 0.40000006556510925,
+    "bonds_mean": 0.0,
+    "matching_mean": 0.5999999642372131,
+    "left_mean": 0.029835226014256477
+   },
+   "Fully matched": {
+    "mean_cost": 0.20578813552856445,
+    "cvar_cost": 0.7796375155448914,
+    "score": 0.9854256510734558,
+    "funded_end_share": 0.5301,
+    "funded_end_median": 1.0234845876693726,
+    "funded_low_mean": 0.7409670948982239,
+    "funded_low_p05": 0.5037539601325989,
+    "stocks_mean": 0.0,
+    "bonds_mean": 0.0,
+    "matching_mean": 1.0,
+    "left_mean": 0.04686115309596062
+   },
+   "Glide path": {
+    "mean_cost": 0.14144928753376007,
+    "cvar_cost": 1.1351401805877686,
+    "score": 1.2765894681215286,
+    "funded_end_share": 0.8771,
+    "funded_end_median": 1.7859716415405273,
+    "funded_low_mean": 0.7267991900444031,
+    "funded_low_p05": 0.38295435905456543,
+    "stocks_mean": 0.3217709958553314,
+    "bonds_mean": 0.0,
+    "matching_mean": 0.678229033946991,
+    "left_mean": 0.03023548610508442
+   },
+   "Learned policy": {
+    "mean_cost": 0.07018648087978363,
+    "cvar_cost": 0.49740082025527954,
+    "score": 0.5675873011350632,
+    "funded_end_share": 0.9167,
+    "funded_end_median": 2.233790636062622,
+    "funded_low_mean": 0.8056601285934448,
+    "funded_low_p05": 0.5839475393295288,
+    "stocks_mean": 0.17387719452381134,
+    "bonds_mean": 0.022874608635902405,
+    "matching_mean": 0.8032482266426086,
+    "left_mean": 0.00963276345282793
+   }
+  },
+  "learned_minus": {
+   "60/40": {
+    "difference": -0.8277826756238937,
+    "lo": -0.869435029476881,
+    "hi": -0.7862398838624358,
+    "verdict": "better"
+   },
+   "Liability-driven 40/60": {
+    "difference": -0.5333949625492096,
+    "lo": -0.5671011013910174,
+    "hi": -0.4994511967524886,
+    "verdict": "better"
+   },
+   "Fully matched": {
+    "difference": -0.41783834993839264,
+    "lo": -0.4438605660572648,
+    "hi": -0.39179945439100267,
+    "verdict": "better"
+   },
+   "Glide path": {
+    "difference": -0.7090021669864655,
+    "lo": -0.753610622882843,
+    "hi": -0.6650579376146197,
+    "verdict": "better"
+   }
+  }
+ },
+ "history": {
+  "first_start": 1973,
+  "last_start": 2006,
+  "starts": 34,
+  "refit_every_years": 5,
+  "block_years": 10,
+  "policies": {
+   "60/40": {
+    "mean_cost": 0.09737980221946012,
+    "worst_cost": 0.5394341349601746,
+    "funded_end_share": 1.0,
+    "stocks_mean": 0.6000000238418579
+   },
+   "Liability-driven 40/60": {
+    "mean_cost": 0.06759503330720369,
+    "worst_cost": 0.4211972951889038,
+    "funded_end_share": 1.0,
+    "stocks_mean": 0.40000006556510925
+   },
+   "Fully matched": {
+    "mean_cost": 0.08418174351647716,
+    "worst_cost": 0.5055148005485535,
+    "funded_end_share": 0.8823529411764706,
+    "stocks_mean": 0.0
+   },
+   "Glide path": {
+    "mean_cost": 0.06276884006665033,
+    "worst_cost": 0.4691525399684906,
+    "funded_end_share": 1.0,
+    "stocks_mean": 0.2777138142024769
+   },
+   "Learned policy": {
+    "mean_cost": 0.06333859540309812,
+    "worst_cost": 0.556292712688446,
+    "funded_end_share": 1.0,
+    "stocks_mean": 0.1700091729324092
+   }
+  },
+  "learned_minus": {
+   "60/40": {
+    "difference": -0.034041206816361996,
+    "lo": -0.07124079346784343,
+    "hi": 0.0005718965612365518,
+    "verdict": "no detectable difference"
+   },
+   "Liability-driven 40/60": {
+    "difference": -0.004256437904105577,
+    "lo": -0.005163348872327548,
+    "hi": 0.0075596154349006905,
+    "verdict": "no detectable difference"
+   },
+   "Fully matched": {
+    "difference": -0.020843148113379034,
+    "lo": -0.04334481886480182,
+    "hi": 0.026104259679842083,
+    "verdict": "no detectable difference"
+   },
+   "Glide path": {
+    "difference": 0.0005697553364477833,
+    "lo": -0.007185327160250916,
+    "hi": 0.012476961235498654,
+    "verdict": "no detectable difference"
+   }
+  }
+ }
+}
