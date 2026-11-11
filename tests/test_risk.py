@@ -251,7 +251,8 @@ def test_documents_are_rendered_from_the_summary_alone(study):
     assert f"{s['window']['months']} months" in block and "HAR regression" in block and "Oracle (not investable)" in block
     md = report.results_md(s, "abc1234")
     assert "## Inverse-volatility portfolio" in md and "## Quantile loss by decade" in md and "commit abc1234" in md
-    site = report.export(s, "abc1234")
+    site = report.export(s, "abc1234", ROOT)
+    assert int(site["stats"]["tests"]["display"]) >= 15
     assert site["stats"]["statusPatchS2"]["display"] == "not run" and site["stats"]["earnsCpuS0"]["display"] == "no"
     assert site["stats"]["wqlFtCpuS0"]["display"].endswith("×") and all(v["source"].startswith("deep-portfolio-constructor") for v in site["stats"].values())
 
@@ -264,7 +265,7 @@ def test_committed_documents_match_the_committed_summary():
     s = json.loads((out / "summary.json").read_text())
     site = json.loads((out / "site_risk.json").read_text())
     commit = site["commit"]
-    assert site == json.loads(json.dumps(report.export(s, commit), ensure_ascii=False))
+    assert site == json.loads(json.dumps(report.export(s, commit, ROOT), ensure_ascii=False))
     assert (out / "results.md").read_text() == report.results_md(s, commit) + "\n"
     readme = (ROOT / "README.md").read_text()
     assert report.START + readme.split(report.START, 1)[1].split(report.END, 1)[0] + report.END == report.readme_section(s, commit)

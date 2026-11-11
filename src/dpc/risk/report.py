@@ -44,22 +44,34 @@ def order(s: dict) -> list[str]:
     return classical + [n for n in names if n not in classical]
 
 
-def accuracy_table(s: dict) -> str:
-    rows = ["| Forecaster | Quantile loss, ratio to HAR [95% interval] | Verdict | Absolute error, ratio to HAR | QLIKE, ratio to HAR | Inside its 80% band |",
-            "|---|---:|---|---:|---:|---:|"]
+def md_table(headers: list[str], rows: list[list[str]], bold_first: tuple[str, ...] = ()) -> str:
+    """A Markdown table: the first column left-aligned, the rest right-aligned except verdicts."""
+    align = ["---"] + ["---" if h == "Verdict" else "---:" for h in headers[1:]]
+    out = ["| " + " | ".join(headers) + " |", "|" + "|".join(align) + "|"]
+    for r in rows:
+        first = f"**{r[0]}**" if r[0] in bold_first else r[0]
+        out.append("| " + " | ".join([first, *r[1:]]) + " |")
+    return "\n".join(out)
+
+
+ACCURACY_HEADERS = ["Forecaster", "Quantile loss, ratio to HAR [95% interval]", "Verdict", "Absolute error, ratio to HAR", "QLIKE, ratio to HAR", "Inside its 80% band"]
+PORTFOLIO_HEADERS = ["Portfolio fed by", "Realized volatility a year", "Against HAR's portfolio: volatility, t", "Verdict", "$1 became", "Worst fall", "Traded a year"]
+
+
+def accuracy_rows(s: dict) -> list[list[str]]:
+    rows = []
     for name in order(s):
         a = s["accuracy"][name]
         if name == "har":
-            rows.append(f"| **{s['labels'][name]}** | 1 (the standard to beat; loss {num(a['wql'], 4)}) |  | 1 | 1 | {pct(a['cover80'], 0)} |")
+            rows.append([s["labels"][name], f"1 (the standard to beat; loss {num(a['wql'], 4)})", "", "1", "1", pct(a["cover80"], 0)])
             continue
         v = a["vs_har"]
-        rows.append(f"| {s['labels'][name]} | {ratio(v['wql'])} | {v['wql']['verdict']} | {num(v['mae']['ratio'], 3)} | {num(v['qlike']['ratio'], 3)} | {pct(a['cover80'], 0)} |")
-    return "\n".join(rows)
+        rows.append([s["labels"][name], ratio(v["wql"]), v["wql"]["verdict"], num(v["mae"]["ratio"], 3), num(v["qlike"]["ratio"], 3), pct(a["cover80"], 0)])
+    return rows
 
 
-def portfolio_table(s: dict, rule: str) -> str:
-    rows = ["| Portfolio fed by | Realized volatility a year | Against HAR's portfolio: volatility, *t* | Verdict | $1 became | Worst fall | Traded a year |",
-            "|---|---:|---:|---|---:|---:|---:|"]
+def portfolio_rows(s: dict, rule: str) -> list[list[str]]:
+    rows = []
     P = s["portfolios"][rule]
     for name in [*order(s), "oracle"]:
         p = P[name]
@@ -68,18 +80,23 @@ def portfolio_table(s: dict, rule: str) -> str:
         else:
             c = p["vs_har"]
             versus, verdict = f"{pct(c['volatility_change'], 1, sign=True)}, {num(c['t_nw'])}", c["verdict"]
-        rows.append(f"| {s['labels'][name]} | {pct(p['realized_volatility'])} | {versus} | {verdict} | {money(p['terminal_wealth'])} | {pct(p['max_drawdown'], 0)} | {pct(p['traded_per_year'], 0)} |")
+        rows.append([s["labels"][name], pct(p["realized_volatility"]), versus, verdict, money(p["terminal_wealth"]), pct(p["max_drawdown"], 0), pct(p["traded_per_year"], 0)])
     m = s["references"]["market"]
-    rows.append(f"| {s['labels']['market']} | {pct(m['realized_volatility'])} |  |  | {money(m['terminal_wealth'])} | {pct(m['max_drawdown'], 0)} | {pct(m['traded_per_year'], 0)} |")
-    return "\n".join(rows)
+    rows.append([s["labels"]["market"], pct(m["realized_volatility"]), "", "", money(m["terminal_wealth"]), pct(m["max_drawdown"], 0), pct(m["traded_per_year"], 0)])
+    return rows
+
+
+def accuracy_table(s: dict) -> str:
+    return md_table(ACCURACY_HEADERS, accuracy_rows(s), bold_first=(s["labels"]["har"],))
+
+
+def portfolio_table(s: dict, rule: str) -> str:
+    return md_table(PORTFOLIO_HEADERS, portfolio_rows(s, rule))
 
 
 def decade_table(s: dict) -> str:
     names = [n for n in order(s) if n != "har"]
-    rows = ["| Decade | " + " | ".join(s["labels"][n] for n in names) + " |", "|---|" + "---:|" * len(names)]
-    for decade, row in s["decades_wql_vs_har"].items():
-        rows.append(f"| {decade} | " + " | ".join(num(row[n], 3) for n in names) + " |")
-    return "\n".join(rows)
+    return md_table(["Decade", *[s["labels"][n] for n in names]], [[decade, *[num(row[n], 3) for n in names]] for decade, row in s["decades_wql_vs_har"].items()])
 
 
 def model_sentence(s: dict, checkpoint: str) -> str:
@@ -110,7 +127,8 @@ def oracle_sentence(s: dict) -> str:
 def classical_sentence(s: dict) -> str:
     best = min((n for n in ("last", "mean60", "ewma") if n in s["accuracy"]), key=lambda n: s["accuracy"][n]["vs_har"]["wql"]["ratio"])
     v = s["accuracy"][best]["vs_har"]["wql"]
-    return (f"Among the classical forecasters, HAR is the standard: the closest rival, {s['labels'][best].lower()}, has a quantile loss "
+    rival = {"last": "last month's volatility", "mean60": "the 60-month mean", "ewma": "the RiskMetrics average"}[best]
+    return (f"Among the classical forecasters, HAR is the standard: the closest rival, {rival}, has a quantile loss "
             f"{ratio(v)} times HAR's ({v['verdict']}).")
 
 
@@ -190,10 +208,16 @@ def results_md(s: dict, commit: str) -> str:
     return "\n".join(parts)
 
 
-def export(s: dict, commit: str) -> dict:
+def test_count(root: Path) -> int:
+    """Test functions in tests/test_risk.py (counted from the file, as the Pension Lab does, so the export does not depend on what is installed)."""
+    file = root / "tests" / "test_risk.py"
+    return sum(1 for line in file.read_text().splitlines() if line.startswith("def test_")) if file.is_file() else 0
+
+
+def export(s: dict, commit: str, root: Path) -> dict:
     """reports/risk/site_risk.json: the figures, tables and sentences the website shows."""
     where = "deep-portfolio-constructor reports/risk/summary.json"
-    stats: dict[str, dict] = {}
+    stats: dict[str, dict] = {"tests": {"label": "Tests of the risk study's code", "display": str(test_count(root)), "source": "deep-portfolio-constructor tests/test_risk.py"}}
 
     def put(key: str, label_: str, display: str, path: str) -> None:
         stats[key] = {"label": label_, "display": display, "source": f"{where} [{path}]"}
@@ -231,7 +255,13 @@ def export(s: dict, commit: str) -> dict:
         "stats": stats,
         "sentences": {**{f"model_{c}": model_sentence(s, c).replace("**", "").replace("*", "") for c in s["models"]},
                       "oracle": oracle_sentence(s).replace("*", ""), "classical": classical_sentence(s)},
-        "tables": {"accuracy": accuracy_table(s), "min_variance": portfolio_table(s, "min_variance")},
+        "tables": {
+            "accuracy": {"caption": f"Forecasts of next month's volatility, {s['window']['industries']} industries and {s['window']['months']} months pooled. Lower is better; 1 is HAR. "
+                                    "Better needs the whole interval below 1.",
+                         "headers": ACCURACY_HEADERS, "rows": accuracy_rows(s), "source": f"{where} [accuracy]"},
+            "min_variance": {"caption": "One long-only minimum-variance rule, fed by each forecaster's volatilities. Realized volatility is measured from the portfolio's own daily returns.",
+                             "headers": PORTFOLIO_HEADERS, "rows": portfolio_rows(s, "min_variance"), "source": f"{where} [portfolios.min_variance, references.market]"},
+        },
     }
 
 
@@ -243,7 +273,7 @@ def write_reports(root: Path, s: dict, commit: str | None = None) -> None:
     commit = commit or head_commit(root)
     out = root / "reports" / "risk"
     (out / "results.md").write_text(results_md(s, commit) + "\n")
-    (out / "site_risk.json").write_text(json.dumps(export(s, commit), indent=1, ensure_ascii=False) + "\n")
+    (out / "site_risk.json").write_text(json.dumps(export(s, commit, root), indent=1, ensure_ascii=False) + "\n")
     readme = root / "README.md"
     text = readme.read_text() if readme.is_file() else ""
     if START in text and END in text:
