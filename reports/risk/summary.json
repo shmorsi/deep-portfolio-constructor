@@ -1,0 +1,789 @@
+{
+ "protocol": "docs/risk_protocol.md",
+ "window": {
+  "first_month": "1960-01",
+  "last_month": "2026-09",
+  "months": 801,
+  "industries": 30
+ },
+ "tests": {
+  "bootstrap_block_months": 12,
+  "bootstrap_draws": 5000,
+  "nw_lags": 12,
+  "seed": 42,
+  "cost_bps": 10.0,
+  "max_weight": 0.2
+ },
+ "labels": {
+  "last": "Last month",
+  "mean60": "60-month mean",
+  "ewma": "RiskMetrics EWMA",
+  "har": "HAR regression",
+  "tsfm_zero_cpu_s0": "CPU model, zero-shot",
+  "tsfm_ft_cpu_s0": "CPU model, fine-tuned",
+  "tsfm_zero_cpu_s0_seed1": "CPU model, seed 1, zero-shot",
+  "tsfm_ft_cpu_s0_seed1": "CPU model, seed 1, fine-tuned",
+  "tsfm_zero_cpu_s0_seed2": "CPU model, seed 2, zero-shot",
+  "tsfm_ft_cpu_s0_seed2": "CPU model, seed 2, fine-tuned",
+  "market": "Market (reference)",
+  "oracle": "Oracle (not investable)"
+ },
+ "rules": {
+  "min_variance": "Minimum variance",
+  "inverse_volatility": "Inverse volatility"
+ },
+ "accuracy": {
+  "last": {
+   "wql": 0.23210214409920454,
+   "mae": 0.015034109973400373,
+   "qlike": 0.3566695339050146,
+   "cover80": 0.7913025384935497,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.170694561803708,
+     "ci_low": 1.1254145593133695,
+     "ci_high": 1.2139911217185475,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.1822294512248943,
+     "ci_low": 1.140402296370631,
+     "ci_high": 1.2240432578060594,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 1.1221926697008435,
+     "ci_low": 0.9832816527965944,
+     "ci_high": 1.2967446991632088,
+     "verdict": "no detectable difference"
+    }
+   }
+  },
+  "mean60": {
+   "wql": 0.27361777963262807,
+   "mae": 0.01764883517059577,
+   "qlike": 0.6349152392449676,
+   "cover80": 0.7603828547648772,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.3800943023249772,
+     "ci_low": 1.2902257055682687,
+     "ci_high": 1.4821485171889237,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.3878422304618054,
+     "ci_low": 1.2952111727295639,
+     "ci_high": 1.4916839567898865,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 1.9976397186528598,
+     "ci_low": 1.5799053948973796,
+     "ci_high": 2.508952820376087,
+     "verdict": "worse"
+    }
+   }
+  },
+  "ewma": {
+   "wql": 0.21277843962523668,
+   "mae": 0.013741467425017756,
+   "qlike": 0.31051341716092723,
+   "cover80": 0.7910112359550562,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.0732281819502454,
+     "ci_low": 1.0305089395552076,
+     "ci_high": 1.12046834128497,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.0805805945045328,
+     "ci_low": 1.0400282387697344,
+     "ci_high": 1.125199720562398,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 0.9769712505765932,
+     "ci_low": 0.8660634980122877,
+     "ci_high": 1.0881520448277107,
+     "verdict": "no detectable difference"
+    }
+   }
+  },
+  "har": {
+   "wql": 0.19826020524226326,
+   "mae": 0.012716744586106957,
+   "qlike": 0.31783270692731963,
+   "cover80": 0.7896379525593009,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.0,
+     "ci_low": 1.0,
+     "ci_high": 1.0,
+     "verdict": "no detectable difference"
+    },
+    "mae": {
+     "ratio": 1.0,
+     "ci_low": 1.0,
+     "ci_high": 1.0,
+     "verdict": "no detectable difference"
+    },
+    "qlike": {
+     "ratio": 1.0,
+     "ci_low": 1.0,
+     "ci_high": 1.0,
+     "verdict": "no detectable difference"
+    }
+   }
+  },
+  "tsfm_zero_cpu_s0": {
+   "wql": 0.2257049354275856,
+   "mae": 0.014147683604056386,
+   "qlike": 0.3174564128703637,
+   "cover80": 0.7603828547648772,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.138427831000106,
+     "ci_low": 1.1019745060139752,
+     "ci_high": 1.175819221946577,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.1125240039430162,
+     "ci_low": 1.0756365898512004,
+     "ci_high": 1.151842391553799,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 0.998816062511018,
+     "ci_low": 0.90936309173143,
+     "ci_high": 1.1193140093396738,
+     "verdict": "no detectable difference"
+    }
+   }
+  },
+  "tsfm_ft_cpu_s0": {
+   "wql": 0.20472673688839327,
+   "mae": 0.013138590135255413,
+   "qlike": 0.3596461507951756,
+   "cover80": 0.7975031210986268,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.0326163873291077,
+     "ci_low": 1.0127963967891611,
+     "ci_high": 1.0525759869265563,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.0331724480500553,
+     "ci_low": 1.0126063749515435,
+     "ci_high": 1.054249640460511,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 1.1315580270894452,
+     "ci_low": 1.0678378547104417,
+     "ci_high": 1.2048450457240882,
+     "verdict": "worse"
+    }
+   }
+  },
+  "tsfm_zero_cpu_s0_seed1": {
+   "wql": 0.22317502923901614,
+   "mae": 0.013986593995347633,
+   "qlike": 0.3145463235704779,
+   "cover80": 0.7719101123595505,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.1256672965021313,
+     "ci_low": 1.092537023033775,
+     "ci_high": 1.159988037340407,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.0998564845462089,
+     "ci_low": 1.0678629518072646,
+     "ci_high": 1.1345933302354072,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 0.9896600214980606,
+     "ci_low": 0.9048558374532112,
+     "ci_high": 1.097314549718944,
+     "verdict": "no detectable difference"
+    }
+   }
+  },
+  "tsfm_ft_cpu_s0_seed1": {
+   "wql": 0.20491490060075376,
+   "mae": 0.013126646597325363,
+   "qlike": 0.3742828249173576,
+   "cover80": 0.768248023304203,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.0335654618654249,
+     "ci_low": 1.0131894518376343,
+     "ci_high": 1.0530541695694464,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.0322332502978966,
+     "ci_low": 1.0088306594157397,
+     "ci_high": 1.0535312020972842,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 1.1776095309251693,
+     "ci_low": 1.1263662247464892,
+     "ci_high": 1.2320730492535295,
+     "verdict": "worse"
+    }
+   }
+  },
+  "tsfm_zero_cpu_s0_seed2": {
+   "wql": 0.22966098528425957,
+   "mae": 0.014221975879368414,
+   "qlike": 50896.81051239072,
+   "cover80": 0.7519766957969205,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.1583816581024229,
+     "ci_low": 1.124272288423401,
+     "ci_high": 1.1920272415939126,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.1183660867818264,
+     "ci_low": 1.0863395050667055,
+     "ci_high": 1.151328960876747,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 160137.1079913105,
+     "ci_low": 1.2122302787400618,
+     "ci_high": 579782.5512670259,
+     "verdict": "worse"
+    }
+   }
+  },
+  "tsfm_ft_cpu_s0_seed2": {
+   "wql": 0.20691484179734126,
+   "mae": 0.013244187215730079,
+   "qlike": 0.3742989597554405,
+   "cover80": 0.7377028714107365,
+   "vs_har": {
+    "wql": {
+     "ratio": 1.0436529183680734,
+     "ci_low": 1.0240340242720027,
+     "ci_high": 1.0619510284248508,
+     "verdict": "worse"
+    },
+    "mae": {
+     "ratio": 1.0414762304968643,
+     "ci_low": 1.0202230953309774,
+     "ci_high": 1.0601332452308583,
+     "verdict": "worse"
+    },
+    "qlike": {
+     "ratio": 1.1776602961161995,
+     "ci_low": 1.1331908238846045,
+     "ci_high": 1.234743369470215,
+     "verdict": "worse"
+    }
+   }
+  }
+ },
+ "decades_wql_vs_har": {
+  "1960s": {
+   "last": 1.1858310645692787,
+   "mean60": 1.20267706408731,
+   "ewma": 1.1127267929667428,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.171008704149333,
+   "tsfm_ft_cpu_s0": 1.0553664982656226,
+   "tsfm_zero_cpu_s0_seed1": 1.182551480972702,
+   "tsfm_ft_cpu_s0_seed1": 1.0369869295952328,
+   "tsfm_zero_cpu_s0_seed2": 1.1914094172001362,
+   "tsfm_ft_cpu_s0_seed2": 1.0553779826847678
+  },
+  "1970s": {
+   "last": 1.1303317115858216,
+   "mean60": 1.4522483702440228,
+   "ewma": 1.0365741126820776,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.1288326142234197,
+   "tsfm_ft_cpu_s0": 1.0391503164262685,
+   "tsfm_zero_cpu_s0_seed1": 1.128493810939276,
+   "tsfm_ft_cpu_s0_seed1": 1.0330728011533648,
+   "tsfm_zero_cpu_s0_seed2": 1.1465930601287024,
+   "tsfm_ft_cpu_s0_seed2": 1.038457617084641
+  },
+  "1980s": {
+   "last": 1.298843447490141,
+   "mean60": 1.1790327247199635,
+   "ewma": 1.2006234464571723,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.1904118353349133,
+   "tsfm_ft_cpu_s0": 1.0378340768780565,
+   "tsfm_zero_cpu_s0_seed1": 1.2073549497563618,
+   "tsfm_ft_cpu_s0_seed1": 1.0540845006900776,
+   "tsfm_zero_cpu_s0_seed2": 1.2278715739066475,
+   "tsfm_ft_cpu_s0_seed2": 1.0635427437094822
+  },
+  "1990s": {
+   "last": 1.2259732630992919,
+   "mean60": 1.2796605494944886,
+   "ewma": 1.091886801381779,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.1628222455605974,
+   "tsfm_ft_cpu_s0": 1.0772367081806702,
+   "tsfm_zero_cpu_s0_seed1": 1.1543115394080352,
+   "tsfm_ft_cpu_s0_seed1": 1.0580464498210307,
+   "tsfm_zero_cpu_s0_seed2": 1.1672534971229043,
+   "tsfm_ft_cpu_s0_seed2": 1.0555981669170078
+  },
+  "2000s": {
+   "last": 1.066819866236679,
+   "mean60": 1.6849300734123547,
+   "ewma": 0.9816167949685507,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.04737986154494,
+   "tsfm_ft_cpu_s0": 1.0165716144169268,
+   "tsfm_zero_cpu_s0_seed1": 1.0385944304416417,
+   "tsfm_ft_cpu_s0_seed1": 1.024579554103829,
+   "tsfm_zero_cpu_s0_seed2": 1.092453404509102,
+   "tsfm_ft_cpu_s0_seed2": 1.0086669416159606
+  },
+  "2010s": {
+   "last": 1.1494383018389394,
+   "mean60": 1.3378804455149325,
+   "ewma": 1.0547189588205543,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.1874061750808669,
+   "tsfm_ft_cpu_s0": 1.0297138255261091,
+   "tsfm_zero_cpu_s0_seed1": 1.1245406943080158,
+   "tsfm_ft_cpu_s0_seed1": 1.0304079579269858,
+   "tsfm_zero_cpu_s0_seed2": 1.1656261017237899,
+   "tsfm_ft_cpu_s0_seed2": 1.0498549177263006
+  },
+  "2020s": {
+   "last": 1.1945178695661725,
+   "mean60": 1.333911931270357,
+   "ewma": 1.0873763035615323,
+   "har": 1.0,
+   "tsfm_zero_cpu_s0": 1.1323315325320995,
+   "tsfm_ft_cpu_s0": 0.9938210643793635,
+   "tsfm_zero_cpu_s0_seed1": 1.1061466154451316,
+   "tsfm_ft_cpu_s0_seed1": 1.0071738460426993,
+   "tsfm_zero_cpu_s0_seed2": 1.1572576774704773,
+   "tsfm_ft_cpu_s0_seed2": 1.0541736372418655
+  }
+ },
+ "portfolios": {
+  "min_variance": {
+   "last": {
+    "realized_volatility": 0.12292957033523584,
+    "volatility_monthly_returns": 0.13453370715626578,
+    "terminal_wealth": 512.46547402901,
+    "cagr": 0.09797948675381951,
+    "max_drawdown": -0.40970540811175804,
+    "traded_per_year": 10.850586236945768,
+    "vs_har": {
+     "diff_log_variance": 0.05840409142874966,
+     "t_nw": 11.126144152511193,
+     "ci_low": 0.04815376581007177,
+     "ci_high": 0.06792063554415098,
+     "volatility_change": 0.02963260631595932,
+     "verdict": "higher risk"
+    }
+   },
+   "mean60": {
+    "realized_volatility": 0.12464102141147014,
+    "volatility_monthly_returns": 0.13230337830227024,
+    "terminal_wealth": 1092.155611426847,
+    "cagr": 0.11049695260818115,
+    "max_drawdown": -0.3740809222725835,
+    "traded_per_year": 1.0147678520525947,
+    "vs_har": {
+     "diff_log_variance": 0.05971224868518411,
+     "t_nw": 6.853352904456596,
+     "ci_low": 0.04138508659421945,
+     "ci_high": 0.07591945325165671,
+     "volatility_change": 0.03030628729481366,
+     "verdict": "higher risk"
+    }
+   },
+   "ewma": {
+    "realized_volatility": 0.12150604911538501,
+    "volatility_monthly_returns": 0.1332654430610258,
+    "terminal_wealth": 543.8258739447587,
+    "cagr": 0.09895693036013675,
+    "max_drawdown": -0.4101013362137902,
+    "traded_per_year": 7.626133915744198,
+    "vs_har": {
+     "diff_log_variance": 0.02451197619625345,
+     "t_nw": 6.197143203105051,
+     "ci_low": 0.01663044206430838,
+     "ci_high": 0.03181997577527385,
+     "volatility_change": 0.012331400489802302,
+     "verdict": "higher risk"
+    }
+   },
+   "har": {
+    "realized_volatility": 0.1210254346779041,
+    "volatility_monthly_returns": 0.12997109490805273,
+    "terminal_wealth": 665.6744339506897,
+    "cagr": 0.10229048374013971,
+    "max_drawdown": -0.38739744242286855,
+    "traded_per_year": 5.669371297521146
+   },
+   "tsfm_zero_cpu_s0": {
+    "realized_volatility": 0.12238067969450744,
+    "volatility_monthly_returns": 0.13049593813180224,
+    "terminal_wealth": 525.1564741903895,
+    "cagr": 0.09838195432533725,
+    "max_drawdown": -0.39496182850688333,
+    "traded_per_year": 8.963473456999353,
+    "vs_har": {
+     "diff_log_variance": 0.04868269496887782,
+     "t_nw": 9.047943242366546,
+     "ci_low": 0.037943229669857574,
+     "ci_high": 0.058613867295199594,
+     "volatility_change": 0.024640016494942518,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_ft_cpu_s0": {
+    "realized_volatility": 0.12201645758942627,
+    "volatility_monthly_returns": 0.129201916679971,
+    "terminal_wealth": 663.1990835095849,
+    "cagr": 0.10222896375645929,
+    "max_drawdown": -0.393418703517078,
+    "traded_per_year": 6.436002454295457,
+    "vs_har": {
+     "diff_log_variance": 0.03176105482361116,
+     "t_nw": 7.527036341770067,
+     "ci_low": 0.02290432524007222,
+     "ci_high": 0.039210164801625216,
+     "volatility_change": 0.016007293133779577,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_zero_cpu_s0_seed1": {
+    "realized_volatility": 0.12257925061810127,
+    "volatility_monthly_returns": 0.13203908274320506,
+    "terminal_wealth": 689.9398670092835,
+    "cagr": 0.10288189495883793,
+    "max_drawdown": -0.390400975651364,
+    "traded_per_year": 9.716943069161887,
+    "vs_har": {
+     "diff_log_variance": 0.05233739766055198,
+     "t_nw": 8.648729834278221,
+     "ci_low": 0.040331346538707104,
+     "ci_high": 0.0634307179412759,
+     "volatility_change": 0.026514105596205262,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_ft_cpu_s0_seed1": {
+    "realized_volatility": 0.12160871332488149,
+    "volatility_monthly_returns": 0.12899578639532616,
+    "terminal_wealth": 661.3501692560774,
+    "cagr": 0.10218286487336492,
+    "max_drawdown": -0.39042062737441696,
+    "traded_per_year": 6.3039495193471815,
+    "vs_har": {
+     "diff_log_variance": 0.016074248100550272,
+     "t_nw": 4.465725088609198,
+     "ci_low": 0.008163773847009637,
+     "ci_high": 0.021273530775349565,
+     "volatility_change": 0.008069508432735795,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_zero_cpu_s0_seed2": {
+    "realized_volatility": 0.12336581466601049,
+    "volatility_monthly_returns": 0.13336137533599488,
+    "terminal_wealth": 546.7610260780435,
+    "cagr": 0.09904555373754298,
+    "max_drawdown": -0.4063471129134709,
+    "traded_per_year": 9.71099243871274,
+    "vs_har": {
+     "diff_log_variance": 0.05459508025014931,
+     "t_nw": 10.510076865257426,
+     "ci_low": 0.04462975601739819,
+     "ci_high": 0.06490332767252723,
+     "volatility_change": 0.027673531389032613,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_ft_cpu_s0_seed2": {
+    "realized_volatility": 0.1218641593780277,
+    "volatility_monthly_returns": 0.1293241022287747,
+    "terminal_wealth": 664.7705688521872,
+    "cagr": 0.10226804610297857,
+    "max_drawdown": -0.39545874830500904,
+    "traded_per_year": 6.616645494714745,
+    "vs_har": {
+     "diff_log_variance": 0.02218674557714814,
+     "t_nw": 5.3740434801931505,
+     "ci_low": 0.013881364284297074,
+     "ci_high": 0.029583326638242133,
+     "volatility_change": 0.011155132411384328,
+     "verdict": "higher risk"
+    }
+   },
+   "oracle": {
+    "realized_volatility": 0.10859523046649262,
+    "volatility_monthly_returns": 0.11227545807138126,
+    "terminal_wealth": 124.03314101106785,
+    "cagr": 0.07488960092537833,
+    "max_drawdown": -0.36546816932040616,
+    "traded_per_year": 10.773562834260321,
+    "vs_har": {
+     "diff_log_variance": -0.24746776719284594,
+     "t_nw": -21.289423560248657,
+     "ci_low": -0.27063087858659557,
+     "ci_high": -0.22645324390657884,
+     "volatility_change": -0.11638504596865573,
+     "verdict": "lower risk"
+    }
+   }
+  },
+  "inverse_volatility": {
+   "last": {
+    "realized_volatility": 0.14923204944513538,
+    "volatility_monthly_returns": 0.15603500560132155,
+    "terminal_wealth": 923.558098540982,
+    "cagr": 0.10771090264387762,
+    "max_drawdown": -0.5081671145811893,
+    "traded_per_year": 2.1628514725220707,
+    "vs_har": {
+     "diff_log_variance": -0.005295086072028596,
+     "t_nw": -4.99105468450339,
+     "ci_low": -0.007403285910166076,
+     "ci_high": -0.0032321300380303434,
+     "volatility_change": -0.002644041384889606,
+     "verdict": "lower risk"
+    }
+   },
+   "mean60": {
+    "realized_volatility": 0.1508957378095696,
+    "volatility_monthly_returns": 0.15681239578991055,
+    "terminal_wealth": 1129.0954240969047,
+    "cagr": 0.11105048290790664,
+    "max_drawdown": -0.5069313410647455,
+    "traded_per_year": 0.33484773470516116,
+    "vs_har": {
+     "diff_log_variance": 0.01861919679998679,
+     "t_nw": 6.224524930227733,
+     "ci_low": 0.012669880477483129,
+     "ci_high": 0.0242754447375944,
+     "volatility_change": 0.009353067499749956,
+     "verdict": "higher risk"
+    }
+   },
+   "ewma": {
+    "realized_volatility": 0.149349655969824,
+    "volatility_monthly_returns": 0.15615691308049426,
+    "terminal_wealth": 960.1922962348028,
+    "cagr": 0.10835663090891212,
+    "max_drawdown": -0.5082289731083358,
+    "traded_per_year": 1.4314973988524142,
+    "vs_har": {
+     "diff_log_variance": -0.00456810603983037,
+     "t_nw": -4.767479318722944,
+     "ci_low": -0.0065630518860452045,
+     "ci_high": -0.002790555410099178,
+     "volatility_change": -0.0022814465556281194,
+     "verdict": "lower risk"
+    }
+   },
+   "har": {
+    "realized_volatility": 0.1496103860779792,
+    "volatility_monthly_returns": 0.15599691671442525,
+    "terminal_wealth": 1020.4870404174579,
+    "cagr": 0.1093683405236594,
+    "max_drawdown": -0.5041846525918476,
+    "traded_per_year": 0.9405914329408869
+   },
+   "tsfm_zero_cpu_s0": {
+    "realized_volatility": 0.1497309080489592,
+    "volatility_monthly_returns": 0.15611983354296533,
+    "terminal_wealth": 943.0916817763425,
+    "cagr": 0.10805828533286044,
+    "max_drawdown": -0.5054783523593149,
+    "traded_per_year": 1.6203924471048916,
+    "vs_har": {
+     "diff_log_variance": 0.00441818432957905,
+     "t_nw": 3.868292125163991,
+     "ci_low": 0.0020458884749986125,
+     "ci_high": 0.006561816436767509,
+     "volatility_change": 0.002211534006639315,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_ft_cpu_s0": {
+    "realized_volatility": 0.15031323484150885,
+    "volatility_monthly_returns": 0.15638561231984988,
+    "terminal_wealth": 1018.2296800161303,
+    "cagr": 0.10933153682345575,
+    "max_drawdown": -0.5049871790633644,
+    "traded_per_year": 1.042774153072455,
+    "vs_har": {
+     "diff_log_variance": 0.013459621605829574,
+     "t_nw": 9.633490613105154,
+     "ci_low": 0.01067256717679319,
+     "ci_high": 0.016152055745589464,
+     "volatility_change": 0.006752506864470487,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_zero_cpu_s0_seed1": {
+    "realized_volatility": 0.14972816519877796,
+    "volatility_monthly_returns": 0.15605795036481335,
+    "terminal_wealth": 959.3247251009947,
+    "cagr": 0.10834162133152381,
+    "max_drawdown": -0.5038273026988127,
+    "traded_per_year": 1.7806046220370448,
+    "vs_har": {
+     "diff_log_variance": 0.002661019103155941,
+     "t_nw": 2.7751840490266586,
+     "ci_low": 0.0006211143655081104,
+     "ci_high": 0.004423326376715348,
+     "volatility_change": 0.0013313950720990064,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_ft_cpu_s0_seed1": {
+    "realized_volatility": 0.1502548669967337,
+    "volatility_monthly_returns": 0.15636676200305782,
+    "terminal_wealth": 1012.0174751459806,
+    "cagr": 0.10922983742322567,
+    "max_drawdown": -0.5052359620649339,
+    "traded_per_year": 1.0189320580186103,
+    "vs_har": {
+     "diff_log_variance": 0.00947788570950442,
+     "t_nw": 8.964776205316015,
+     "ci_low": 0.00729283958766551,
+     "ci_high": 0.011339737462216478,
+     "volatility_change": 0.004750189403007532,
+     "verdict": "higher risk"
+    }
+   },
+   "tsfm_zero_cpu_s0_seed2": {
+    "realized_volatility": 0.14929814679624617,
+    "volatility_monthly_returns": 0.1558233674121746,
+    "terminal_wealth": 914.9842712234155,
+    "cagr": 0.10755613539862963,
+    "max_drawdown": -0.5059164577200451,
+    "traded_per_year": 1.9436689690425968,
+    "vs_har": {
+     "diff_log_variance": -0.0055192973609127895,
+     "t_nw": -4.2201287171344415,
+     "ci_low": -0.008166949460159934,
+     "ci_high": -0.0030417363447541724,
+     "volatility_change": -0.002755844350379455,
+     "verdict": "lower risk"
+    }
+   },
+   "tsfm_ft_cpu_s0_seed2": {
+    "realized_volatility": 0.15021618111929183,
+    "volatility_monthly_returns": 0.15628772736743057,
+    "terminal_wealth": 1006.7679044639416,
+    "cagr": 0.109143416686182,
+    "max_drawdown": -0.5062023136864453,
+    "traded_per_year": 1.0973970486046438,
+    "vs_har": {
+     "diff_log_variance": 0.010105188140628748,
+     "t_nw": 9.341877103764487,
+     "ci_low": 0.007836446507278124,
+     "ci_high": 0.012011111880984839,
+     "volatility_change": 0.005065379948615112,
+     "verdict": "higher risk"
+    }
+   },
+   "oracle": {
+    "realized_volatility": 0.145924291338563,
+    "volatility_monthly_returns": 0.15125399016348556,
+    "terminal_wealth": 681.0262793146321,
+    "cagr": 0.10266706375520585,
+    "max_drawdown": -0.49845510143465754,
+    "traded_per_year": 2.0980286160900814,
+    "vs_har": {
+     "diff_log_variance": -0.05922225534835576,
+     "t_nw": -21.05987113031172,
+     "ci_low": -0.06495782614610782,
+     "ci_high": -0.05406606837916389,
+     "volatility_change": -0.029177013654060113,
+     "verdict": "lower risk"
+    }
+   }
+  }
+ },
+ "references": {
+  "market": {
+   "realized_volatility": 0.15945782300589043,
+   "volatility_monthly_returns": 0.15266216584729628,
+   "terminal_wealth": 928.7691599055416,
+   "cagr": 0.10780427817287719,
+   "max_drawdown": -0.5002582361473598,
+   "traded_per_year": 0.07431112659124497
+  }
+ },
+ "models": {
+  "cpu_s0": {
+   "label": "CPU model",
+   "parameters": 833440,
+   "sha256": "d41b77fd19881097a4d8fc400b4f198a8edbf242a6691147308d5ce2f4a08a91",
+   "weights": "public (tsfm-from-scratch results/runs/cpu_s0_seed0/model.pt)",
+   "status": "run",
+   "accuracy_verdict": "worse",
+   "portfolio_verdict": "higher risk",
+   "earns_its_place": false,
+   "refits": 14,
+   "refits_kept_pretrained": 0,
+   "tsfm_commit": "a5479fd",
+   "torch": "2.14.1+cpu",
+   "checkpoint_sha256": "d41b77fd19881097a4d8fc400b4f198a8edbf242a6691147308d5ce2f4a08a91"
+  },
+  "patch_s2": {
+   "label": "T4 model",
+   "parameters": 10083392,
+   "sha256": "85c46256cefa665b7eb0822f9877831563df85e22345670b40c4a115c16d0fd2",
+   "weights": "not public yet",
+   "status": "not run"
+  }
+ },
+ "described_after_the_test": {
+  "finetuned_quantile_loss_vs": {
+   "cpu_s0": {
+    "last": {
+     "ratio": 0.8820544837400962,
+     "ci_low": 0.8487006538904421,
+     "ci_high": 0.9214648685938209,
+     "verdict": "better"
+    },
+    "mean60": {
+     "ratio": 0.7482216147037991,
+     "ci_low": 0.6964886350951932,
+     "ci_high": 0.801556651881316,
+     "verdict": "better"
+    },
+    "ewma": {
+     "ratio": 0.962159217113234,
+     "ci_low": 0.9202638166179754,
+     "ci_high": 1.005642631243837,
+     "verdict": "no detectable difference"
+    },
+    "tsfm_zero_cpu_s0": {
+     "ratio": 0.90705476378064,
+     "ci_low": 0.8766775451408851,
+     "ci_high": 0.9407547514630773,
+     "verdict": "better"
+    }
+   }
+  }
+ }
+}

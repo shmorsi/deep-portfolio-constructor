@@ -7,6 +7,12 @@ name = "dpc"
 version = "0.1.0"
 description = "Deep Portfolio Constructor: a transformer that builds a long-only portfolio for long-term wealth, trained on the growth of wealth after costs through a differentiable simulator. The archived long-short study is in docs/longshort.md."
 requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Sherif Morsi" }]
+
+[project.urls]
+Homepage = "https://shmorsi.github.io/projects/deep-portfolio-constructor.html"
+Repository = "https://github.com/shmorsi/deep-portfolio-constructor"
 
 [tool.setuptools.packages.find]
 where = ["src"]

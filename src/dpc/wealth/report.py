@@ -49,8 +49,9 @@ def _params(cfg: Config, panel) -> int:
 
 
 def _test_count(cfg: Config) -> int:
-    """Tests of this study and the code it shares. The Pension Lab's tests are counted in its own export (dpc.pension.site)."""
-    out = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "--ignore=tests/test_pension.py"],
+    """Tests of this study and the code it shares. The Pension Lab's and the risk study's tests are counted in their own exports
+    (dpc.pension.site, dpc.risk.report)."""
+    out = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-q", "--ignore=tests/test_pension.py", "--ignore=tests/test_risk.py"],
                          cwd=cfg.root, capture_output=True, text=True)
     return len([ln for ln in out.stdout.splitlines() if "::" in ln])
 
