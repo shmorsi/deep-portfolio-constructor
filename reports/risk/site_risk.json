@@ -1,6 +1,6 @@
 {
- "source": "deep-portfolio-constructor 043d686: reports/risk/summary.json",
- "commit": "043d686",
+ "source": "deep-portfolio-constructor 6718ec7: reports/risk/summary.json",
+ "commit": "6718ec7",
  "protocol": "docs/risk_protocol.md",
  "stats": {
   "tests": {
@@ -219,7 +219,8 @@
   "model_patch_s2": "The T4 model (10,083,392 parameters) has not been run: its weights are not public yet, and the protocol scores it without change when they are.",
   "described_cpu_s0": "Described after the test, not pre-registered: fine-tuned, the CPU model's quantile loss was 0.962 [0.920, 1.006] times that of the RiskMetrics average (no detectable difference), 0.882 [0.849, 0.921] times that of last month's volatility (better) and 0.748 [0.696, 0.802] times that of the 60-month mean (better). Against its own zero-shot run: 0.907 [0.877, 0.941] (better).",
   "oracle": "A perfect forecast (the oracle, which is handed next month's volatilities and cannot be invested in) would have run the same rule at 10.9% a year against 12.1% for HAR's (−11.6%, t = −21.29: lower risk). That is all the room any forecaster has with this rule.",
-  "classical": "Among the classical forecasters, HAR is the standard: the closest rival, the RiskMetrics average, has a quantile loss 1.073 [1.031, 1.120] times HAR's (worse)."
+  "classical": "Among the classical forecasters, HAR is the standard: the closest rival, the RiskMetrics average, has a quantile loss 1.073 [1.031, 1.120] times HAR's (worse).",
+  "seeds": "The CPU model's other pretraining seeds give the same verdicts, fine-tuned: seed 1: 1.034 [1.013, 1.053] times HAR's loss (worse), portfolio +0.8% against HAR's (higher risk); seed 2: 1.044 [1.024, 1.062] times HAR's loss (worse), portfolio +1.1% against HAR's (higher risk)."
  },
  "tables": {
   "accuracy": {
@@ -280,6 +281,38 @@
      "1.033",
      "1.132",
      "80%"
+    ],
+    [
+     "CPU model, seed 1, zero-shot",
+     "1.126 [1.093, 1.160]",
+     "worse",
+     "1.100",
+     "0.990",
+     "77%"
+    ],
+    [
+     "CPU model, seed 1, fine-tuned",
+     "1.034 [1.013, 1.053]",
+     "worse",
+     "1.032",
+     "1.178",
+     "77%"
+    ],
+    [
+     "CPU model, seed 2, zero-shot",
+     "1.158 [1.124, 1.192]",
+     "worse",
+     "1.118",
+     "160137.108",
+     "75%"
+    ],
+    [
+     "CPU model, seed 2, fine-tuned",
+     "1.044 [1.024, 1.062]",
+     "worse",
+     "1.041",
+     "1.178",
+     "74%"
     ]
    ],
    "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy]"
@@ -349,6 +382,42 @@
      "$663",
      "−39%",
      "644%"
+    ],
+    [
+     "CPU model, seed 1, zero-shot",
+     "12.3%",
+     "+2.7%, 8.65",
+     "higher risk",
+     "$690",
+     "−39%",
+     "972%"
+    ],
+    [
+     "CPU model, seed 1, fine-tuned",
+     "12.2%",
+     "+0.8%, 4.47",
+     "higher risk",
+     "$661",
+     "−39%",
+     "630%"
+    ],
+    [
+     "CPU model, seed 2, zero-shot",
+     "12.3%",
+     "+2.8%, 10.51",
+     "higher risk",
+     "$547",
+     "−41%",
+     "971%"
+    ],
+    [
+     "CPU model, seed 2, fine-tuned",
+     "12.2%",
+     "+1.1%, 5.37",
+     "higher risk",
+     "$665",
+     "−40%",
+     "662%"
     ],
     [
      "Oracle (not investable)",

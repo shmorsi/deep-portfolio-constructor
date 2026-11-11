@@ -176,6 +176,10 @@ Every table is in [reports/pension/results.md](reports/pension/results.md); the 
 | **HAR regression** | 1 (the standard to beat; loss 0.1983) |  | 1 | 1 | 79% |
 | CPU model, zero-shot | 1.138 [1.102, 1.176] | worse | 1.113 | 0.999 | 76% |
 | CPU model, fine-tuned | 1.033 [1.013, 1.053] | worse | 1.033 | 1.132 | 80% |
+| CPU model, seed 1, zero-shot | 1.126 [1.093, 1.160] | worse | 1.100 | 0.990 | 77% |
+| CPU model, seed 1, fine-tuned | 1.034 [1.013, 1.053] | worse | 1.032 | 1.178 | 77% |
+| CPU model, seed 2, zero-shot | 1.158 [1.124, 1.192] | worse | 1.118 | 160137.108 | 75% |
+| CPU model, seed 2, fine-tuned | 1.044 [1.024, 1.062] | worse | 1.041 | 1.178 | 74% |
 
 Lower is better; 1 is HAR. Each ratio pools 30 industries and 801 months; the interval is a moving-block bootstrap over months. "Better" needs the whole interval below 1.
 
@@ -189,12 +193,17 @@ Lower is better; 1 is HAR. Each ratio pools 30 industries and 801 months; the in
 | HAR regression | 12.1% | the standard to beat |  | $666 | −39% | 567% |
 | CPU model, zero-shot | 12.2% | +2.5%, 9.05 | higher risk | $525 | −39% | 896% |
 | CPU model, fine-tuned | 12.2% | +1.6%, 7.53 | higher risk | $663 | −39% | 644% |
+| CPU model, seed 1, zero-shot | 12.3% | +2.7%, 8.65 | higher risk | $690 | −39% | 972% |
+| CPU model, seed 1, fine-tuned | 12.2% | +0.8%, 4.47 | higher risk | $661 | −39% | 630% |
+| CPU model, seed 2, zero-shot | 12.3% | +2.8%, 10.51 | higher risk | $547 | −41% | 971% |
+| CPU model, seed 2, fine-tuned | 12.2% | +1.1%, 5.37 | higher risk | $665 | −40% | 662% |
 | Oracle (not investable) | 10.9% | −11.6%, −21.29 | lower risk | $124 | −37% | 1077% |
 | Market (reference) | 15.9% |  |  | $929 | −50% | 7% |
 
 * A perfect forecast (the oracle, which is handed next month's volatilities and cannot be invested in) would have run the same rule at 10.9% a year against 12.1% for HAR's (−11.6%, *t* = −21.29: lower risk). That is all the room any forecaster has with this rule.
 * Among the classical forecasters, HAR is the standard: the closest rival, the RiskMetrics average, has a quantile loss 1.073 [1.031, 1.120] times HAR's (worse).
 * Fine-tuning was refit 14 times, every five years on past data only; at every one the validation years preferred a fine-tuned model to the untouched one.
+* The CPU model's other pretraining seeds give the same verdicts, fine-tuned: seed 1: 1.034 [1.013, 1.053] times HAR's loss (worse), portfolio +0.8% against HAR's (higher risk); seed 2: 1.044 [1.024, 1.062] times HAR's loss (worse), portfolio +1.1% against HAR's (higher risk).
 * Described after the test, not pre-registered: fine-tuned, the CPU model's quantile loss was 0.962 [0.920, 1.006] times that of the RiskMetrics average (no detectable difference), 0.882 [0.849, 0.921] times that of last month's volatility (better) and 0.748 [0.696, 0.802] times that of the 60-month mean (better). Against its own zero-shot run: 0.907 [0.877, 0.941] (better).
 * Two measures of a portfolio's risk appear side by side. "Realized volatility a year" is the root of the average monthly variance. The comparison with HAR's portfolio is the average difference in log variance, month by month, shown as the change in a typical month's volatility; it is the one the verdict is based on.
 * Every table (the second rule, the decades, the other seeds) is in [`reports/risk/results.md`](reports/risk/results.md). Run `python -m dpc.cli risk-study`; the model's forecasts come from [`scripts/risk_tsfm_forecast.py`](scripts/risk_tsfm_forecast.py), run in tsfm-from-scratch's environment.

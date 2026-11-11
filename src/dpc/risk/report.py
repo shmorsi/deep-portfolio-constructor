@@ -156,6 +156,20 @@ def described_rows(s: dict) -> tuple[list[str], list[list[str]]]:
     return ["Fine-tuned model", "Against", "Quantile loss, ratio [95% interval]", "Verdict"], rows
 
 
+def seeds_sentence(s: dict) -> str:
+    """The CPU model's other pretraining seeds, fine-tuned: the robustness check the protocol asks for."""
+    names = sorted(n for n in s["accuracy"] if n.startswith("tsfm_ft_cpu_s0_seed"))
+    if not names or "tsfm_ft_cpu_s0" not in s["accuracy"]:
+        return ""
+    P = s["portfolios"]["min_variance"]
+    primary = (s["accuracy"]["tsfm_ft_cpu_s0"]["vs_har"]["wql"]["verdict"], P["tsfm_ft_cpu_s0"]["vs_har"]["verdict"])
+    same = all((s["accuracy"][n]["vs_har"]["wql"]["verdict"], P[n]["vs_har"]["verdict"]) == primary for n in names)
+    parts = [f"seed {n[-1]}: {ratio(s['accuracy'][n]['vs_har']['wql'])} times HAR's loss ({s['accuracy'][n]['vs_har']['wql']['verdict']}), portfolio "
+             f"{pct(P[n]['vs_har']['volatility_change'], 1, sign=True)} against HAR's ({P[n]['vs_har']['verdict']})" for n in names]
+    lead = "The CPU model's other pretraining seeds give the same verdicts" if same else "The CPU model's other pretraining seeds do not all give the same verdicts"
+    return f"{lead}, fine-tuned: " + "; ".join(parts) + "."
+
+
 def finetune_sentence(s: dict, checkpoint: str) -> str:
     m = s["models"][checkpoint]
     if m["status"] != "run":
@@ -198,6 +212,7 @@ def readme_section(s: dict, commit: str) -> str:
         f"* {oracle_sentence(s)}",
         f"* {classical_sentence(s)}",
         *[f"* {t}" for t in (finetune_sentence(s, c) for c in s["models"]) if t],
+        *[f"* {t}" for t in (seeds_sentence(s),) if t],
         *[f"* {t}" for t in (described_sentence(s, c) for c in s["models"]) if t],
         f"* {MEASURE_NOTE}",
         f"* Every table (the second rule, the decades, the other seeds) is in [`reports/risk/results.md`](reports/risk/results.md). "
@@ -236,6 +251,10 @@ def results_md(s: dict, commit: str) -> str:
         "## Quantile loss by decade, ratio to HAR",
         "",
         decade_table(s),
+        "",
+        "## The other seeds",
+        "",
+        seeds_sentence(s) or "Not run.",
         "",
         "## Described after the test (not pre-registered)",
         "",
@@ -302,7 +321,7 @@ def export(s: dict, commit: str, root: Path) -> dict:
         "stats": stats,
         "sentences": {**{f"model_{c}": model_sentence(s, c).replace("**", "").replace("*", "") for c in s["models"]},
                       **{f"described_{c}": described_sentence(s, c) for c in s["models"] if described_sentence(s, c)},
-                      "oracle": oracle_sentence(s).replace("*", ""), "classical": classical_sentence(s)},
+                      "oracle": oracle_sentence(s).replace("*", ""), "classical": classical_sentence(s), "seeds": seeds_sentence(s)},
         "tables": {
             "accuracy": {"caption": f"Forecasts of next month's volatility, {s['window']['industries']} industries and {s['window']['months']} months pooled. Lower is better; 1 is HAR. "
                                     "Better needs the whole interval below 1.",
