@@ -132,12 +132,43 @@ def classical_sentence(s: dict) -> str:
             f"{ratio(v)} times HAR's ({v['verdict']}).")
 
 
+VERDICT_WORD = {"better": "better", "worse": "worse", "no detectable difference": "no detectable difference"}
+RIVAL = {"last": "last month's volatility", "mean60": "the 60-month mean", "ewma": "the RiskMetrics average"}
+
+
+def described_sentence(s: dict, checkpoint: str) -> str:
+    """After the test, not pre-registered: where the fine-tuned model stands among the other forecasters."""
+    d = s.get("described_after_the_test", {}).get("finetuned_quantile_loss_vs", {}).get(checkpoint)
+    if not d:
+        return ""
+    parts = [f"{ratio(d[n])} times that of {RIVAL[n]} ({VERDICT_WORD[d[n]['verdict']]})" for n in ("ewma", "last", "mean60") if n in d]
+    zero = d.get(f"tsfm_zero_{checkpoint}")
+    tail = f" Against its own zero-shot run: {ratio(zero)} ({VERDICT_WORD[zero['verdict']]})." if zero else ""
+    return (f"Described after the test, not pre-registered: fine-tuned, the {s['models'][checkpoint]['label']}'s quantile loss was "
+            + ", ".join(parts[:-1]) + (" and " if len(parts) > 1 else "") + parts[-1] + "." + tail)
+
+
+def described_rows(s: dict) -> tuple[list[str], list[list[str]]]:
+    rows = []
+    for checkpoint, d in s.get("described_after_the_test", {}).get("finetuned_quantile_loss_vs", {}).items():
+        for other, v in d.items():
+            rows.append([f"{s['labels'][f'tsfm_ft_{checkpoint}']}", s["labels"][other], ratio(v), v["verdict"]])
+    return ["Fine-tuned model", "Against", "Quantile loss, ratio [95% interval]", "Verdict"], rows
+
+
 def finetune_sentence(s: dict, checkpoint: str) -> str:
     m = s["models"][checkpoint]
     if m["status"] != "run":
         return ""
-    return (f"Fine-tuning was refit {m['refits']} times, every five years on past data only; at {m['refits_kept_pretrained']} of them the "
-            f"validation years preferred the untouched pretrained model, and it was kept.")
+    kept = m["refits_kept_pretrained"]
+    chose = ("at every one the validation years preferred a fine-tuned model to the untouched one" if kept == 0 else
+             f"at {kept} of them the validation years preferred the untouched pretrained model, which was kept")
+    return f"Fine-tuning was refit {m['refits']} times, every five years on past data only; {chose}."
+
+
+MEASURE_NOTE = ("Two measures of a portfolio's risk appear side by side. \"Realized volatility a year\" is the root of the average monthly variance. The comparison "
+                "with HAR's portfolio is the average difference in log variance, month by month, shown as the change in a typical month's volatility; "
+                "it is the one the verdict is based on.")
 
 
 def readme_section(s: dict, commit: str) -> str:
@@ -167,6 +198,8 @@ def readme_section(s: dict, commit: str) -> str:
         f"* {oracle_sentence(s)}",
         f"* {classical_sentence(s)}",
         *[f"* {t}" for t in (finetune_sentence(s, c) for c in s["models"]) if t],
+        *[f"* {t}" for t in (described_sentence(s, c) for c in s["models"]) if t],
+        f"* {MEASURE_NOTE}",
         f"* Every table (the second rule, the decades, the other seeds) is in [`reports/risk/results.md`](reports/risk/results.md). "
         f"Run `python -m dpc.cli risk-study`; the model's forecasts come from [`scripts/risk_tsfm_forecast.py`](scripts/risk_tsfm_forecast.py), run in tsfm-from-scratch's environment.",
         END,
@@ -203,6 +236,14 @@ def results_md(s: dict, commit: str) -> str:
         "## Quantile loss by decade, ratio to HAR",
         "",
         decade_table(s),
+        "",
+        "## Described after the test (not pre-registered)",
+        "",
+        "The protocol compares every forecaster with HAR. These rows compare the fine-tuned model with each other forecaster, by the same loss and bootstrap.",
+        "",
+        md_table(*described_rows(s)),
+        "",
+        MEASURE_NOTE,
         "",
     ]
     return "\n".join(parts)
@@ -247,6 +288,12 @@ def export(s: dict, commit: str, root: Path) -> dict:
             put(f"volVsHar{tag}{sfx}", f"Portfolio volatility against HAR's, {s['labels'][name]}", pct(c["volatility_change"], 1, sign=True), f"portfolios.min_variance.{name}.vs_har.volatility_change")
             put(f"volT{tag}{sfx}", f"Newey-West t, {s['labels'][name]}", num(c["t_nw"]), f"portfolios.min_variance.{name}.vs_har.t_nw")
             put(f"volVerdict{tag}{sfx}", f"Verdict on portfolio risk, {s['labels'][name]}", c["verdict"], f"portfolios.min_variance.{name}.vs_har.verdict")
+        for other, v in s.get("described_after_the_test", {}).get("finetuned_quantile_loss_vs", {}).get(checkpoint, {}).items():
+            tag = {"last": "Last", "mean60": "Mean60", "ewma": "Ewma"}.get(other, "Zero")
+            path = f"described_after_the_test.finetuned_quantile_loss_vs.{checkpoint}.{other}"
+            put(f"ftVs{tag}{sfx}", f"Fine-tuned {m['label']}: quantile loss against {s['labels'][other]} (described after the test)", f"{num(v['ratio'], 3)}×", f"{path}.ratio")
+            put(f"ftVs{tag}Ci{sfx}", f"95% interval, fine-tuned {m['label']} against {s['labels'][other]}", f"[{num(v['ci_low'], 3)}, {num(v['ci_high'], 3)}]", f"{path}.ci_low, ci_high")
+            put(f"ftVs{tag}Verdict{sfx}", f"Verdict, fine-tuned {m['label']} against {s['labels'][other]}", v["verdict"], f"{path}.verdict")
         put(f"earns{sfx}", f"{m['label']}: its risk forecasts help this investor", "yes" if m["earns_its_place"] else "no", f"models.{checkpoint}.earns_its_place")
         put(f"refits{sfx}", f"{m['label']}: fine-tuning refits", str(m["refits"]), f"models.{checkpoint}.refits")
         put(f"refitsKept{sfx}", f"{m['label']}: refits that kept the pretrained model", f"{m['refits_kept_pretrained']} of {m['refits']}", f"models.{checkpoint}.refits_kept_pretrained")
@@ -254,6 +301,7 @@ def export(s: dict, commit: str, root: Path) -> dict:
         "source": f"deep-portfolio-constructor {commit}: reports/risk/summary.json", "commit": commit, "protocol": PROTOCOL,
         "stats": stats,
         "sentences": {**{f"model_{c}": model_sentence(s, c).replace("**", "").replace("*", "") for c in s["models"]},
+                      **{f"described_{c}": described_sentence(s, c) for c in s["models"] if described_sentence(s, c)},
                       "oracle": oracle_sentence(s).replace("*", ""), "classical": classical_sentence(s)},
         "tables": {
             "accuracy": {"caption": f"Forecasts of next month's volatility, {s['window']['industries']} industries and {s['window']['months']} months pooled. Lower is better; 1 is HAR. "

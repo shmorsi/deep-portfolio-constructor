@@ -129,4 +129,17 @@ if it shows the question has little room in it.
 
 ## Deviations
 
-None yet.
+None.
+
+## Added after the first run
+
+Dated 2026-11-11, after the scores above were known. Nothing pre-registered changed.
+
+* **A descriptive comparison.** The protocol compares every forecaster with `har`. The results
+  also show the fine-tuned model against each other forecaster (last month, the 60-month
+  mean, RiskMetrics, and its own zero-shot run), by the same loss and the same bootstrap. It
+  is labelled "described after the test" wherever it appears and does not enter the decision
+  rule.
+* **A note on the two risk figures.** The tables show each portfolio's yearly realized
+  volatility (the root of the average monthly variance) beside the pre-registered comparison
+  (the average difference in log variance). The documents now say which is which.

@@ -167,6 +167,17 @@ def evaluate(cfg: Config, panel, rp: RiskPanel, forecasts: dict[str, fc.Forecast
                 rows[name]["vs_har"] = pf.compare_variance(rvars[name], rvars["har"], ev.nw_lags, ev.bootstrap_block_months, ev.bootstrap_draws, cfg.project.seed)
         portfolios[rule] = rows
 
+    # Described after the test, not pre-registered: the fine-tuned model against each other forecaster (same loss, same bootstrap).
+    described = {}
+    for checkpoint in MODELS:
+        ft = model_file("ft", checkpoint)
+        if ft in forecasts:
+            others = [n for n in ("last", "mean60", "ewma", model_file("zero", checkpoint)) if n in forecasts]
+            described[checkpoint] = {}
+            for other in others:
+                ratio, lo, hi = sc.ratio_ci(sums[ft]["wql_num"], sums[other]["wql_num"], boot)
+                described[checkpoint][other] = {"ratio": ratio, "ci_low": lo, "ci_high": hi, "verdict": sc.verdict_ratio(lo, hi)}
+
     years = np.array([rp.dates[t + 1].year for t in idx])
     models = {}
     for checkpoint, info in MODELS.items():
@@ -195,6 +206,7 @@ def evaluate(cfg: Config, panel, rp: RiskPanel, forecasts: dict[str, fc.Forecast
         "portfolios": portfolios,
         "references": references,
         "models": models,
+        "described_after_the_test": {"finetuned_quantile_loss_vs": described},
     }
     return summary, runs
 

@@ -1,0 +1,375 @@
+{
+ "source": "deep-portfolio-constructor 043d686: reports/risk/summary.json",
+ "commit": "043d686",
+ "protocol": "docs/risk_protocol.md",
+ "stats": {
+  "tests": {
+   "label": "Tests of the risk study's code",
+   "display": "16",
+   "source": "deep-portfolio-constructor tests/test_risk.py"
+  },
+  "months": {
+   "label": "Months scored",
+   "display": "801",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [window.months]"
+  },
+  "industries": {
+   "label": "Industries",
+   "display": "30",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [window.industries]"
+  },
+  "forecasts": {
+   "label": "Forecasts scored per forecaster",
+   "display": "24,030",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [window.months x window.industries]"
+  },
+  "volHar": {
+   "label": "Realized volatility a year, minimum variance on HAR's forecasts",
+   "display": "12.1%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.har.realized_volatility]"
+  },
+  "volOracle": {
+   "label": "Realized volatility a year, minimum variance on perfect forecasts",
+   "display": "10.9%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.oracle.realized_volatility]"
+  },
+  "volMarket": {
+   "label": "Realized volatility a year, the market",
+   "display": "15.9%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [references.market.realized_volatility]"
+  },
+  "oracleVsHar": {
+   "label": "Volatility of the oracle's portfolio against HAR's",
+   "display": "−11.6%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.oracle.vs_har.volatility_change]"
+  },
+  "oracleVerdict": {
+   "label": "Verdict, oracle against HAR",
+   "display": "lower risk",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.oracle.vs_har.verdict]"
+  },
+  "statusCpuS0": {
+   "label": "CPU model: status",
+   "display": "run",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.cpu_s0.status]"
+  },
+  "paramsCpuS0": {
+   "label": "CPU model: parameters",
+   "display": "833,440",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.cpu_s0.parameters]"
+  },
+  "wqlFtCpuS0": {
+   "label": "Quantile loss against HAR, CPU model, fine-tuned",
+   "display": "1.033×",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy.tsfm_ft_cpu_s0.vs_har.wql.ratio]"
+  },
+  "wqlCiFtCpuS0": {
+   "label": "95% interval, CPU model, fine-tuned",
+   "display": "[1.013, 1.053]",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy.tsfm_ft_cpu_s0.vs_har.wql.ci_low, ci_high]"
+  },
+  "wqlVerdictFtCpuS0": {
+   "label": "Verdict on accuracy, CPU model, fine-tuned",
+   "display": "worse",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy.tsfm_ft_cpu_s0.vs_har.wql.verdict]"
+  },
+  "volFtCpuS0": {
+   "label": "Realized volatility a year, minimum variance on CPU model, fine-tuned",
+   "display": "12.2%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_ft_cpu_s0.realized_volatility]"
+  },
+  "volVsHarFtCpuS0": {
+   "label": "Portfolio volatility against HAR's, CPU model, fine-tuned",
+   "display": "+1.6%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_ft_cpu_s0.vs_har.volatility_change]"
+  },
+  "volTFtCpuS0": {
+   "label": "Newey-West t, CPU model, fine-tuned",
+   "display": "7.53",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_ft_cpu_s0.vs_har.t_nw]"
+  },
+  "volVerdictFtCpuS0": {
+   "label": "Verdict on portfolio risk, CPU model, fine-tuned",
+   "display": "higher risk",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_ft_cpu_s0.vs_har.verdict]"
+  },
+  "wqlZeroCpuS0": {
+   "label": "Quantile loss against HAR, CPU model, zero-shot",
+   "display": "1.138×",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy.tsfm_zero_cpu_s0.vs_har.wql.ratio]"
+  },
+  "wqlCiZeroCpuS0": {
+   "label": "95% interval, CPU model, zero-shot",
+   "display": "[1.102, 1.176]",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy.tsfm_zero_cpu_s0.vs_har.wql.ci_low, ci_high]"
+  },
+  "wqlVerdictZeroCpuS0": {
+   "label": "Verdict on accuracy, CPU model, zero-shot",
+   "display": "worse",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy.tsfm_zero_cpu_s0.vs_har.wql.verdict]"
+  },
+  "volZeroCpuS0": {
+   "label": "Realized volatility a year, minimum variance on CPU model, zero-shot",
+   "display": "12.2%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_zero_cpu_s0.realized_volatility]"
+  },
+  "volVsHarZeroCpuS0": {
+   "label": "Portfolio volatility against HAR's, CPU model, zero-shot",
+   "display": "+2.5%",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_zero_cpu_s0.vs_har.volatility_change]"
+  },
+  "volTZeroCpuS0": {
+   "label": "Newey-West t, CPU model, zero-shot",
+   "display": "9.05",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_zero_cpu_s0.vs_har.t_nw]"
+  },
+  "volVerdictZeroCpuS0": {
+   "label": "Verdict on portfolio risk, CPU model, zero-shot",
+   "display": "higher risk",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance.tsfm_zero_cpu_s0.vs_har.verdict]"
+  },
+  "ftVsLastCpuS0": {
+   "label": "Fine-tuned CPU model: quantile loss against Last month (described after the test)",
+   "display": "0.882×",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.last.ratio]"
+  },
+  "ftVsLastCiCpuS0": {
+   "label": "95% interval, fine-tuned CPU model against Last month",
+   "display": "[0.849, 0.921]",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.last.ci_low, ci_high]"
+  },
+  "ftVsLastVerdictCpuS0": {
+   "label": "Verdict, fine-tuned CPU model against Last month",
+   "display": "better",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.last.verdict]"
+  },
+  "ftVsMean60CpuS0": {
+   "label": "Fine-tuned CPU model: quantile loss against 60-month mean (described after the test)",
+   "display": "0.748×",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.mean60.ratio]"
+  },
+  "ftVsMean60CiCpuS0": {
+   "label": "95% interval, fine-tuned CPU model against 60-month mean",
+   "display": "[0.696, 0.802]",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.mean60.ci_low, ci_high]"
+  },
+  "ftVsMean60VerdictCpuS0": {
+   "label": "Verdict, fine-tuned CPU model against 60-month mean",
+   "display": "better",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.mean60.verdict]"
+  },
+  "ftVsEwmaCpuS0": {
+   "label": "Fine-tuned CPU model: quantile loss against RiskMetrics EWMA (described after the test)",
+   "display": "0.962×",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.ewma.ratio]"
+  },
+  "ftVsEwmaCiCpuS0": {
+   "label": "95% interval, fine-tuned CPU model against RiskMetrics EWMA",
+   "display": "[0.920, 1.006]",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.ewma.ci_low, ci_high]"
+  },
+  "ftVsEwmaVerdictCpuS0": {
+   "label": "Verdict, fine-tuned CPU model against RiskMetrics EWMA",
+   "display": "no detectable difference",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.ewma.verdict]"
+  },
+  "ftVsZeroCpuS0": {
+   "label": "Fine-tuned CPU model: quantile loss against CPU model, zero-shot (described after the test)",
+   "display": "0.907×",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.tsfm_zero_cpu_s0.ratio]"
+  },
+  "ftVsZeroCiCpuS0": {
+   "label": "95% interval, fine-tuned CPU model against CPU model, zero-shot",
+   "display": "[0.877, 0.941]",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.tsfm_zero_cpu_s0.ci_low, ci_high]"
+  },
+  "ftVsZeroVerdictCpuS0": {
+   "label": "Verdict, fine-tuned CPU model against CPU model, zero-shot",
+   "display": "better",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [described_after_the_test.finetuned_quantile_loss_vs.cpu_s0.tsfm_zero_cpu_s0.verdict]"
+  },
+  "earnsCpuS0": {
+   "label": "CPU model: its risk forecasts help this investor",
+   "display": "no",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.cpu_s0.earns_its_place]"
+  },
+  "refitsCpuS0": {
+   "label": "CPU model: fine-tuning refits",
+   "display": "14",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.cpu_s0.refits]"
+  },
+  "refitsKeptCpuS0": {
+   "label": "CPU model: refits that kept the pretrained model",
+   "display": "0 of 14",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.cpu_s0.refits_kept_pretrained]"
+  },
+  "statusPatchS2": {
+   "label": "T4 model: status",
+   "display": "not run",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.patch_s2.status]"
+  },
+  "paramsPatchS2": {
+   "label": "T4 model: parameters",
+   "display": "10,083,392",
+   "source": "deep-portfolio-constructor reports/risk/summary.json [models.patch_s2.parameters]"
+  }
+ },
+ "sentences": {
+  "model_cpu_s0": "No for the CPU model (833,440 parameters). Fine-tuned, its quantile loss was 1.033 [1.013, 1.053] times HAR's: worse than HAR (zero-shot: 1.138 [1.102, 1.176]). The minimum-variance portfolio built on its forecasts ran at 12.2% a year against 12.1% for HAR's (+1.6%, t = 7.53): higher risk than HAR's portfolio.",
+  "model_patch_s2": "The T4 model (10,083,392 parameters) has not been run: its weights are not public yet, and the protocol scores it without change when they are.",
+  "described_cpu_s0": "Described after the test, not pre-registered: fine-tuned, the CPU model's quantile loss was 0.962 [0.920, 1.006] times that of the RiskMetrics average (no detectable difference), 0.882 [0.849, 0.921] times that of last month's volatility (better) and 0.748 [0.696, 0.802] times that of the 60-month mean (better). Against its own zero-shot run: 0.907 [0.877, 0.941] (better).",
+  "oracle": "A perfect forecast (the oracle, which is handed next month's volatilities and cannot be invested in) would have run the same rule at 10.9% a year against 12.1% for HAR's (−11.6%, t = −21.29: lower risk). That is all the room any forecaster has with this rule.",
+  "classical": "Among the classical forecasters, HAR is the standard: the closest rival, the RiskMetrics average, has a quantile loss 1.073 [1.031, 1.120] times HAR's (worse)."
+ },
+ "tables": {
+  "accuracy": {
+   "caption": "Forecasts of next month's volatility, 30 industries and 801 months pooled. Lower is better; 1 is HAR. Better needs the whole interval below 1.",
+   "headers": [
+    "Forecaster",
+    "Quantile loss, ratio to HAR [95% interval]",
+    "Verdict",
+    "Absolute error, ratio to HAR",
+    "QLIKE, ratio to HAR",
+    "Inside its 80% band"
+   ],
+   "rows": [
+    [
+     "Last month",
+     "1.171 [1.125, 1.214]",
+     "worse",
+     "1.182",
+     "1.122",
+     "79%"
+    ],
+    [
+     "60-month mean",
+     "1.380 [1.290, 1.482]",
+     "worse",
+     "1.388",
+     "1.998",
+     "76%"
+    ],
+    [
+     "RiskMetrics EWMA",
+     "1.073 [1.031, 1.120]",
+     "worse",
+     "1.081",
+     "0.977",
+     "79%"
+    ],
+    [
+     "HAR regression",
+     "1 (the standard to beat; loss 0.1983)",
+     "",
+     "1",
+     "1",
+     "79%"
+    ],
+    [
+     "CPU model, zero-shot",
+     "1.138 [1.102, 1.176]",
+     "worse",
+     "1.113",
+     "0.999",
+     "76%"
+    ],
+    [
+     "CPU model, fine-tuned",
+     "1.033 [1.013, 1.053]",
+     "worse",
+     "1.033",
+     "1.132",
+     "80%"
+    ]
+   ],
+   "source": "deep-portfolio-constructor reports/risk/summary.json [accuracy]"
+  },
+  "min_variance": {
+   "caption": "One long-only minimum-variance rule, fed by each forecaster's volatilities. Realized volatility is measured from the portfolio's own daily returns.",
+   "headers": [
+    "Portfolio fed by",
+    "Realized volatility a year",
+    "Against HAR's portfolio: volatility, t",
+    "Verdict",
+    "$1 became",
+    "Worst fall",
+    "Traded a year"
+   ],
+   "rows": [
+    [
+     "Last month",
+     "12.3%",
+     "+3.0%, 11.13",
+     "higher risk",
+     "$512",
+     "−41%",
+     "1085%"
+    ],
+    [
+     "60-month mean",
+     "12.5%",
+     "+3.0%, 6.85",
+     "higher risk",
+     "$1,092",
+     "−37%",
+     "101%"
+    ],
+    [
+     "RiskMetrics EWMA",
+     "12.2%",
+     "+1.2%, 6.20",
+     "higher risk",
+     "$544",
+     "−41%",
+     "763%"
+    ],
+    [
+     "HAR regression",
+     "12.1%",
+     "the standard to beat",
+     "",
+     "$666",
+     "−39%",
+     "567%"
+    ],
+    [
+     "CPU model, zero-shot",
+     "12.2%",
+     "+2.5%, 9.05",
+     "higher risk",
+     "$525",
+     "−39%",
+     "896%"
+    ],
+    [
+     "CPU model, fine-tuned",
+     "12.2%",
+     "+1.6%, 7.53",
+     "higher risk",
+     "$663",
+     "−39%",
+     "644%"
+    ],
+    [
+     "Oracle (not investable)",
+     "10.9%",
+     "−11.6%, −21.29",
+     "lower risk",
+     "$124",
+     "−37%",
+     "1077%"
+    ],
+    [
+     "Market (reference)",
+     "15.9%",
+     "",
+     "",
+     "$929",
+     "−50%",
+     "7%"
+    ]
+   ],
+   "source": "deep-portfolio-constructor reports/risk/summary.json [portfolios.min_variance, references.market]"
+  }
+ }
+}
