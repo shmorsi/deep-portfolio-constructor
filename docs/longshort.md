@@ -65,7 +65,7 @@ Out-of-sample, January 2008 to September 2026 (225 months), monthly rebalancing,
 * Across position caps of 3–10% and sector limits of 2.5–10%: 0.54 to 0.67.
 * At 40 bps costs: 0.19.
 
-Full tables, crisis years (2008, 2020, 2022) and sensitivity tests are in [`reports/stage6_evaluation.md`](../reports/stage6_evaluation.md). The 2-page write-up is [`reports/research_note.md`](../reports/archive/longshort_research_note.md).
+Full tables, crisis years (2008, 2020, 2022) and sensitivity tests are in [`reports/stage6_evaluation.md`](../reports/stage6_evaluation.md). The 2-page write-up is [`reports/archive/longshort_research_note.md`](../reports/archive/longshort_research_note.md).
 
 ![Risk decomposition](../reports/figures/stage6_risk_decomposition.png)
 
@@ -93,10 +93,10 @@ pip install -e .
 ```
 
 ```bash
-python -m dpc.cli quickstart
+streamlit run dashboard/longshort_app.py
 ```
 
-`quickstart` prints the headline table and opens the Streamlit dashboard (current weights, risk breakdown, exposures against limits, performance against every baseline). It reads only committed results.
+This opens the study's Streamlit dashboard (current weights, risk breakdown, exposures against limits, performance against every baseline). It reads only committed results. (`python -m dpc.cli quickstart` now opens the wealth study's dashboard.)
 
 **Understand it from first principles:** open [`notebooks/01_first_principles.ipynb`](../notebooks/01_first_principles.ipynb). It covers:
 * why a naive long-short portfolio hides a factor bet
@@ -155,10 +155,10 @@ python -m dpc.cli site          # figures for the portfolio website, each with i
 ```
 
 ```bash
-pytest                          # 89 tests
+pytest                          # the whole suite, every study
 ```
 
-Every setting lives in [`config.yaml`](config.yaml), and the loader rejects unknown or missing keys.
+Every setting lives in [`config.yaml`](../config.yaml), and the loader rejects unknown or missing keys.
 
 ## Look-ahead safeguards
 

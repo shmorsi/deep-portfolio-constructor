@@ -5,6 +5,11 @@ the README cannot drift from the results. Sentences that depend on a result
 follow the pre-registered verdict. Run after ``python -m dpc.cli wealth-site``:
 
     python scripts/write_readme.py
+
+The Pension Lab and risk-study sections are not written here: their blocks,
+between the ``pension`` and ``risk`` markers, belong to ``python -m dpc.cli
+pension-site`` and ``risk-site``, which rewrite them in place. This script
+carries those blocks over from the current README unchanged.
 """
 
 from __future__ import annotations
@@ -33,22 +38,31 @@ def num(x: float, digits: int = 2) -> str:
     text = f"{abs(x):.{digits}f}"
     return (MINUS if x < 0 and float(text) != 0 else "") + text
 
+
 def month_name(ym: str) -> str:
     """'2026-09' -> 'September 2026'."""
     months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]
     return f"{months[int(ym[5:7]) - 1]} {ym[:4]}"
 
 
+def kept_block(readme: str, name: str) -> str:
+    """The block between the ``name`` markers of the current README, markers included.
+
+    Empty markers when the README has none yet, for ``pension-site`` / ``risk-site`` to fill."""
+    start, end = f"<!-- {name}:start -->", f"<!-- {name}:end -->"
+    if start in readme and end in readme:
+        return start + readme.split(start, 1)[1].split(end, 1)[0] + end
+    return f"{start}\n{end}"
+
 
 def main() -> None:
     site = json.loads((ROOT / "reports" / "site_wealth.json").read_text())
     perf, comps, labels = site["performance"], site["comparisons"], site["labels"]
     d, m, mom = perf["deep"], perf["market"], perf["momentum_tilt"]
-    c, cm = comps["deep - market"], comps["momentum_tilt - market"]
+    c = comps["deep - market"]
     verdict = c["verdict"]
     oos = site["oos"]
     end_name = month_name(oos["end"])
-    years = oos["months"] // 12
 
     def cell(key: str) -> str:
         x = comps[key]
@@ -178,11 +192,27 @@ Here **{words[best].lower()}** grew the most. Trading every day only keeps the p
 ![The same network on four schedules](reports/figures/wealth/schedules.png)
 """
 
+    readme = ROOT / "README.md"
+    current = readme.read_text() if readme.is_file() else ""
+    pension, risk = kept_block(current, "pension"), kept_block(current, "risk")
+
     text = f"""# Deep Portfolio Constructor
 
 **A neural network that builds a long-only portfolio for long-term wealth.** A transformer allocates across Kenneth French's 30 US industry portfolios and decides how much to trade each month. It is trained in PyTorch on the growth of wealth itself, after trading costs, through a differentiable simulator of buying, holding and paying to trade, and tested out of sample from January 1960 to {oos['end'][:4]} against the market and five classical long-only strategies, under a protocol committed to git before the test.
 
 **Explore it:** [shmorsi.github.io/projects/deep-portfolio-constructor.html](https://shmorsi.github.io/projects/deep-portfolio-constructor.html). Slide the growth toy, pick a strategy and a start year, and scrub through the network's holdings since 1960.
+
+**One question, three studies: can AI help someone who invests for decades, and how would you know?**
+
+| | Study | What it asks | Where |
+|---|---|---|---|
+| 1 | **Wealth study** | Can a network trained on the growth of wealth build a better long-only portfolio than holding the market? | this README, from the top |
+| 2 | **[Pension Lab](#pension-lab-what-it-costs-to-keep-a-pension-promise)** | What does it cost to keep a pension promise funded, and does a learned policy cost less than a glide path? | this repository, `src/dpc/pension/` |
+| 3 | **[World Shock Lab](https://github.com/shmorsi/world-shock-lab)** | What does a central-bank or oil surprise do to the markets a long-term investor holds? | its own repository; [the lab](https://shmorsi.github.io/shock-lab/) |
+
+The three share one method: fix the test before running it, score on data the model never saw, and publish the answer when it is no.
+
+A fourth test joins this project to the forecasting one: the **[risk study](#risk-study-does-a-forecasting-models-volatility-forecast-help-the-portfolio)** asks whether a time-series foundation model's volatility forecasts beat the standard methods and lower a long-only portfolio's risk.
 
 ```mermaid
 flowchart LR
@@ -233,6 +263,14 @@ $1 invested in January 1960, out of sample to {end_name} ({oos['months']} months
 
 Every table (decades, costs, seeds, factor alphas, all comparisons) is in [`reports/wealth/results.md`](reports/wealth/results.md). The write-up is [`reports/wealth/research_note.md`](reports/wealth/research_note.md).
 {extras}
+## Pension Lab: what it costs to keep a pension promise
+
+{pension}
+
+## Risk study: does a forecasting model's volatility forecast help the portfolio?
+
+{risk}
+
 ## How it works
 
 **Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to {end_name} (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of {site['data_check']['correlation']:.4f}. The T-bill rate and the Fama-French factors come from the same library.
@@ -342,7 +380,7 @@ Every setting lives in [`config.yaml`](config.yaml) (section `wealth`), and the 
 
 This repository began as a market-neutral long-short study (a transformer return model, a transformer covariance model and end-to-end training through a differentiable optimiser, on 99 large caps since 2008). It is archived in [`docs/longshort.md`](docs/longshort.md), with its research note under [`reports/archive/`](reports/archive/); its code, notebook (`notebooks/01_first_principles.ipynb`) and dashboard (`dashboard/longshort_app.py`) still run.
 """
-    (ROOT / "README.md").write_text(text)
+    readme.write_text(text)
     print(f"README.md written from {site['commit']} (verdict: {verdict})")
 
 
