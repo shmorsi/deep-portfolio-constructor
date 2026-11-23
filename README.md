@@ -14,6 +14,8 @@
 
 The three share one method: fix the test before running it, score on data the model never saw, and publish the answer when it is no.
 
+Around the studies sits the machinery an institution runs every day, built as tested tools and applied to public data: an [institutional toolkit](#institutional-toolkit-risk-models-attribution-ldi-currency-private-assets) (factor risk model, Black-Litterman, a tracking-error budget, Brinson attribution in SQL, VaR backtests, LDI liquidity stress, currency hedging, private-markets pacing), [the anomaly zoo](#the-anomaly-zoo-what-survives-what-decays-what-combines), a [derivatives and rates library](#derivatives-and-rates), and [spreadsheet models](#spreadsheet-models-pension-funding-and-an-lbo-with-private-credit) checked cell by cell against Python.
+
 A fourth test joins this project to the forecasting one: the **[risk study](#risk-study-does-a-forecasting-models-volatility-forecast-help-the-portfolio)** asks whether a time-series foundation model's volatility forecasts beat the standard methods and lower a long-only portfolio's risk.
 
 ```mermaid

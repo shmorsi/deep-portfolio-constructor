@@ -69,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
                                           "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site",
                                           "pension", "pension-run", "pension-site", "pension-anatomy", "pension-figures", "pension-stress",
                                           "risk-study", "risk-data", "risk-classical", "risk-evaluate", "risk-site",
-                                          "institutional", "derivatives", "excel"])
+                                          "institutional", "derivatives", "excel", "anomalies"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -90,6 +90,13 @@ def main(argv: list[str] | None = None) -> int:
         stages = [args.stage]
 
     for stage in stages:
+        if stage == "anomalies":         # the anomaly zoo (src/dpc/anomalies/), not pre-registered
+            from dpc.anomalies.run import main as anomalies_main
+
+            rc = anomalies_main(cfg, args.refresh)
+            if rc:
+                return rc
+            continue
         if stage == "excel":             # the two workbooks (excel/), built and checked by LibreOffice
             from dpc.excel.verify import main as excel_main
 
