@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from ..logging_utils import get_logger
-from . import active, attribution, curve, data, fx, ldi, liabilities, privates
+from . import active, attribution, curve, data, fx, ldi, liabilities, privates, var_backtest
 
 log = get_logger(__name__)
 
@@ -158,6 +158,13 @@ def _privates(panel) -> dict:
     }
 
 
+def _var(panel) -> dict:
+    r = panel.mkt_rf + panel.rf
+    out = var_backtest.backtest(r, 0.99, 120)
+    return {"series": "US stock market, monthly total return (Kenneth French)", "level": 0.99, "window_months": 120,
+            "start": f"{panel.dates[120]:%Y-%m}", "end": f"{panel.dates[-1]:%Y-%m}", **out}
+
+
 def _fmt_pct(x, d=1):
     return f"{100 * x:.{d}f}%"
 
@@ -275,6 +282,20 @@ def write_markdown(s: dict, path: Path) -> None:
              f"reported volatility {_fmt_pct(ds['vol_observed'])} a quarter against a true {_fmt_pct(ds['vol_true'])}; Geltner's correction "
              f"(estimated phi {ds['phi_hat']:.2f}) gives {_fmt_pct(ds['vol_desmoothed'])}. Correlation with the stock market: true {ds['corr_with_other_true']:.2f}, "
              f"smoothed {ds['corr_with_other_observed']:.2f}, desmoothed {ds['corr_with_other_desmoothed']:.2f}.\n")
+    v = s["var"]
+    L.append("\n## 7. Market risk: does a 99% VaR forecast hold up?\n")
+    L.append(f"{v['series']}, one-month 99% VaR forecast each month from the previous {v['window_months']} months, "
+             f"{v['start']} to {v['end']}. A sound model is exceeded in 1% of months (Kupiec) and its exceptions do not cluster "
+             "(Christoffersen); a test is passed when p > 0.05.\n")
+    L.append("| Model | Average VaR | Exceptions (expected) | Kupiec p | Back-to-back exceptions | Christoffersen p |")
+    L.append("|---|---:|---:|---:|---:|---:|")
+    for k, lab in (("historical", "Historical simulation"), ("normal", "Normal, window mean and volatility"), ("ewma", "Normal, EWMA volatility (lambda 0.97)")):
+        m = v[k]
+        L.append(f"| {lab} | {_fmt_pct(m['mean_var'])} | {m['exceptions']} ({m['expected']:.1f}) | {m['p_value']:.3f} | "
+                 f"{m['independence']['n11']} | {m['independence']['p_value']:.3f} |")
+    h = v["historical"]
+    L.append(f"\nAverage historical expected shortfall (the mean loss beyond VaR, the Basel III measure): {_fmt_pct(h['mean_es'])}; "
+             f"the average loss in the months that did exceed VaR: {_fmt_pct(h['mean_loss_when_exceeded'])}.\n")
     L.append("## Limits\n")
     L.append("- 30 industries are not stocks: the active study has 30 assets and one view; its information ratio is not a claim about a stock picker.\n"
              "- The risk model has three public factors; commercial models have dozens. The bias statistic shows what that costs.\n"
@@ -388,6 +409,7 @@ def main(cfg, refresh: bool = False) -> int:
     s["fx"] = _fx(panel, cache)
     log.info("Private assets")
     s["privates"] = _privates(panel)
+    s["var"] = _var(panel)
     s["data"] = {"french_vintage_end": f"{panel.dates[-1]:%Y-%m}", "sources": ["Kenneth French data library", "FRED (DGS*, DEXCAUS)"]}
     out = cfg.paths.reports / "institutional"
     out.mkdir(parents=True, exist_ok=True)
@@ -431,6 +453,9 @@ def readme_block(s: dict) -> str:
         f"{_fmt_pct(f['usd_move_in_worst_24_equity_months'])} on average in the worst 24 months for US stocks. |",
         f"| **Private assets: Takahashi-Alexander, pacing, denominator effect, desmoothing** | Committing {_fmt_pct(p['pacing']['commit_rate'])} of assets a year reaches 90% of a 25% target in "
         f"{p['pacing']['years_to_90pct_of_target']} years; a 30% public crash lifts the share to {_fmt_pct(p['pacing']['share_after_crash'])}. |",
+        f"| **VaR backtest (Kupiec, Christoffersen)** | 99% one-month VaR of the US market, {s['var']['start']} to {s['var']['end']}: historical simulation "
+        f"was exceeded {s['var']['historical']['exceptions']} times against {s['var']['historical']['expected']:.1f} expected (Kupiec p {s['var']['historical']['p_value']:.3f}, and the "
+        f"exceptions cluster); EWMA volatility passes both tests ({s['var']['ewma']['exceptions']} exceptions, p {s['var']['ewma']['p_value']:.3f} and {s['var']['ewma']['independence']['p_value']:.3f}). |",
         "",
         "![Active management: growth against the benchmark and the rolling bias statistic](reports/figures/institutional/active.png)",
         "",

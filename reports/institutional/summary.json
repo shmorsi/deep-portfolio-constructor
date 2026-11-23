@@ -345,7 +345,7 @@
     "selection": 0.004264998679502827,
     "interaction": -0.0006131351944841723
    },
-   "sql_max_abs_difference": 3.524958103184872e-15,
+   "sql_max_abs_difference": 3.6572307682281036e-15,
    "note": "gross of trading costs: attribution explains holdings x returns; costs are reported separately"
   }
  },
@@ -939,6 +939,63 @@
    "corr_with_other_true": 0.9262534795211401,
    "corr_with_other_observed": 0.761796352341688,
    "corr_with_other_desmoothed": 0.9257240795055065
+  }
+ },
+ "var": {
+  "series": "US stock market, monthly total return (Kenneth French)",
+  "level": 0.99,
+  "window_months": 120,
+  "start": "1936-07",
+  "end": "2026-09",
+  "historical": {
+   "mean_var": 0.10881255401662049,
+   "exceptions": 23,
+   "months": 1083,
+   "expected": 10.830000000000009,
+   "rate": 0.02123730378578024,
+   "lr": 10.444676158429644,
+   "p_value": 0.00123003470526407,
+   "independence": {
+    "n01": 20,
+    "n11": 3,
+    "lr": 6.451335442990626,
+    "p_value": 0.011086897637505809
+   },
+   "worst_excess": 0.11955200000000005,
+   "mean_es": 0.13326209602954756,
+   "mean_loss_when_exceeded": 0.11161304347826087
+  },
+  "normal": {
+   "mean_var": 0.10170346810803829,
+   "exceptions": 24,
+   "months": 1083,
+   "expected": 10.830000000000009,
+   "rate": 0.0221606648199446,
+   "lr": 12.017661101479035,
+   "p_value": 0.0005269879200318004,
+   "independence": {
+    "n01": 21,
+    "n11": 3,
+    "lr": 5.983167056909224,
+    "p_value": 0.014443044063548302
+   },
+   "worst_excess": 0.1363419543218659
+  },
+  "ewma": {
+   "mean_var": 0.10945503553857372,
+   "exceptions": 17,
+   "months": 1083,
+   "expected": 10.830000000000009,
+   "rate": 0.01569713758079409,
+   "lr": 3.025946332409916,
+   "p_value": 0.0819425038176956,
+   "independence": {
+    "n01": 16,
+    "n11": 1,
+    "lr": 1.240148507043756,
+    "p_value": 0.2654424348158938
+   },
+   "worst_excess": 0.11598758281328649
   }
  },
  "data": {

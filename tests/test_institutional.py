@@ -218,3 +218,27 @@ def test_geltner_recovers_volatility():
     assert out["vol_observed"] < 0.6 * out["vol_true"]
     assert out["vol_desmoothed"] == pytest.approx(out["vol_true"], rel=0.05)
     assert out["phi_hat"] == pytest.approx(0.6, abs=0.03)
+
+
+# ------------------------------------------------------------- VaR backtest
+def test_kupiec_and_christoffersen():
+    from dpc.institutional.var_backtest import christoffersen, kupiec
+
+    ok = np.zeros(1000, bool)
+    ok[::100] = True                                   # exactly 1% and evenly spread
+    k = kupiec(ok, 0.01)
+    assert k["exceptions"] == 10 and k["lr"] == pytest.approx(0.0, abs=1e-9) and k["p_value"] == pytest.approx(1.0)
+    bad = np.zeros(1000, bool)
+    bad[:40] = True                                    # 4% and all in a row
+    assert kupiec(bad, 0.01)["p_value"] < 1e-6
+    assert christoffersen(bad)["p_value"] < 1e-6
+    assert christoffersen(ok)["p_value"] > 0.05
+
+
+def test_var_on_normal_returns_has_about_one_percent_exceptions():
+    from dpc.institutional.var_backtest import backtest
+
+    r = RNG.normal(0.01, 0.04, 6000)
+    out = backtest(r, 0.99, 120)
+    assert out["normal"]["rate"] == pytest.approx(0.01, abs=0.004)
+    assert out["historical"]["mean_es"] > out["historical"]["mean_var"]

@@ -8,6 +8,7 @@
     liabilities     a pension cohort with mortality (Gompertz-Makeham), solvency and going-concern valuations
     ldi             a swap overlay: hedge ratio, leverage, collateral, and the liquidity stress of a yield spike
     fx              the currency hedge ratio for a Canadian investor holding US equities
+    var_backtest    99% VaR forecasts and their Kupiec and Christoffersen backtests
     privates        private assets: Takahashi-Alexander cash flows, commitment pacing, the denominator effect, desmoothing
 
 None of this was pre-registered: it is a toolkit with tests, run once on public data by

@@ -106,6 +106,19 @@ US stock market in Canadian dollars, 1971-02 to 2026-09 (668 months). The minimu
 
 **Desmoothing.** Quarterly returns of a series with known volatility (the construction industry's quarterly returns, a stand-in with known volatility) smoothed as an appraisal would (phi = 0.6): reported volatility 7.0% a quarter against a true 14.9%; Geltner's correction (estimated phi 0.53) gives 12.6%. Correlation with the stock market: true 0.93, smoothed 0.76, desmoothed 0.93.
 
+
+## 7. Market risk: does a 99% VaR forecast hold up?
+
+US stock market, monthly total return (Kenneth French), one-month 99% VaR forecast each month from the previous 120 months, 1936-07 to 2026-09. A sound model is exceeded in 1% of months (Kupiec) and its exceptions do not cluster (Christoffersen); a test is passed when p > 0.05.
+
+| Model | Average VaR | Exceptions (expected) | Kupiec p | Back-to-back exceptions | Christoffersen p |
+|---|---:|---:|---:|---:|---:|
+| Historical simulation | 10.9% | 23 (10.8) | 0.001 | 3 | 0.011 |
+| Normal, window mean and volatility | 10.2% | 24 (10.8) | 0.001 | 3 | 0.014 |
+| Normal, EWMA volatility (lambda 0.97) | 10.9% | 17 (10.8) | 0.082 | 1 | 0.265 |
+
+Average historical expected shortfall (the mean loss beyond VaR, the Basel III measure): 13.3%; the average loss in the months that did exceed VaR: 11.2%.
+
 ## Limits
 
 - 30 industries are not stocks: the active study has 30 assets and one view; its information ratio is not a claim about a stock picker.

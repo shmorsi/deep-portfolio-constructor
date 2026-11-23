@@ -226,6 +226,7 @@ Lower is better; 1 is HAR. Each ratio pools 30 industries and 801 months; the in
 | **LDI swap overlay and liquidity stress** | A full hedge takes 1.69x leverage and its collateral meets a rise of 200 bp; the worst month for the US 30-year since 1977 was 208 bp. Funding risk falls as liquidity risk rises (the 2022 UK LDI lesson). |
 | **FX hedge ratio for a Canadian investor** | 1971-02 to 2026-09: the minimum-variance hedge of US equities is 0.00; the US dollar rose 2.4% on average in the worst 24 months for US stocks. |
 | **Private assets: Takahashi-Alexander, pacing, denominator effect, desmoothing** | Committing 5.0% of assets a year reaches 90% of a 25% target in 8 years; a 30% public crash lifts the share to 33.4%. |
+| **VaR backtest (Kupiec, Christoffersen)** | 99% one-month VaR of the US market, 1936-07 to 2026-09: historical simulation was exceeded 23 times against 10.8 expected (Kupiec p 0.001, and the exceptions cluster); EWMA volatility passes both tests (17 exceptions, p 0.082 and 0.265). |
 
 ![Active management: growth against the benchmark and the rolling bias statistic](reports/figures/institutional/active.png)
 
