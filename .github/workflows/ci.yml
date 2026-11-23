@@ -37,6 +37,9 @@ jobs:
     # The workbooks in excel/ are recalculated by LibreOffice and compared cell by cell with
     # their Python twins (src/dpc/excel/); the main job skips that test for want of LibreOffice.
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEBIAN_FRONTEND: noninteractive
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
