@@ -345,7 +345,7 @@
     "selection": 0.004264998679502827,
     "interaction": -0.0006131351944841723
    },
-   "sql_max_abs_difference": 3.6572307682281036e-15,
+   "sql_max_abs_difference": 3.678047449939825e-15,
    "note": "gross of trading costs: attribution explains holdings x returns; costs are reported separately"
   }
  },
@@ -560,7 +560,7 @@
    "cash_share": 0.05,
    "return_seeking_share": 0.65,
    "haircut_bonds": 0.03,
-   "swap_duration": 18.0
+   "swap_duration": 15.0
   },
   "rows": [
    {
@@ -577,8 +577,8 @@
    {
     "hedge_ratio": 0.5,
     "bonds_only": false,
-    "leverage": 1.2119883040935673,
-    "swap_notional": 20.13888888888889,
+    "leverage": 1.2543859649122808,
+    "swap_notional": 24.166666666666668,
     "funded_change_down100": -7.384308397724371,
     "funded_change_up100": 7.0992590850288195,
     "funded_change_up100_equity_down20": -7.4250264612489625,
@@ -588,8 +588,8 @@
    {
     "hedge_ratio": 0.75,
     "bonds_only": false,
-    "leverage": 1.4513157894736841,
-    "swap_notional": 42.875,
+    "leverage": 1.541578947368421,
+    "swap_notional": 51.45,
     "funded_change_down100": -3.9093147660694494,
     "funded_change_up100": 2.286251911090198,
     "funded_change_up100_equity_down20": -12.238033635187573,
@@ -599,8 +599,8 @@
    {
     "hedge_ratio": 1.0,
     "bonds_only": false,
-    "leverage": 1.6906432748538012,
-    "swap_notional": 65.61111111111111,
+    "leverage": 1.8287719298245615,
+    "swap_notional": 78.73333333333333,
     "funded_change_down100": -0.43432113441452813,
     "funded_change_up100": -2.5267552628484125,
     "funded_change_up100_equity_down20": -17.051040809126185,

@@ -39,7 +39,7 @@ class Plan:
     cash_share: float = 0.05          # cash and T-bills: the first collateral
     return_seeking_share: float = 0.65
     haircut_bonds: float = 0.03       # long bonds pledged as collateral lose this much value
-    swap_duration: float = 18.0       # receive-fixed swap DV01 per unit notional, in years
+    swap_duration: float = 15.0       # a 30-year par swap's DV01 per unit notional, in years: 14.9 on the 2026-11 Treasury curve (reports/derivatives)
 
 
 def overlay(plan: Plan, hedge_ratio: float) -> dict:

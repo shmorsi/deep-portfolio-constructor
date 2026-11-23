@@ -81,9 +81,9 @@ A plan 95% funded: 30% in long bonds, 5% cash, 65% return-seeking; receive-fixed
 | Hedge ratio | Leverage | Funded ratio, yields −1 pt | yields +1 pt | +1 pt and equities −20% | Margin call, +1 pt | Largest rise the collateral meets |
 |---:|---:|---:|---:|---:|---:|---:|
 | 28% (bonds only) | 1.00x | -10.5 pts | +11.4 pts | -3.2 pts | 0.0 | no swaps |
-| 50% | 1.21x | -7.4 pts | +7.1 pts | -7.4 pts | 3.6 | 403 bp |
-| 75% | 1.45x | -3.9 pts | +2.3 pts | -12.2 pts | 7.7 | 267 bp |
-| 100% | 1.69x | -0.4 pts | -2.5 pts | -17.1 pts | 11.8 | 200 bp |
+| 50% | 1.25x | -7.4 pts | +7.1 pts | -7.4 pts | 3.6 | 403 bp |
+| 75% | 1.54x | -3.9 pts | +2.3 pts | -12.2 pts | 7.7 | 267 bp |
+| 100% | 1.83x | -0.4 pts | -2.5 pts | -17.1 pts | 11.8 | 200 bp |
 
 The worst rises in the US 30-year yield since 1977: 50 bp in a day (1980-02-19), 95 bp in a week (1980-02-21), 208 bp in a month (1980-02-21); since 2000: 50 bp in a week (2009-01-26), 99 bp in a month (2009-01-29). Hedging steadies the funded ratio; it is the swaps' cash calls, not the funding position, that a fast rise tests. A plan below full funding that hedges all of its liability's DV01 is over-hedged in funded-ratio terms (its assets are smaller than what it hedges), which is why the 100% row loses when yields rise.
 

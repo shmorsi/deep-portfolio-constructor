@@ -69,7 +69,7 @@ def main(argv: list[str] | None = None) -> int:
                                           "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site",
                                           "pension", "pension-run", "pension-site", "pension-anatomy", "pension-figures", "pension-stress",
                                           "risk-study", "risk-data", "risk-classical", "risk-evaluate", "risk-site",
-                                          "institutional"])
+                                          "institutional", "derivatives"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -90,6 +90,13 @@ def main(argv: list[str] | None = None) -> int:
         stages = [args.stage]
 
     for stage in stages:
+        if stage == "derivatives":       # the derivatives and rates library (src/dpc/derivatives/), not pre-registered
+            from dpc.derivatives.run import main as derivatives_main
+
+            rc = derivatives_main(cfg, args.refresh)
+            if rc:
+                return rc
+            continue
         if stage == "institutional":     # the institutional toolkit (src/dpc/institutional/), not pre-registered
             from dpc.institutional.run import main as institutional_main
 
