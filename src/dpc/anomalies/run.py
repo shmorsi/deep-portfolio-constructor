@@ -19,6 +19,17 @@ def _p(x, d=1):
     return f"{100 * x:.{d}f}%"
 
 
+def _count(n: int, one: str = "clears", many: str = "clear") -> str:
+    return f"{n} {one if n == 1 else many}"
+
+
+def render(root: Path) -> None:
+    """Rewrite results.md and the README block from the committed summary.json (no recomputation)."""
+    s = json.loads((root / "reports" / "anomalies" / "summary.json").read_text())
+    (root / "reports" / "anomalies" / "results.md").write_text(markdown(s))
+    update_readme(root, s)
+
+
 def _clean(o):
     if isinstance(o, dict):
         return {str(k): _clean(v) for k, v in o.items()}
@@ -40,8 +51,8 @@ def markdown(s: dict) -> str:
          f"Fifteen published anomalies as value-weighted top-minus-bottom decile spreads (Kenneth French), {s['start']} to {s['end']} "
          f"({s['months']} months), gross of trading costs. Not pre-registered.", "",
          "## 1. Which survive?", "",
-         f"{s['n_t196']} of 15 clear |t| > 1.96, {s['n_t3']} clear Harvey, Liu and Zhu's 3.0, and {s['n_bh']} survive a Benjamini-Hochberg "
-         "false-discovery rate of 5%.", "",
+         f"{s['n_t196']} of 15 clear |t| > 1.96, {_count(s['n_t3'])} Harvey, Liu and Zhu's 3.0, and {_count(s['n_bh'], 'survives', 'survive')} a "
+         "Benjamini-Hochberg false-discovery rate of 5%. Only momentum is beyond doubt; the rest are within reach of luck in a field that has tested hundreds of signals.", "",
          "| Anomaly | Paper | Return a year | Newey-West t | Sharpe | Before publication | After publication | Decay |",
          "|---|---|---:|---:|---:|---:|---:|---:|"]
     for a in ZOO:
@@ -83,8 +94,8 @@ def readme_block(s: dict) -> str:
         f"yields) as value-weighted decile spreads, {s['start']} to {s['end']} ([`src/dpc/anomalies/`](src/dpc/anomalies/), "
         "[`reports/anomalies/results.md`](reports/anomalies/results.md)).",
         "",
-        f"* **Survival:** {s['n_t196']} of 15 clear t > 1.96; {s['n_t3']} clear the 3.0 hurdle for a field that has tested hundreds of signals; "
-        f"{s['n_bh']} survive a 5% false-discovery rate.",
+        f"* **Survival:** {s['n_t196']} of 15 clear |t| > 1.96; {_count(s['n_t3'])} the 3.0 hurdle for a field that has tested hundreds of signals, and "
+        f"{_count(s['n_bh'], 'survives', 'survive')} a 5% false-discovery rate.",
         f"* **Publication decay:** returns fell from {_p(pl['mean_pre_ann'])} to {_p(pl['mean_post_ann'])} a year after the papers appeared "
         f"(pooled change {_p(pl['post_coef_ann'])}, t {pl['post_t']:.2f}; implied decay {_p(pl['implied_decay'], 0)}).",
         f"* **Combining out of sample** (from {s['combine_start']}): equal weight Sharpe {cb['equal_weight']['sharpe']:.2f}; the best alternative, "

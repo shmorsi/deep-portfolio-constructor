@@ -1,0 +1,313 @@
+{
+ "start": "1963-07",
+ "end": "2026-09",
+ "months": 759,
+ "n_t196": 4,
+ "n_t3": 1,
+ "n_bh": 1,
+ "survival": {
+  "size": {
+   "name": "Size (small minus big)",
+   "mean_ann": 0.020856916996047435,
+   "t": 0.8048198196041692,
+   "p": 0.4209236627652153,
+   "sharpe": 0.1265766689870283,
+   "bh_5pct": false
+  },
+  "value": {
+   "name": "Book-to-market",
+   "mean_ann": 0.04692648221343873,
+   "t": 1.7965346998402696,
+   "p": 0.0724095191752995,
+   "sharpe": 0.274984106237279,
+   "bh_5pct": false
+  },
+  "profitability": {
+   "name": "Operating profitability",
+   "mean_ann": 0.029087747035573118,
+   "t": 1.337093390643746,
+   "p": 0.18119215433236624,
+   "sharpe": 0.1951859839436671,
+   "bh_5pct": false
+  },
+  "investment": {
+   "name": "Investment (conservative minus aggressive)",
+   "mean_ann": 0.03847272727272727,
+   "t": 2.0302267493877633,
+   "p": 0.042333496012277795,
+   "sharpe": 0.3116771932316257,
+   "bh_5pct": false
+  },
+  "momentum": {
+   "name": "Momentum (12-2)",
+   "mean_ann": 0.14313201581027668,
+   "t": 4.564569197787814,
+   "p": 5.005210907052502e-06,
+   "sharpe": 0.5607331200567017,
+   "bh_5pct": true
+  },
+  "st_reversal": {
+   "name": "Short-term reversal (1-0)",
+   "mean_ann": 0.03122687747035574,
+   "t": 1.4601617925064132,
+   "p": 0.1442456132507477,
+   "sharpe": 0.1534056741467423,
+   "bh_5pct": false
+  },
+  "lt_reversal": {
+   "name": "Long-term reversal (60-13)",
+   "mean_ann": 0.032692490118577076,
+   "t": 1.1399357242566655,
+   "p": 0.2543130803827778,
+   "sharpe": 0.17371005766811703,
+   "bh_5pct": false
+  },
+  "accruals": {
+   "name": "Accruals",
+   "mean_ann": 0.03401422924901186,
+   "t": 2.6773899956706444,
+   "p": 0.007419821291631045,
+   "sharpe": 0.3340834507971231,
+   "bh_5pct": false
+  },
+  "low_beta": {
+   "name": "Low beta",
+   "mean_ann": -0.020935968379446647,
+   "t": -0.6532712331407047,
+   "p": 0.51358143448558,
+   "sharpe": -0.08431008979887289,
+   "bh_5pct": false
+  },
+  "net_issuance": {
+   "name": "Net share issuance",
+   "mean_ann": 0.044332015810276675,
+   "t": 2.4057498873420324,
+   "p": 0.01613930999180739,
+   "sharpe": 0.37525664490304517,
+   "bh_5pct": false
+  },
+  "low_vol": {
+   "name": "Low volatility",
+   "mean_ann": 0.03926640316205535,
+   "t": 0.9396277363803522,
+   "p": 0.3474085439508655,
+   "sharpe": 0.13615832722075613,
+   "bh_5pct": false
+  },
+  "low_resvol": {
+   "name": "Low residual volatility",
+   "mean_ann": 0.05723794466403162,
+   "t": 1.5006885617304904,
+   "p": 0.13343613291028522,
+   "sharpe": 0.2202554538047271,
+   "bh_5pct": false
+  },
+  "earnings_yield": {
+   "name": "Earnings-to-price",
+   "mean_ann": 0.03161897233201581,
+   "t": 1.456647900791694,
+   "p": 0.14521359799942976,
+   "sharpe": 0.20503866692112932,
+   "bh_5pct": false
+  },
+  "cashflow_yield": {
+   "name": "Cash-flow-to-price",
+   "mean_ann": 0.027421343873517787,
+   "t": 1.2798546465060598,
+   "p": 0.20059626074129577,
+   "sharpe": 0.17505599753520096,
+   "bh_5pct": false
+  },
+  "dividend_yield": {
+   "name": "Dividend yield",
+   "mean_ann": -0.00043952569169960554,
+   "t": -0.018153428114526877,
+   "p": 0.9855164554874687,
+   "sharpe": -0.0023501600618090826,
+   "bh_5pct": false
+  }
+ },
+ "decay": {
+  "size": {
+   "paper": "Banz (1981)",
+   "pre_months": 222,
+   "post_months": 537,
+   "pre_ann": 0.09581621621621624,
+   "post_ann": -0.010131843575418997,
+   "decay": 1.1057424721568607
+  },
+  "value": {
+   "paper": "Fama and French (1992)",
+   "pre_months": 354,
+   "post_months": 405,
+   "pre_ann": 0.06869152542372882,
+   "post_ann": 0.027902222222222214,
+   "decay": 0.5938040092994694
+  },
+  "profitability": {
+   "paper": "Novy-Marx (2013)",
+   "pre_months": 606,
+   "post_months": 153,
+   "pre_ann": 0.02306930693069307,
+   "post_ann": 0.052925490196078416,
+   "decay": -1.2941950685853736
+  },
+  "investment": {
+   "paper": "Titman, Wei and Xie (2004)",
+   "pre_months": 498,
+   "post_months": 261,
+   "pre_ann": 0.06360963855421686,
+   "post_ann": -0.009489655172413795,
+   "decay": 1.149185805612233
+  },
+  "momentum": {
+   "paper": "Jegadeesh and Titman (1993)",
+   "pre_months": 366,
+   "post_months": 393,
+   "pre_ann": 0.20371803278688522,
+   "post_ann": 0.08670839694656489,
+   "decay": 0.5743705367640536
+  },
+  "st_reversal": {
+   "paper": "Jegadeesh (1990)",
+   "pre_months": 330,
+   "post_months": 429,
+   "pre_ann": 0.07188363636363637,
+   "post_ann": -4.755244755243144e-05,
+   "decay": 1.0006615197833326
+  },
+  "lt_reversal": {
+   "paper": "De Bondt and Thaler (1985)",
+   "pre_months": 270,
+   "post_months": 489,
+   "pre_ann": 0.08152444444444443,
+   "post_ann": 0.005730061349693255,
+   "decay": 0.9297135799116294
+  },
+  "accruals": {
+   "paper": "Sloan (1996)",
+   "pre_months": 402,
+   "post_months": 357,
+   "pre_ann": 0.04955223880597015,
+   "post_ann": 0.016517647058823522,
+   "decay": 0.666661941885188
+  },
+  "low_beta": {
+   "paper": "Black, Jensen and Scholes (1972)",
+   "pre_months": 114,
+   "post_months": 645,
+   "pre_ann": -0.04035789473684211,
+   "post_ann": -0.017503255813953494,
+   "decay": 0.5662990865087163
+  },
+  "net_issuance": {
+   "paper": "Pontiff and Woodgate (2008)",
+   "pre_months": 546,
+   "post_months": 213,
+   "pre_ann": 0.04850769230769231,
+   "post_ann": 0.033628169014084504,
+   "decay": 0.3067456435409157
+  },
+  "low_vol": {
+   "paper": "Ang, Hodrick, Xing and Zhang (2006)",
+   "pre_months": 522,
+   "post_months": 237,
+   "pre_ann": 0.06312183908045978,
+   "post_ann": -0.013275949367088598,
+   "decay": 1.2103226008698207
+  },
+  "low_resvol": {
+   "paper": "Ang, Hodrick, Xing and Zhang (2006)",
+   "pre_months": 522,
+   "post_months": 237,
+   "pre_ann": 0.08433103448275864,
+   "post_ann": -0.0024354430379746766,
+   "decay": 1.0288795584319863
+  },
+  "earnings_yield": {
+   "paper": "Basu (1977)",
+   "pre_months": 174,
+   "post_months": 585,
+   "pre_ann": 0.07486206896551725,
+   "post_ann": 0.01875692307692308,
+   "decay": 0.7494469050065549
+  },
+  "cashflow_yield": {
+   "paper": "Lakonishok, Shleifer and Vishny (1994)",
+   "pre_months": 378,
+   "post_months": 381,
+   "pre_ann": 0.05857142857142856,
+   "post_ann": -0.0034834645669291346,
+   "decay": 1.059473785289034
+  },
+  "dividend_yield": {
+   "paper": "Litzenberger and Ramaswamy (1979)",
+   "pre_months": 198,
+   "post_months": 561,
+   "pre_ann": -0.00832121212121212,
+   "post_ann": 0.0023422459893048123,
+   "decay": 1.2814789426331348
+  }
+ },
+ "pooled": {
+  "post_coef_ann": -0.05470218988096993,
+  "post_t": -2.7711553455272684,
+  "mean_pre_ann": 0.0625719997383729,
+  "mean_post_ann": 0.012542932791490905,
+  "anomalies_with_pre_sample": 15,
+  "implied_decay": 0.874227931178349
+ },
+ "combine_start": "1973-07",
+ "combine": {
+  "equal_weight": {
+   "mean_ann": 0.03526760563380282,
+   "t": 2.233844082721661,
+   "vol_ann": 0.08929558392200809,
+   "sharpe": 0.3949535249649747,
+   "max_drawdown": -0.4009760571931533,
+   "sharpe_since_2000": 0.2578109306892591
+  },
+  "factor_momentum": {
+   "mean_ann": 0.06755974550228071,
+   "t": 4.194323420732072,
+   "vol_ann": 0.1269872407246573,
+   "sharpe": 0.5320199503253126,
+   "max_drawdown": -0.42932940241600026,
+   "sharpe_since_2000": 0.37473125058773743,
+   "vs_equal_weight": {
+    "difference": 0.13706642536033786,
+    "lo90": -0.027399870839152872,
+    "hi90": 0.32360222579977865,
+    "verdict": "no detectable difference"
+   }
+  },
+  "shrinkage_mv": {
+   "mean_ann": 0.03506448615300989,
+   "t": 4.97086365364622,
+   "vol_ann": 0.040752494510631176,
+   "sharpe": 0.8604255168689747,
+   "max_drawdown": -0.15703017292643262,
+   "sharpe_since_2000": 0.3390098906141743,
+   "vs_equal_weight": {
+    "difference": 0.465471991904,
+    "lo90": 0.19786361580503994,
+    "hi90": 0.7804521993426599,
+    "verdict": "better"
+   }
+  },
+  "boosting": {
+   "mean_ann": 0.05999729388933649,
+   "t": 2.57757840179296,
+   "vol_ann": 0.13427731037623014,
+   "sharpe": 0.44681632154554424,
+   "max_drawdown": -0.5616027684233942,
+   "sharpe_since_2000": 0.2568853991037533,
+   "vs_equal_weight": {
+    "difference": 0.051862796580569526,
+    "lo90": -0.11299081178711032,
+    "hi90": 0.2583923005313549,
+    "verdict": "no detectable difference"
+   }
+  }
+ }
+}
