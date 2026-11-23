@@ -32,3 +32,20 @@ jobs:
         run: |
           python -m dpc.cli wealth-site
           python scripts/check_site_export.py
+
+  excel:
+    # The workbooks in excel/ are recalculated by LibreOffice and compared cell by cell with
+    # their Python twins (src/dpc/excel/); the main job skips that test for want of LibreOffice.
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      DEBIAN_FRONTEND: noninteractive
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-calc
+      - run: pip install numpy pandas scipy openpyxl pyyaml pytest && pip install -e . --no-deps
+      - run: pytest -q tests/test_excel.py
