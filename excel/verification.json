@@ -1,0 +1,36 @@
+{
+ "pension_funding_model.xlsx": {
+  "max_abs_difference": 5.115907697472721e-13,
+  "by_block": {
+   "liability": 5.115907697472721e-13,
+   "assets": 4.547473508864641e-13,
+   "special": 4.440892098500626e-15,
+   "funded_ratio": 4.218847493575595e-15,
+   "rate_shock": 4.440892098500626e-16
+  },
+  "funded_ratio_year_20": 1.245676946606224,
+  "total_contributions": 46.18498574688897
+ },
+ "lbo_private_credit.xlsx": {
+  "max_abs_difference": 3.979039320256561e-13,
+  "by_block": {
+   "revenue": 2.2737367544323206e-13,
+   "ebitda": 5.684341886080802e-14,
+   "fcf": 4.973799150320701e-14,
+   "senior": 3.979039320256561e-13,
+   "cash": 4.263256414560601e-14,
+   "moic": 3.9968028886505635e-15,
+   "irr": 2.7755575615628914e-16,
+   "irr_excel_function": 2.7755575615628914e-16,
+   "grid": 4.440892098500626e-15
+  },
+  "moic": 2.448579691324786,
+  "irr": 0.19614229921262027,
+  "leverage_entry": 5.5,
+  "leverage_exit": 2.6243226227349576,
+  "min_coverage": 2.3365591397849466,
+  "senior_repaid_share": 0.387268096294871
+ },
+ "tolerance": 1e-06,
+ "recalculated_with": "LibreOffice Calc (headless)"
+}

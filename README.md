@@ -249,6 +249,15 @@ Black-Scholes-Merton, Black-76 and Bachelier with Greeks and implied volatility;
 ![Delta-hedged straddle P&L by month](reports/figures/derivatives/vrp.png)
 <!-- derivatives:end -->
 
+## Spreadsheet models: pension funding and an LBO with private credit
+
+Two workbooks with live formulas, inputs in blue, built in code and **recalculated by LibreOffice and checked cell by cell against a Python twin** (`python -m dpc.cli excel`; the check is in [`excel/verification.json`](excel/verification.json)):
+
+* [`excel/pension_funding_model.xlsx`](excel/pension_funding_model.xlsx): a 20-year funding projection (liability roll-forward, normal cost, benefits, a special payment that amortises any shortfall over ten years), a rate-shock table with duration and convexity, and a funded-ratio chart.
+* [`excel/lbo_private_credit.xlsx`](excel/lbo_private_credit.xlsx): a five-year LBO with a senior term loan (amortisation and cash sweep) and a private-credit tranche, leverage and interest cover by year, MOIC and IRR (also by Excel's own `IRR`), and an entry-by-exit-multiple sensitivity grid.
+
+Change a blue cell and every number follows; the Python twins are in [`src/dpc/excel/models.py`](src/dpc/excel/models.py).
+
 ## How it works
 
 **Data.** Kenneth French's 30 value-weighted US industry portfolios, monthly, July 1926 to September 2026 (CRSP vintage 202609). Each portfolio holds every listed firm in its industry at each date, including firms that later failed, so there is no survivorship bias. Industry market caps (number of firms times average size) give the market portfolio; rebuilt from the 30 industries it tracks French's own market return with a correlation of 0.9998. The T-bill rate and the Fama-French factors come from the same library.
