@@ -16,6 +16,7 @@ diffcp==1.1.9
 
 # Data
 pyarrow==26.0.1
+duckdb==2.0.1
 tabulate==0.10.0
 yfinance==1.8.0
 PyYAML==6.0.3

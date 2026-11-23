@@ -1,0 +1,951 @@
+{
+ "active": {
+  "budgets": {
+   "0.01": {
+    "start": "1970-01",
+    "end": "2026-09",
+    "months": 681,
+    "portfolio_cagr": 0.11752243810672858,
+    "benchmark_cagr": 0.11228036958626264,
+    "portfolio_growth": 547.6994342462727,
+    "benchmark_growth": 419.43045842554585,
+    "active_return_ann": 0.0053611470973021335,
+    "active_t_nw": 3.2446763151976903,
+    "tracking_error_realised": 0.012707341374890189,
+    "tracking_error_ex_ante_mean": 0.009999999762055121,
+    "information_ratio": 0.42189368642411734,
+    "bias_statistic": 1.2707341696783154,
+    "bias_band": [
+     0.9458072185396595,
+     1.0541927814603405
+    ],
+    "bias_verdict": "risk under-forecast",
+    "turnover_ann": 1.1896968004876578,
+    "hit_rate": 0.5374449339207048
+   },
+   "0.02": {
+    "start": "1970-01",
+    "end": "2026-09",
+    "months": 681,
+    "portfolio_cagr": 0.12273838967023964,
+    "benchmark_cagr": 0.11228036958626264,
+    "portfolio_growth": 713.3604042918067,
+    "benchmark_growth": 419.43045842554585,
+    "active_return_ann": 0.010800135166809447,
+    "active_t_nw": 3.3506459869259646,
+    "tracking_error_realised": 0.024953331676736284,
+    "tracking_error_ex_ante_mean": 0.019999999632181766,
+    "information_ratio": 0.43281335361234724,
+    "bias_statistic": 1.247666606072342,
+    "bias_band": [
+     0.9458072185396595,
+     1.0541927814603405
+    ],
+    "bias_verdict": "risk under-forecast",
+    "turnover_ann": 2.18552311068832,
+    "hit_rate": 0.5447870778267254
+   },
+   "0.04": {
+    "start": "1970-01",
+    "end": "2026-09",
+    "months": 681,
+    "portfolio_cagr": 0.12993092345241863,
+    "benchmark_cagr": 0.11228036958626264,
+    "portfolio_growth": 1024.9318906956403,
+    "benchmark_growth": 419.43045842554585,
+    "active_return_ann": 0.018770044247017798,
+    "active_t_nw": 2.9232388435325487,
+    "tracking_error_realised": 0.04757690724619814,
+    "tracking_error_ex_ante_mean": 0.03973341458325964,
+    "information_ratio": 0.3945200588572875,
+    "bias_statistic": 1.1973879713735718,
+    "bias_band": [
+     0.9458072185396595,
+     1.0541927814603405
+    ],
+    "bias_verdict": "risk under-forecast",
+    "turnover_ann": 3.8475036595388517,
+    "hit_rate": 0.527165932452276
+   }
+  },
+  "risk_models": {
+   "sample": {
+    "start": "1970-01",
+    "end": "2026-09",
+    "months": 681,
+    "portfolio_cagr": 0.12108939435538724,
+    "benchmark_cagr": 0.11228036958626264,
+    "portfolio_growth": 656.2719664780731,
+    "benchmark_growth": 419.43045842554585,
+    "active_return_ann": 0.00920240960866928,
+    "active_t_nw": 3.086263057697511,
+    "tracking_error_realised": 0.023037362300089702,
+    "tracking_error_ex_ante_mean": 0.01999999976890941,
+    "information_ratio": 0.3994558703725143,
+    "bias_statistic": 1.1518681278849265,
+    "bias_band": [
+     0.9458072185396595,
+     1.0541927814603405
+    ],
+    "bias_verdict": "risk under-forecast",
+    "turnover_ann": 2.5632757627306355,
+    "hit_rate": 0.5315712187958884
+   },
+   "shrunk": {
+    "start": "1970-01",
+    "end": "2026-09",
+    "months": 681,
+    "portfolio_cagr": 0.1207565274685769,
+    "benchmark_cagr": 0.11228036958626264,
+    "portfolio_growth": 645.3049057801826,
+    "benchmark_growth": 419.43045842554585,
+    "active_return_ann": 0.008811751049886655,
+    "active_t_nw": 2.9959767137884645,
+    "tracking_error_realised": 0.022154401028979774,
+    "tracking_error_ex_ante_mean": 0.019999999540835003,
+    "information_ratio": 0.3977426895161897,
+    "bias_statistic": 1.1077200752225478,
+    "bias_band": [
+     0.9458072185396595,
+     1.0541927814603405
+    ],
+    "bias_verdict": "risk under-forecast",
+    "turnover_ann": 2.1643687278573673,
+    "hit_rate": 0.5242290748898678
+   },
+   "factor": {
+    "start": "1970-01",
+    "end": "2026-09",
+    "months": 681,
+    "portfolio_cagr": 0.12273838967023964,
+    "benchmark_cagr": 0.11228036958626264,
+    "portfolio_growth": 713.3604042918067,
+    "benchmark_growth": 419.43045842554585,
+    "active_return_ann": 0.010800135166809447,
+    "active_t_nw": 3.3506459869259646,
+    "tracking_error_realised": 0.024953331676736284,
+    "tracking_error_ex_ante_mean": 0.019999999632181766,
+    "information_ratio": 0.43281335361234724,
+    "bias_statistic": 1.247666606072342,
+    "bias_band": [
+     0.9458072185396595,
+     1.0541927814603405
+    ],
+    "bias_verdict": "risk under-forecast",
+    "turnover_ann": 2.18552311068832,
+    "hit_rate": 0.5447870778267254
+   }
+  },
+  "final_risk": {
+   "as_of": "2026-09",
+   "active_risk_ann": 0.019999999406920592,
+   "factor_share": 0.5679848850425148,
+   "specific_share": 0.43201511495748535,
+   "active_exposures": {
+    "Mkt-RF": 0.0847691161840996,
+    "SMB": 0.04100770304928503,
+    "HML": 0.0007291546715376433
+   },
+   "factor_variance_by_factor": {
+    "Mkt-RF": 0.4967485470673935,
+    "SMB": 0.07196049798346202,
+    "HML": -0.0007241600083407422
+   },
+   "top_contributors": [
+    {
+     "industry": "BusEq",
+     "active_weight": 0.047106708835835454,
+     "pct_of_active_risk": 0.4340421226920076
+    },
+    {
+     "industry": "Steel",
+     "active_weight": 0.023742660780697616,
+     "pct_of_active_risk": 0.33120157529434635
+    },
+    {
+     "industry": "ElcEq",
+     "active_weight": 0.01918681776227845,
+     "pct_of_active_risk": 0.24209082899101164
+    },
+    {
+     "industry": "FabPr",
+     "active_weight": 0.02190598481847014,
+     "pct_of_active_risk": 0.22393299666115518
+    },
+    {
+     "industry": "Mines",
+     "active_weight": 0.016512792223245688,
+     "pct_of_active_risk": 0.14890629511529757
+    },
+    {
+     "industry": "Autos",
+     "active_weight": -0.012737409497932301,
+     "pct_of_active_risk": -0.10050436364334549
+    },
+    {
+     "industry": "Trans",
+     "active_weight": 0.01062415492561903,
+     "pct_of_active_risk": 0.07623030029381582
+    },
+    {
+     "industry": "Rtail",
+     "active_weight": -0.010333102254424409,
+     "pct_of_active_risk": -0.06252494615728381
+    }
+   ]
+  },
+  "attribution": {
+   "window": "2016-10 to 2026-09",
+   "cumulative_portfolio": 4.1395597036617,
+   "cumulative_benchmark": 3.102426533121755,
+   "cumulative_active": 1.0371331705399447,
+   "by_sector": {
+    "Discretionary": {
+     "allocation": 0.071719,
+     "selection": -0.059022,
+     "interaction": 0.011066,
+     "total": 0.023762
+    },
+    "Energy": {
+     "allocation": 0.157951,
+     "selection": -0.002792,
+     "interaction": 0.013601,
+     "total": 0.16876
+    },
+    "Financials": {
+     "allocation": 0.006754,
+     "selection": -0.0,
+     "interaction": -0.0,
+     "total": 0.006754
+    },
+    "Health": {
+     "allocation": 0.045615,
+     "selection": 0.0,
+     "interaction": -0.0,
+     "total": 0.045615
+    },
+    "Industrials": {
+     "allocation": -0.008508,
+     "selection": 0.00137,
+     "interaction": -0.005755,
+     "total": -0.012893
+    },
+    "Materials": {
+     "allocation": -0.001438,
+     "selection": 0.061122,
+     "interaction": 0.034415,
+     "total": 0.094098
+    },
+    "Other": {
+     "allocation": 0.044271,
+     "selection": -0.0,
+     "interaction": 0.0,
+     "total": 0.044271
+    },
+    "Staples": {
+     "allocation": 0.174072,
+     "selection": 0.021033,
+     "interaction": -0.017906,
+     "total": 0.177199
+    },
+    "Technology": {
+     "allocation": 0.299606,
+     "selection": 0.029922,
+     "interaction": 0.003202,
+     "total": 0.33273
+    },
+    "Telecom": {
+     "allocation": 0.097396,
+     "selection": -0.0,
+     "interaction": -0.0,
+     "total": 0.097396
+    },
+    "Utilities": {
+     "allocation": 0.059441,
+     "selection": 0.0,
+     "interaction": 0.0,
+     "total": 0.059441
+    }
+   },
+   "totals": {
+    "allocation": 0.9468784874056035,
+    "selection": 0.051631620208718934,
+    "interaction": 0.03862306292561216
+   },
+   "full_span_average_per_year": {
+    "Discretionary": {
+     "allocation": 0.000884,
+     "selection": 0.000434,
+     "interaction": 3.9e-05,
+     "total": 0.001357
+    },
+    "Energy": {
+     "allocation": 0.001841,
+     "selection": 0.000505,
+     "interaction": 0.000168,
+     "total": 0.002514
+    },
+    "Financials": {
+     "allocation": 0.00105,
+     "selection": 0.0,
+     "interaction": -0.0,
+     "total": 0.00105
+    },
+    "Health": {
+     "allocation": 9.4e-05,
+     "selection": -0.0,
+     "interaction": -0.0,
+     "total": 9.4e-05
+    },
+    "Industrials": {
+     "allocation": 0.000236,
+     "selection": 0.000673,
+     "interaction": -0.000146,
+     "total": 0.000762
+    },
+    "Materials": {
+     "allocation": 0.001024,
+     "selection": 0.001341,
+     "interaction": 0.000124,
+     "total": 0.002489
+    },
+    "Other": {
+     "allocation": 0.000168,
+     "selection": -0.0,
+     "interaction": 0.0,
+     "total": 0.000168
+    },
+    "Staples": {
+     "allocation": 0.000935,
+     "selection": 0.00094,
+     "interaction": -0.00075,
+     "total": 0.001125
+    },
+    "Technology": {
+     "allocation": 0.00165,
+     "selection": 0.000372,
+     "interaction": -4.8e-05,
+     "total": 0.001975
+    },
+    "Telecom": {
+     "allocation": 0.001004,
+     "selection": -0.0,
+     "interaction": 0.0,
+     "total": 0.001004
+    },
+    "Utilities": {
+     "allocation": 0.000447,
+     "selection": 0.0,
+     "interaction": 0.0,
+     "total": 0.000447
+    }
+   },
+   "full_span_average_totals": {
+    "allocation": 0.009333794792479108,
+    "selection": 0.004264998679502827,
+    "interaction": -0.0006131351944841723
+   },
+   "sql_max_abs_difference": 3.524958103184872e-15,
+   "note": "gross of trading costs: attribution explains holdings x returns; costs are reported separately"
+  }
+ },
+ "curve": {
+  "as_of": "2026-11",
+  "fit_rmse_bp_median": 3.006129426371071,
+  "fit_rmse_bp_p95": 6.547295094490968,
+  "months": 443,
+  "pca_explained": [
+   0.9048504916705822,
+   0.06943255828402761,
+   0.011935993778867055
+  ],
+  "pca_cumulative": 0.9862190437334768,
+  "pca_months": 442,
+  "pca_loadings": {
+   "level": {
+    "1": 0.1118,
+    "2": 0.1559,
+    "3": 0.1781,
+    "4": 0.1895,
+    "5": 0.1951,
+    "6": 0.1976,
+    "7": 0.1984,
+    "8": 0.1983,
+    "9": 0.1976,
+    "10": 0.1966,
+    "11": 0.1954,
+    "12": 0.1941,
+    "13": 0.1928,
+    "14": 0.1914,
+    "15": 0.19,
+    "16": 0.1885,
+    "17": 0.1871,
+    "18": 0.1856,
+    "19": 0.1842,
+    "20": 0.1827,
+    "21": 0.1812,
+    "22": 0.1798,
+    "23": 0.1783,
+    "24": 0.1767,
+    "25": 0.1752,
+    "26": 0.1736,
+    "27": 0.172,
+    "28": 0.1704,
+    "29": 0.1688,
+    "30": 0.1671
+   },
+   "slope": {
+    "1": 0.3781,
+    "2": 0.3891,
+    "3": 0.3571,
+    "4": 0.3116,
+    "5": 0.2629,
+    "6": 0.2149,
+    "7": 0.1695,
+    "8": 0.1271,
+    "9": 0.088,
+    "10": 0.0521,
+    "11": 0.0194,
+    "12": -0.0102,
+    "13": -0.0368,
+    "14": -0.0606,
+    "15": -0.0814,
+    "16": -0.0996,
+    "17": -0.115,
+    "18": -0.1279,
+    "19": -0.1384,
+    "20": -0.1465,
+    "21": -0.1523,
+    "22": -0.1561,
+    "23": -0.1578,
+    "24": -0.1576,
+    "25": -0.1556,
+    "26": -0.1519,
+    "27": -0.1467,
+    "28": -0.14,
+    "29": -0.1319,
+    "30": -0.1226
+   },
+   "curvature": {
+    "1": 0.5294,
+    "2": 0.3357,
+    "3": 0.1385,
+    "4": -0.0168,
+    "5": -0.1277,
+    "6": -0.2002,
+    "7": -0.2411,
+    "8": -0.2566,
+    "9": -0.2521,
+    "10": -0.2324,
+    "11": -0.2014,
+    "12": -0.1628,
+    "13": -0.1194,
+    "14": -0.0739,
+    "15": -0.0283,
+    "16": 0.0154,
+    "17": 0.0558,
+    "18": 0.0914,
+    "19": 0.1213,
+    "20": 0.1446,
+    "21": 0.1604,
+    "22": 0.1683,
+    "23": 0.1677,
+    "24": 0.1584,
+    "25": 0.14,
+    "26": 0.1125,
+    "27": 0.0758,
+    "28": 0.0298,
+    "29": -0.0254,
+    "30": -0.0897
+   }
+  },
+  "latest_fit": {
+   "beta": [
+    0.011968399498825121,
+    0.029775230616571505,
+    0.037839351576350974,
+    0.127431344550885
+   ],
+   "l1": 1.8,
+   "l2": 16.0,
+   "rmse_bp": 1.6436976049074195,
+   "observed": {
+    "0.08333333333333333": 0.042,
+    "0.25": 0.0434,
+    "0.5": 0.044199999999999996,
+    "1.0": 0.0462,
+    "2.0": 0.047599999999999996,
+    "3.0": 0.0481,
+    "5.0": 0.048600000000000004,
+    "7.0": 0.049400000000000006,
+    "10.0": 0.0504,
+    "20.0": 0.054299999999999994,
+    "30.0": 0.054000000000000006
+   },
+   "fitted": {
+    "0.08333333333333333": 0.04224494580882802,
+    "0.25": 0.043150287995400084,
+    "0.5": 0.0442925439253753,
+    "1.0": 0.045954942159203455,
+    "2.0": 0.04766350725396108,
+    "3.0": 0.0482810728193886,
+    "5.0": 0.04865457218634387,
+    "7.0": 0.04916131392484086,
+    "10.0": 0.050492223841893544,
+    "20.0": 0.0542806863964135,
+    "30.0": 0.05402390368835191
+   }
+  }
+ },
+ "liabilities": {
+  "cohort": {
+   "ages": [
+    30.0,
+    35.0,
+    40.0,
+    45.0,
+    50.0,
+    55.0,
+    60.0,
+    65.0,
+    70.0,
+    75.0,
+    80.0,
+    85.0,
+    90.0,
+    95.0
+   ],
+   "pensions": [
+    6.0,
+    10.5,
+    15.0,
+    19.5,
+    24.0,
+    28.5,
+    33.0,
+    40.0,
+    29.63,
+    21.95,
+    16.26,
+    12.05,
+    8.93,
+    6.61
+   ],
+   "cola": 0.02
+  },
+  "life_expectancy_65": 22.24208395719686,
+  "life_expectancy_65_longevity": 23.93902876412019,
+  "solvency": 2784.4247803688304,
+  "going_concern_6pct": 2480.81990962204,
+  "going_concern_5pct": 2884.917069414455,
+  "solvency_duration": 16.37104146709003,
+  "going_concern_duration": 14.415508618355267,
+  "krd": {
+   "2": 0.264040294815466,
+   "5": 0.8780952939953763,
+   "10": 2.8629772107577196,
+   "20": 4.546232916875214,
+   "30": 7.819692541698456
+  },
+  "longevity_increase": 0.06828407177011675
+ },
+ "ldi": {
+  "plan": {
+   "liability": 100.0,
+   "liability_duration": 16.37,
+   "liability_convexity": 280.0,
+   "funded_ratio": 0.95,
+   "bond_share": 0.3,
+   "bond_duration": 16.0,
+   "cash_share": 0.05,
+   "return_seeking_share": 0.65,
+   "haircut_bonds": 0.03,
+   "swap_duration": 18.0
+  },
+  "rows": [
+   {
+    "hedge_ratio": 0.27855833842394623,
+    "bonds_only": true,
+    "leverage": 1.0,
+    "swap_notional": 0.0,
+    "funded_change_down100": -10.462341852763856,
+    "funded_change_up100": 11.362460308126554,
+    "funded_change_up100_equity_down20": -3.161825238151239,
+    "margin_call_up100": 0.0,
+    "max_survivable_rise_bp": null
+   },
+   {
+    "hedge_ratio": 0.5,
+    "bonds_only": false,
+    "leverage": 1.2119883040935673,
+    "swap_notional": 20.13888888888889,
+    "funded_change_down100": -7.384308397724371,
+    "funded_change_up100": 7.0992590850288195,
+    "funded_change_up100_equity_down20": -7.4250264612489625,
+    "margin_call_up100": 3.625,
+    "max_survivable_rise_bp": 402.5123630128476
+   },
+   {
+    "hedge_ratio": 0.75,
+    "bonds_only": false,
+    "leverage": 1.4513157894736841,
+    "swap_notional": 42.875,
+    "funded_change_down100": -3.9093147660694494,
+    "funded_change_up100": 2.286251911090198,
+    "funded_change_up100_equity_down20": -12.238033635187573,
+    "margin_call_up100": 7.7175,
+    "max_survivable_rise_bp": 266.8297544622633
+   },
+   {
+    "hedge_ratio": 1.0,
+    "bonds_only": false,
+    "leverage": 1.6906432748538012,
+    "swap_notional": 65.61111111111111,
+    "funded_change_down100": -0.43432113441452813,
+    "funded_change_up100": -2.5267552628484125,
+    "funded_change_up100_equity_down20": -17.051040809126185,
+    "margin_call_up100": 11.81,
+    "max_survivable_rise_bp": 199.56016065840376
+   }
+  ],
+  "worst_us10": {
+   "1": {
+    "rise": 0.006500000000000006,
+    "date": "1980-02-19"
+   },
+   "5": {
+    "rise": 0.013600000000000015,
+    "date": "1980-02-21"
+   },
+   "20": {
+    "rise": 0.02550000000000001,
+    "date": "1980-02-26"
+   }
+  },
+  "worst_us30": {
+   "1": {
+    "rise": 0.0049999999999999906,
+    "date": "1980-02-19"
+   },
+   "5": {
+    "rise": 0.009500000000000008,
+    "date": "1980-02-21"
+   },
+   "20": {
+    "rise": 0.020800000000000013,
+    "date": "1980-02-21"
+   }
+  },
+  "worst_us30_since_2000": {
+   "1": {
+    "rise": 0.0029000000000000015,
+    "date": "2020-03-10"
+   },
+   "5": {
+    "rise": 0.0049999999999999975,
+    "date": "2009-01-26"
+   },
+   "20": {
+    "rise": 0.009899999999999996,
+    "date": "2009-01-29"
+   }
+  }
+ },
+ "fx": {
+  "start": "1971-02",
+  "end": "2026-09",
+  "months": 668,
+  "min_variance_ratio": 0.0014704587197714154,
+  "table": [
+   {
+    "hedge_ratio": 0.0,
+    "vol_ann": 0.14279953703272635,
+    "worst_month": -0.2219393508972891,
+    "max_drawdown": -0.4874840950342878,
+    "corr_with_usd_equity": 0.9068917631769249
+   },
+   {
+    "hedge_ratio": 0.5,
+    "vol_ann": 0.14660569462184073,
+    "worst_month": -0.22449757922871327,
+    "max_drawdown": -0.4679155794562959,
+    "corr_with_usd_equity": 0.9786526932642957
+   },
+   {
+    "hedge_ratio": 1.0,
+    "vol_ann": 0.15751453920009975,
+    "worst_month": -0.22705580756013743,
+    "max_drawdown": -0.523577172960157,
+    "corr_with_usd_equity": 0.9995800556456638
+   },
+   {
+    "hedge_ratio": 0.0014704587197714154,
+    "vol_ann": 0.1427995034772,
+    "worst_month": -0.22194687443560332,
+    "max_drawdown": -0.48739947763870217,
+    "corr_with_usd_equity": 0.9071797327487373
+   }
+  ],
+  "rolling_10y_min": -0.6673632967123065,
+  "rolling_10y_max": 0.5769208244367606,
+  "rolling_10y_last": -0.4059508049600698,
+  "usd_move_in_worst_24_equity_months": 0.02391902794626202
+ },
+ "privates": {
+  "fund": {
+   "params": {
+    "life": 12,
+    "bow": 2.5,
+    "growth": 0.11,
+    "calls": [
+     0.25,
+     0.333,
+     0.5
+    ]
+   },
+   "calls": [
+    0.25,
+    0.2498,
+    0.2501,
+    0.1251,
+    0.0625,
+    0.0313,
+    0.0156,
+    0.0078,
+    0.0039,
+    0.002,
+    0.001,
+    0.0
+   ],
+   "distributions": [
+    0.0,
+    0.0031,
+    0.0182,
+    0.0579,
+    0.1207,
+    0.1999,
+    0.2776,
+    0.3247,
+    0.3125,
+    0.2343,
+    0.1225,
+    0.0341
+   ],
+   "nav": [
+    0.25,
+    0.5241,
+    0.8137,
+    0.9703,
+    1.0189,
+    0.9623,
+    0.8062,
+    0.5779,
+    0.3329,
+    0.1372,
+    0.0308,
+    0.0
+   ],
+   "paid_in": 0.99902294921875,
+   "tvpi": 1.7073725763675147,
+   "irr": 0.10999999999999999,
+   "trough_cumulative_net": -0.7956700327298482,
+   "breakeven_year": 8
+  },
+  "pacing": {
+   "target": 0.25,
+   "commit_rate": 0.05012807054907484,
+   "net_outflow": 0.02,
+   "years_to_90pct_of_target": 8,
+   "share_base": [
+    0.0,
+    0.0121,
+    0.0364,
+    0.0726,
+    0.114,
+    0.1552,
+    0.192,
+    0.2208,
+    0.2398,
+    0.2495,
+    0.2524,
+    0.2521,
+    0.2512,
+    0.2506,
+    0.2503,
+    0.2501,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25
+   ],
+   "share_crash": [
+    0.0,
+    0.0121,
+    0.0364,
+    0.0726,
+    0.114,
+    0.1552,
+    0.192,
+    0.2208,
+    0.2398,
+    0.2495,
+    0.2524,
+    0.2521,
+    0.2512,
+    0.2506,
+    0.2503,
+    0.2501,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.25,
+    0.3341,
+    0.3288,
+    0.3197,
+    0.3071,
+    0.2933,
+    0.2799,
+    0.2682,
+    0.2591,
+    0.2532,
+    0.2502,
+    0.2493,
+    0.2493,
+    0.2496,
+    0.2498,
+    0.2499
+   ],
+   "share_crash_dynamic": [
+    0.0,
+    0.0121,
+    0.0364,
+    0.0726,
+    0.114,
+    0.1552,
+    0.192,
+    0.2208,
+    0.2398,
+    0.2495,
+    0.2524,
+    0.2517,
+    0.2503,
+    0.2491,
+    0.2484,
+    0.2481,
+    0.2481,
+    0.2484,
+    0.2488,
+    0.2493,
+    0.2497,
+    0.2499,
+    0.25,
+    0.25,
+    0.25,
+    0.3341,
+    0.3169,
+    0.2867,
+    0.2487,
+    0.2166,
+    0.1952,
+    0.186,
+    0.1878,
+    0.1987,
+    0.2149,
+    0.2313,
+    0.2433,
+    0.2494,
+    0.2511,
+    0.2509
+   ],
+   "commit_dynamic": [
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0487,
+    0.0491,
+    0.05,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0,
+    0.0099,
+    0.0281,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0501,
+    0.0495,
+    0.0496
+   ],
+   "crash_year": 25,
+   "share_before": 0.25000018896297765,
+   "share_after_crash": 0.33411237895963686
+  },
+  "desmoothing": {
+   "series": "the construction industry's quarterly returns, a stand-in with known volatility",
+   "phi": 0.6,
+   "phi_hat": 0.5288638564247817,
+   "vol_true": 0.1487458479851305,
+   "vol_observed": 0.06985929800417387,
+   "vol_desmoothed": 0.12584484023042233,
+   "corr_true_desmoothed": 0.9965050206911253,
+   "corr_with_other_true": 0.9262534795211401,
+   "corr_with_other_observed": 0.761796352341688,
+   "corr_with_other_desmoothed": 0.9257240795055065
+  }
+ },
+ "data": {
+  "french_vintage_end": "2026-09",
+  "sources": [
+   "Kenneth French data library",
+   "FRED (DGS*, DEXCAUS)"
+  ]
+ }
+}

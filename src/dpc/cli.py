@@ -68,7 +68,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("stage", choices=["setup", "quickstart", "data", "signals", "baselines", "risk", "alpha", "e2e", "robustness", "evaluate", "site", "all",
                                           "wealth", "wealth-data", "wealth-baselines", "wealth-train", "wealth-reference", "wealth-benchmarks", "wealth-schedules", "wealth-evaluate", "wealth-site",
                                           "pension", "pension-run", "pension-site", "pension-anatomy", "pension-figures", "pension-stress",
-                                          "risk-study", "risk-data", "risk-classical", "risk-evaluate", "risk-site"])
+                                          "risk-study", "risk-data", "risk-classical", "risk-evaluate", "risk-site",
+                                          "institutional"])
     parser.add_argument("--variants", default=None,
                         help="wealth-train: comma-separated variants, or 'all' (deep + ablations); default deep, or all within `wealth`")
     parser.add_argument("--workers", type=int, default=None, help="wealth-train: parallel seed processes (default: config)")
@@ -89,6 +90,13 @@ def main(argv: list[str] | None = None) -> int:
         stages = [args.stage]
 
     for stage in stages:
+        if stage == "institutional":     # the institutional toolkit (src/dpc/institutional/), not pre-registered
+            from dpc.institutional.run import main as institutional_main
+
+            rc = institutional_main(cfg, args.refresh)
+            if rc:
+                return rc
+            continue
         if stage.startswith("risk-"):
             from dpc.risk import run as risk_run
             from dpc.risk.report import stage_site as risk_site
